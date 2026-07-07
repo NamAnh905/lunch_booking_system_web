@@ -1,0 +1,42 @@
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+import { PageResponse, ApiResponse } from '@shared/models';
+import { Menu, MenuCreateRequest, MenuUpdateRequest } from '@shared/models/menu.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MenuService {
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/admin/menus`;
+
+  query(query: any, page: number, size: number): Observable<ApiResponse<PageResponse<Menu>>> {
+    let params = new HttpParams()
+      .set('page', (page + 1).toString())
+      .set('size', size.toString());
+
+    if (query && query.keyword) {
+      params = params.set('keyword', query.keyword);
+    }
+
+    return this.http.get<ApiResponse<PageResponse<Menu>>>(this.apiUrl, { params });
+  }
+
+  getByDate(date: string): Observable<ApiResponse<Menu[]>> {
+    return this.http.get<ApiResponse<Menu[]>>(`${this.apiUrl}?date=${date}`);
+  }
+
+  add(form: MenuCreateRequest): Observable<ApiResponse<Menu>> {
+    return this.http.post<ApiResponse<Menu>>(this.apiUrl, form);
+  }
+
+  edit(id: number | string, form: MenuUpdateRequest): Observable<ApiResponse<Menu>> {
+    return this.http.put<ApiResponse<Menu>>(`${this.apiUrl}/${id}`, form);
+  }
+
+  delete(id: number | string): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
+  }
+}

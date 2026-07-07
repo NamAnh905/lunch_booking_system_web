@@ -1,0 +1,13 @@
+<div class="app-layout">
+  @if (isAdminPage) {
+    <app-admin-sidebar></app-admin-sidebar>
+  }
+  <main class="main-content">
+    @if (isAdminPage) {
+      <app-admin-navbar [showBreadcrumb]="showBreadcrumb"></app-admin-navbar>
+    }
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

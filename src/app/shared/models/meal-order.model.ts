@@ -1,0 +1,9 @@
+export interface CalendarDay {
+  dayNumber: number | null;
+  dateString: string;
+  isRegistered: boolean;
+  menuId?: number;
+  orderId?: number;
+  isPast?: boolean;
+  isDisabled?: boolean;
+}

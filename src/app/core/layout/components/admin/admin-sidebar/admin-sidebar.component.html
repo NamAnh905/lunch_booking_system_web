@@ -1,0 +1,47 @@
+﻿<aside class="admin-sidebar" [class.collapsed]="isCollapsed()">
+  <div class="sidebar-header">
+    <div class="logo-container">
+      @if (!isCollapsed()) {
+        <img class="logo-image" src="/assets/images/vnpost-logo1.png" alt="VNPost Logo">
+      }
+    </div>
+    
+    <button class="toggle-btn" (click)="toggleSidebar()">
+      <svg lucideMenu></svg>
+    </button>
+  </div>
+
+  <div class="sidebar-menu">
+    @for (group of menuGroups; track group.title) {
+      <div class="menu-group">
+        @if (!isCollapsed()) {
+          <div class="group-title">{{ group.title }}</div>
+        }
+        
+        @for (item of group.items; track item.route) {
+          <a [routerLink]="item.route" routerLinkActive="active" class="menu-item" [title]="isCollapsed() ? item.label : ''">
+            <span class="icon">
+              @switch (item.icon) {
+                @case ('calendar-days') { <svg lucideCalendarDays></svg> }
+                @case ('pie-chart') { <svg lucidePieChart></svg> }
+                @case ('users') { <svg lucideUsers></svg> }
+                @case ('shield') { <svg lucideShield></svg> }
+                @case ('key') { <svg lucideKey></svg> }
+                @case ('building') { <svg lucideBuilding></svg> }
+                @case ('utensils-crossed') { <svg lucideUtensilsCrossed></svg> }
+                @case ('soup') { <svg lucideSoup></svg> }
+                @case ('coins') { <svg lucideCoins></svg> }
+                @case ('ticket') { <svg lucideTicket></svg> }
+                @case ('message-square') { <svg lucideMessageSquare></svg> }
+                @case ('bell') { <svg lucideBell></svg> }
+              }
+            </span>
+            @if (!isCollapsed()) {
+              <span class="label">{{ item.label }}</span>
+            }
+          </a>
+        }
+      </div>
+    }
+  </div>
+</aside>

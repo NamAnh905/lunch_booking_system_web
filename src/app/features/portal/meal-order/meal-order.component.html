@@ -1,0 +1,210 @@
+<nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm"
+    style="box-shadow: 5px 3px 8px #888888 !important; padding: 10px">
+    <div class="container">
+        <a class="navbar-brand" routerLink="/portal/meal-order">
+            <img class="logo-vnpost" src="assets/images/vnpost-logo1.png" alt="" style="width: 68%;">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <!-- Left Side Of Navbar -->
+            <ul class="navbar-nav mr-auto"></ul>
+
+            <!-- Right Side Of Navbar -->
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a id="navbarDropdown" class="nav-link dropdown-toggle" href="javascript:void(0)" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" (click)="toggleDropdown()">
+                        {{ usernameDisplay }}
+                    </a>
+
+                    @if (dropdownOpen) {
+                    <div class="dropdown-menu dropdown-menu-right show" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="javascript:void(0)">Thông tin cá nhân</a>
+                        <a class="dropdown-item" href="javascript:void(0)">Đăng ký ăn trưa</a>
+                        <a class="dropdown-item" href="javascript:void(0)" (click)="onLogout($event)">Đăng xuất</a>
+                    </div>
+                    }
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="py-4">
+    <div class="container tickets">
+        <h1 style="color: #004b8c">Hệ thống đăng ký cơm trưa cho nhân viên</h1>
+        <div class="container-cover" style="box-shadow: 0px 3px 8px 0px #888888;border-radius: 8px;">
+            <div class="container">
+                <div class="col-md-12">
+                    <h5>Ngày {{ selectedDay }}/{{ currentMonth + 1 }}/{{ currentYear }}</h5>
+                    <div class="notify" style="color: black">
+                        <p><i style="color: red">Chú ý: đăng ký ăn trưa trước 14h45 !!</i></p>
+                        <div>
+                            <div style="display: flex; align-items: center">
+                                <label class="dayselect-label active"></label>
+                                <label for="" style="padding-left: 1%">Ngày đã đăng ký ăn</label>
+                            </div>
+                            <div style="display: flex; align-items: center">
+                                <label class="dayselect-label"></label>
+                                <label for="" style="padding-left: 1%">Ngày chưa đăng ký ăn</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="lunch-selector">
+                <div class="lunch-date">
+                    <div class="selector">
+                        <div class="calander"></div>
+                    </div>
+                    <div class="container">
+                        <div class="row">
+                            <div id="days" class="col" style="padding: 31.969px 0">
+                                <div class="calendar" style="width: 100%">
+                                    <section class="ftco-section" style="margin: 0; padding: 0">
+                                        <div class="container">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="elegant-calencar d-md-flex"
+                                                        style="box-shadow: 3px 4px 7px #888888 !important">
+                                                        <div class="wrap-header d-flex align-items-center">
+                                                            <p id="reset"><img class="calendar img"
+                                                                    src="assets/icons/calendar.ico" alt=""></p>
+                                                            <div id="header" class="p-0">
+                                                                <form id="monthYear">
+                                                                    <div class="pre-button d-flex align-items-center justify-content-center"
+                                                                        (click)="prevMonth()"><i
+                                                                            class="fa fa-chevron-left"></i></div>
+                                                                    <div class="head-info">
+                                                                        <div class="head-day">{{ selectedDay }}</div>
+                                                                        <div class="head-month">{{
+                                                                            MONTH_NAMES[currentMonth] }} - {{
+                                                                            currentYear }}</div>
+                                                                    </div>
+                                                                    <div class="next-button d-flex align-items-center justify-content-center"
+                                                                        (click)="nextMonth()"><i
+                                                                            class="fa fa-chevron-right"></i></div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                        <div class="calendar-wrap">
+                                                            <table id="calendar">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Sun</th>
+                                                                        <th>Mon</th>
+                                                                        <th>Tue</th>
+                                                                        <th>Wed</th>
+                                                                        <th>Thu</th>
+                                                                        <th>Fri</th>
+                                                                        <th>Sat</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @for (row of calendarRows; track $index) {
+                                                                    <tr>
+                                                                        @for (day of row; track $index) {
+                                                                        <td [attr.data-date]="day.dateString"
+                                                                            [class.daySelect]="day.isRegistered"
+                                                                            [class.notSelect]="!day.isRegistered && !day.isDisabled && day.dayNumber"
+                                                                            [class.disabled]="day.isDisabled && day.dayNumber"
+                                                                            [attr.id]="(day.isDisabled || !day.dayNumber) ? 'disabled' : ''"
+                                                                            (click)="onDayClick(day)"
+                                                                            [style.cursor]="day.isDisabled ? 'not-allowed' : (day.dayNumber ? 'pointer' : 'default')">
+                                                                            {{ day.dayNumber || '' }}
+                                                                        </td>
+                                                                        }
+                                                                    </tr>
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                            <div class="col-md-auto"
+                                style="color: black; font-size: 16px; display: flex; align-items: center">
+                                <div class="col lunch-label">
+                                    <p><label for="">Giá tiền:</label></p>
+                                    <p><label for="">Tổng ngày ăn: </label></p>
+                                    <p><label for="">Tổng tiền: </label></p>
+                                    <a id="allday" class="btn btn-info text-white" (click)="toggleSelectAll()">Chọn tất
+                                        cả</a>
+                                </div>
+                                <div class="col lunch-span" id="lunch-infor">
+                                    <p><label id="price" for="price" [attr.value]="pricePerMeal">{{ pricePerMeal |
+                                            number:'1.0-0'
+                                            }}</label>vnđ / vé</p>
+                                    <p><label id="countday" for="day">{{ totalDaysEat }}</label> ngày</p>
+                                    <p><label class="total" id="total" for="totalprice" [attr.value]="totalPrice">{{
+                                            totalPrice | number:'1.0-0' }}</label> VNĐ</p>
+                                    <div class="row"><a href="javascript:void(0)" class="btn btn-info text-white"
+                                            (click)="viewMenu()">Xem thực đơn >></a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <form id="ticketstore">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12 col-sm-8" style="padding-top: 1%; text-align: center">
+                                <button type="button" class="btn btn-primary register" id="update"
+                                    (click)="saveRegistration()">Lưu đăng ký</button>
+                            </div>
+                            <div class="col-md-auto"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+    @media (min-width: 768px) {
+        .modal-xl {
+            width: 90%;
+            max-width: 1500px;
+        }
+    }
+</style>
+@if (showMenuModal) {
+<div class="modal fade show" id="exampleModalXl" tabindex="-1" aria-labelledby="exampleModalXlLabel" aria-hidden="true"
+    style="display: block; padding-right: 17px; background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content" style="overflow: auto">
+            <div class="modal-header">
+                <div class="row w-100" style="place-content: center">
+                    <h3 class="modal-title" id="exampleModalLabel">Thực đơn</h3>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeMenuModal()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="tablemenu" class="text-center">
+                    <ul class="list-unstyled text-left d-inline-block">
+                        @for (dish of selectedMenuDishes; track $index) {
+                        <li class="mb-2">🍽️ <strong>{{ dish }}</strong></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                    (click)="closeMenuModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+}

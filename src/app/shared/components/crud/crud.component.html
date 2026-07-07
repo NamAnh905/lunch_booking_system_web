@@ -1,0 +1,92 @@
+<div class="crud-container">
+  <!-- 1. Header & Operations Bar -->
+  <div class="crud-header">
+    <div class="crud-left-actions">
+      <!-- Custom filters or search inputs from parent component -->
+      <ng-content select="[crud-filters]"></ng-content>
+    </div>
+    
+    <div class="crud-right-actions">
+      <!-- Add Button -->
+      @if (hasPermission(permissions.add)) {
+        <button class="btn btn-primary" (click)="onAdd()" [disabled]="loading">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Thêm mới
+        </button>
+      }
+      
+
+      
+      <!-- Export Button -->
+      @if (hasPermission(permissions.export)) {
+        <button class="btn btn-info" (click)="onExport()" [disabled]="loading">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Xuất Excel
+        </button>
+      }
+
+      <!-- Refresh Button -->
+      <button class="btn btn-secondary btn-icon" (click)="onRefresh()" [disabled]="loading" title="Tải lại">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. Data Table Content Area -->
+  <div class="crud-body" [class.loading]="loading">
+    <!-- Projected table elements -->
+    <ng-content select="[crud-table]"></ng-content>
+    
+    <!-- Spinner loading state -->
+    @if (loading) {
+      <div class="loading-overlay">
+        <div class="spinner"></div>
+      </div>
+    }
+  </div>
+
+  <!-- 3. Pagination Footer -->
+  <div class="crud-footer">
+    <div class="pagination-info">
+      Hiển thị từ <strong>{{ startItem }}</strong> đến <strong>{{ endItem }}</strong> trong tổng số <strong>{{ total }}</strong> bản ghi
+    </div>
+    
+    <!-- Navigation Arrows -->
+    <div class="pagination-buttons">
+      <button [disabled]="page === 1 || loading" (click)="onPageChange(1)" title="Trang đầu">
+        &laquo;
+      </button>
+      <button [disabled]="page === 1 || loading" (click)="onPageChange(page - 1)" title="Trang trước">
+        &lsaquo;
+      </button>
+      
+      <span class="current-page-display">Trang {{ page }} / {{ totalPages || 1 }}</span>
+
+      <button [disabled]="page === totalPages || totalPages === 0 || loading" (click)="onPageChange(page + 1)" title="Trang sau">
+        &rsaquo;
+      </button>
+      <button [disabled]="page === totalPages || totalPages === 0 || loading" (click)="onPageChange(totalPages)" title="Trang cuối">
+        &raquo;
+      </button>
+    </div>
+
+    <!-- Items Per Page selector -->
+    <div class="page-size-selector">
+      <span>Số dòng / trang:</span>
+      <select [ngModel]="size" (ngModelChange)="onSizeChange($event)">
+        @for (s of sizeOptions; track s) {
+          <option [value]="s">{{ s }}</option>
+        }
+      </select>
+    </div>
+  </div>
+</div>

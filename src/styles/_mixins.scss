@@ -1,0 +1,64 @@
+// Flexbox Utilities
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Typography / Text Ellipsis
+@mixin text-ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@mixin multi-line-ellipsis($lines) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Scrollbars (Premium Sleek Design)
+@mixin custom-scroll {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+    &:hover {
+      background: rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+
+// Responsive / Media Queries
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == "xs" {
+    @media (max-width: 575.98px) { @content; }
+  } @else if $breakpoint == "sm" {
+    @media (min-width: 576px) and (max-width: 767.98px) { @content; }
+  } @else if $breakpoint == "md" {
+    @media (min-width: 768px) and (max-width: 991.98px) { @content; }
+  } @else if $breakpoint == "lg" {
+    @media (min-width: 992px) and (max-width: 1199.98px) { @content; }
+  } @else if $breakpoint == "xl" {
+    @media (min-width: 1200px) { @content; }
+  }
+}

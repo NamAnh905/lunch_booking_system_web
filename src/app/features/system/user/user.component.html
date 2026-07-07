@@ -1,0 +1,171 @@
+<app-crud
+  [loading]="loading"
+  [total]="total"
+  [page]="page"
+  [size]="size"
+  [selections]="selections"
+  [permissions]="{ add: 'MANAGE_USERS', edit: 'MANAGE_USERS', delete: 'MANAGE_USERS', export: 'EXPORT_USERS' }"
+  (pageChange)="onPageChange($event)"
+  (sizeChange)="onSizeChange($event)"
+  (refresh)="onReset()"
+  (export)="onExport()"
+  (add)="onAdd()"
+  (edit)="onEdit($event)"
+  (delete)="onDelete($event)">
+  
+  <div crud-filters class="filters">
+    <input type="text" placeholder="Tìm kiếm người dùng..." [(ngModel)]="query.keyword" (keyup.enter)="onSearch()">
+    <button class="btn btn-secondary" (click)="onSearch()">Tìm kiếm</button>
+  </div>
+
+  <table crud-table class="data-table">
+    <thead>
+      <tr>
+        <th class="checkbox-col">
+          <input type="checkbox" (change)="toggleAll($event)" [checked]="selections.length === data.length && data.length > 0">
+        </th>
+        <th class="text-center" style="width: 60px;">STT</th>
+        <th>Tài khoản</th>
+        <th>Họ tên</th>
+        <th>Phòng ban</th>
+        <th>Trạng thái</th>
+        <th>Vai trò</th>
+        <th class="action-column">Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of data; track item.id; let i = $index) {
+        <tr>
+          <td class="checkbox-col">
+            <input type="checkbox" [checked]="isSelected(item)" (change)="toggleSelection(item)">
+          </td>
+          <td class="text-center">{{ (page - 1) * size + i + 1 }}</td>
+          <td>{{ item.username }}</td>
+          <td>{{ item.fullName }}</td>
+          <td>{{ item.department }}</td>
+          <td>
+            <span class="badge" [class.badge-success]="item.isActive" [class.badge-danger]="!item.isActive">
+              {{ item.isActive ? 'Hoạt động' : 'Khóa' }}
+            </span>
+          </td>
+          <td>{{ item.roles ? item.roles.join(', ') : '' }}</td>
+          <td class="action-column">
+            <div class="row-actions">
+              <button class="btn-icon edit" (click)="onEditRow(item)" title="Sửa">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </button>
+              @if (item.isActive) {
+                <button class="btn-icon lock" (click)="onToggleStatus(item)" title="Khóa">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                </button>
+              } @else {
+                <button class="btn-icon unlock" (click)="onToggleStatus(item)" title="Mở khóa">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+                  </svg>
+                </button>
+              }
+            </div>
+          </td>
+        </tr>
+      }
+      @if (data.length === 0 && !loading) {
+        <tr>
+          <td colspan="8" class="text-center empty-state">Không có dữ liệu</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-crud>
+
+<!-- Form Modal -->
+@if (isFormOpen) {
+  <div class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{ formMode === 'add' ? 'Thêm người dùng' : 'Cập nhật người dùng' }}</h3>
+        <button class="close-btn" (click)="closeForm()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form #f="ngForm" (ngSubmit)="onSave(f.value)">
+          @if (formMode === 'add') {
+            <div class="form-group">
+              <label>Tài khoản <span class="required">*</span></label>
+              <input type="text" name="username" [(ngModel)]="formModel.username" required>
+            </div>
+          } @else {
+            <div class="form-group">
+              <label>Tài khoản</label>
+              <input type="text" [value]="formModel.username" disabled class="disabled">
+            </div>
+          }
+          
+          <div class="form-group">
+            <label>
+              Mật khẩu 
+              @if (formMode === 'add') {
+                <span class="required">*</span>
+              } @else {
+                <span class="hint">(Để trống nếu không đổi)</span>
+              }
+            </label>
+            <input type="password" name="password" [(ngModel)]="formModel.password" [required]="formMode === 'add'">
+          </div>
+          
+          <div class="form-group">
+            <label>Họ tên <span class="required">*</span></label>
+            <input type="text" name="fullName" [(ngModel)]="formModel.fullName" required>
+          </div>
+          
+          <div class="form-group">
+            <label>Phòng ban <span class="required">*</span></label>
+            <input type="text" name="department" [(ngModel)]="formModel.department" required>
+          </div>
+          
+          <div class="form-group">
+            <label>Vai trò</label>
+            <div class="multi-select-dropdown" (click)="toggleRolesDropdown()">
+              <div class="dropdown-header">
+                {{ getRolesDisplayText() }}
+              </div>
+              @if (isRolesDropdownOpen) {
+                <div class="dropdown-list" (click)="$event.stopPropagation()">
+                  @for (role of availableRoles; track role.code) {
+                    <label class="dropdown-item">
+                      <input type="checkbox" [value]="role.code" (change)="onRoleChange(role.code, $event)" [checked]="formModel.roles?.includes(role.code)">
+                      {{ role.name }} ({{ role.code }})
+                    </label>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+          
+          @if (formMode === 'edit') {
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" name="isActive" [(ngModel)]="formModel.isActive">
+                Hoạt động
+              </label>
+            </div>
+          }
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeForm()">Hủy</button>
+            <button type="submit" class="btn btn-primary" [disabled]="!f.valid || loading">Lưu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}

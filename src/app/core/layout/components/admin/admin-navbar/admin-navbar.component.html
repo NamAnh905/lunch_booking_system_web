@@ -1,0 +1,30 @@
+<header class="admin-navbar">
+  <div class="navbar-left">
+    @if (showBreadcrumb) {
+      <app-breadcrumb></app-breadcrumb>
+    }
+  </div>
+  
+  <!-- User Profile Dropdown -->
+  <div class="user-profile-dropdown" tabindex="0">
+    <div class="user-trigger" *ngIf="currentUser$ | async as user" (click)="toggleDropdown()">
+      <div class="user-info">
+        <span class="user-name">{{ user.username }}</span>
+        <span class="user-role">{{ user.roles.length > 0 ? user.roles[0] : 'User' }}</span>
+      </div>
+      <div class="user-avatar">{{ (user.username | slice:0:2) | uppercase }}</div>
+    </div>
+    
+    <div class="dropdown-menu" [class.show]="isDropdownOpen">
+      <a class="dropdown-item" (click)="goToProfile()">
+        <svg lucideUser width="16" height="16"></svg>
+        <span>Thông tin cá nhân</span>
+      </a>
+      <div class="dropdown-divider"></div>
+      <a class="dropdown-item text-danger" (click)="logout()">
+        <svg lucideLogOut width="16" height="16"></svg>
+        <span>Đăng xuất</span>
+      </a>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,175 @@
+@import '../../../../../../styles/variables';
+
+.admin-sidebar {
+  width: $sidebar-width;
+  height: 100vh;
+  background-color: #ffffff;
+  border-right: 1px solid $border-color;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+
+  &.collapsed {
+    width: $sidebar-collapsed-width;
+
+    .sidebar-header {
+      padding: 0 12px;
+      justify-content: center;
+
+      .logo-container {
+        display: none;
+      }
+
+      .toggle-btn {
+        margin: 0;
+      }
+    }
+
+    .menu-group {
+      padding: 12px 0;
+      border-bottom: 1px solid $border-color;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    .menu-item {
+      justify-content: center;
+      padding: 8px;
+      margin: 2px 8px;
+      border-radius: $radius-md;
+
+      .icon {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+.sidebar-header {
+  height: $navbar-height;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 1px solid $border-color;
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fcb813; // Vietnam Post Yellow
+
+    .logo-image {
+      max-height: 40px;
+      max-width: 140px;
+      object-fit: contain;
+    }
+  }
+
+  .toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $text-secondary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: $radius-sm;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: $bg-color;
+      color: $text-primary;
+    }
+  }
+}
+
+.sidebar-menu {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 0;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+  }
+
+  .menu-group {
+    margin-bottom: 8px;
+
+    .group-title {
+      padding: 6px 16px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: $text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    color: $text-primary;
+    text-decoration: none;
+    transition: all 0.2s;
+    margin: 2px 8px;
+    border-radius: $radius-md;
+    position: relative;
+
+    .icon {
+      display: flex;
+      align-items: center;
+      margin-right: 12px;
+      color: $text-secondary;
+      transition: color 0.2s;
+    }
+
+    .label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    &:hover {
+      background-color: rgba(252, 184, 19, 0.08); // Light yellow
+      color: #fcb813;
+
+      .icon {
+        color: #fcb813;
+      }
+    }
+
+    &.active {
+      background-color: transparent; // Bỏ hẳn nền khoanh vùng
+      color: #fcb813;
+      font-weight: 600;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 16px;
+        width: 3px;
+        border-radius: 0 4px 4px 0;
+        background-color: #fcb813;
+      }
+
+      .icon {
+        color: #fcb813;
+      }
+    }
+  }
+}

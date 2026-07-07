@@ -1,0 +1,5 @@
+export enum TicketSource {
+  STANDARD = 'STANDARD',
+  EXCHANGED = 'EXCHANGED',
+  TRANSFERRED = 'TRANSFERRED'
+}

@@ -1,0 +1,120 @@
+@use '../../../../styles/variables' as *;
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.confirm-modal {
+  background: white;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid $border-color;
+
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: $text-primary;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      color: $text-secondary;
+      cursor: pointer;
+      padding: 0;
+
+      &:hover {
+        color: $text-primary;
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 24px;
+
+    .confirm-message {
+      margin: 0;
+      font-size: 15px;
+      color: $text-primary;
+      line-height: 1.5;
+    }
+  }
+
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid $border-color;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background-color: #f8fafc;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+      transition: all 0.2s;
+
+      &.btn-secondary {
+        background-color: white;
+        border: 1px solid $border-color;
+        color: $text-primary;
+
+        &:hover {
+          background-color: #f1f5f9;
+        }
+      }
+
+      &.btn-danger {
+        background-color: $error-color;
+        color: white;
+
+        &:hover {
+          background-color: darken($error-color, 10%);
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
