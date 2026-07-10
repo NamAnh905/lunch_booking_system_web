@@ -5,11 +5,12 @@ import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
 import { DepartmentService } from './department.service';
 import { DepartmentResponse, DepartmentCreateRequest, DepartmentUpdateRequest } from '@shared/models/department.model';
+import { AutoFocusDirective } from '../../../shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-department',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent],
+  imports: [CommonModule, FormsModule, CrudComponent, AutoFocusDirective],
   templateUrl: './department.component.html',
   styleUrl: './department.component.scss'
 })
@@ -60,7 +61,4 @@ export class DepartmentComponent extends BaseCrudComponent<DepartmentResponse, {
     });
   }
 
-  onExport() {
-    this.toastService.showWarning('Tính năng xuất Excel danh sách phòng ban đang được phát triển ở phía Backend!');
-  }
 }

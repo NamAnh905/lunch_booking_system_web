@@ -1,11 +1,18 @@
 <app-crud [loading]="loading" [total]="total" [page]="page" [size]="size" [selections]="selections"
-  [permissions]="{ add: 'MANAGE_PRICES', edit: 'MANAGE_PRICES', delete: 'MANAGE_PRICES', export: 'VIEW_PRICES' }"
-  (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)" (refresh)="onReset()" (export)="onExport()"
+  [permissions]="{ add: 'MANAGE_PRICES', edit: 'MANAGE_PRICES', delete: 'MANAGE_PRICES' }"
+  (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)" (refresh)="onReset()"
   (add)="onAdd()" (edit)="onEdit($event)" (delete)="onDelete($event)">
 
   <div crud-filters class="filters">
-    <input type="text" placeholder="Tìm kiếm giá..." [(ngModel)]="query.keyword" (keyup.enter)="onSearch()">
-    <button class="btn btn-secondary" (click)="onSearch()">Tìm kiếm</button>
+    <div class="search-wrapper">
+      <input type="text" placeholder="Tìm kiếm giá..." [(ngModel)]="query.keyword" (keyup.enter)="onSearch()" class="search-input">
+      <button class="search-btn" (click)="onSearch()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </button>
+    </div>
   </div>
 
   <table crud-table class="data-table">
@@ -34,8 +41,8 @@
         <td>{{ item.amount | number:'1.0-0' }} VNĐ</td>
         <td>{{ item.description }}</td>
         <td>
-          <span class="badge" [class.badge-success]="item.isActive" [class.badge-danger]="!item.isActive">
-            {{ item.isActive ? 'Hoạt động' : 'Khóa' }}
+          <span class="status-clean" [class.active]="item.isActive" [class.inactive]="!item.isActive">
+            <span class="status-dot"></span> {{ item.isActive ? 'Hoạt động' : 'Khóa' }}
           </span>
         </td>
         <td class="action-column">
@@ -90,7 +97,7 @@
       <form #f="ngForm" (ngSubmit)="onSave(f.value)">
         <div class="form-group">
           <label class="required">Tên giá</label>
-          <input type="text" name="name" [(ngModel)]="formModel.name" required placeholder="VD: Suất mặc định">
+          <input type="text" name="name" [(ngModel)]="formModel.name" required placeholder="VD: Suất mặc định" appAutoFocus>
         </div>
 
         <div class="form-group">

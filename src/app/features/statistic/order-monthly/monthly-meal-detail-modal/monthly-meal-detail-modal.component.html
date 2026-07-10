@@ -1,0 +1,31 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Chi tiết vé ăn tháng {{ month }}/{{ year }}</h2>
+      <button class="close-btn" (click)="onClose()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="user-info">
+        <div class="info">
+          <h3>{{ userName }}</h3>
+          <p>Tổng số vé trong tháng: <strong>{{ totalMeals }} vé</strong></p>
+        </div>
+      </div>
+
+      <div class="calendar-grid">
+        <div class="day-circle" *ngFor="let day of days" [class.ordered]="day.hasOrder">
+          {{ day.day }}
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="circle ordered"></div> Đã đặt cơm
+        </div>
+        <div class="legend-item">
+          <div class="circle"></div> Không đặt
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

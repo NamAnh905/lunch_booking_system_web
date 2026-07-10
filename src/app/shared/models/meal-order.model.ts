@@ -6,4 +6,6 @@ export interface CalendarDay {
   orderId?: number;
   isPast?: boolean;
   isDisabled?: boolean;
+  isPastOrCutoff?: boolean;
+  isClaimedTicket?: boolean;
 }

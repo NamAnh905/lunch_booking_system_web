@@ -113,10 +113,14 @@
                                                                             [class.daySelect]="day.isRegistered"
                                                                             [class.notSelect]="!day.isRegistered && !day.isDisabled && day.dayNumber"
                                                                             [class.disabled]="day.isDisabled && day.dayNumber"
+                                                                            [class.past-day]="day.isPastOrCutoff && day.dayNumber"
                                                                             [attr.id]="(day.isDisabled || !day.dayNumber) ? 'disabled' : ''"
                                                                             (click)="onDayClick(day)"
-                                                                            [style.cursor]="day.isDisabled ? 'not-allowed' : (day.dayNumber ? 'pointer' : 'default')">
+                                                                            [style.cursor]="(day.isDisabled || day.isPastOrCutoff) ? 'not-allowed' : (day.dayNumber ? 'pointer' : 'default')">
                                                                             {{ day.dayNumber || '' }}
+                                                                            @if (day.isClaimedTicket) {
+                                                                            <span class="claimed-badge" title="Vé nhận từ chợ Pass">PASS</span>
+                                                                            }
                                                                         </td>
                                                                         }
                                                                     </tr>
@@ -133,22 +137,30 @@
                             </div>
                             <div class="col-md-auto"
                                 style="color: black; font-size: 16px; display: flex; align-items: center">
-                                <div class="col lunch-label">
-                                    <p><label for="">Giá tiền:</label></p>
-                                    <p><label for="">Tổng ngày ăn: </label></p>
-                                    <p><label for="">Tổng tiền: </label></p>
-                                    <a id="allday" class="btn btn-info text-white" (click)="toggleSelectAll()">Chọn tất
-                                        cả</a>
-                                </div>
-                                <div class="col lunch-span" id="lunch-infor">
-                                    <p><label id="price" for="price" [attr.value]="pricePerMeal">{{ pricePerMeal |
-                                            number:'1.0-0'
-                                            }}</label>vnđ / vé</p>
-                                    <p><label id="countday" for="day">{{ totalDaysEat }}</label> ngày</p>
-                                    <p><label class="total" id="total" for="totalprice" [attr.value]="totalPrice">{{
-                                            totalPrice | number:'1.0-0' }}</label> VNĐ</p>
-                                    <div class="row"><a href="javascript:void(0)" class="btn btn-info text-white"
-                                            (click)="viewMenu()">Xem thực đơn >></a></div>
+                                <div class="d-flex w-100">
+                                    <div class="col lunch-label pl-0">
+                                        <p><label for="">Giá tiền:</label></p>
+                                        <p><label for="">Tổng ngày ăn: </label></p>
+                                        <p><label for="">Tổng tiền: </label></p>
+                                        <div class="d-flex flex-column" style="gap: 10px; margin-top: 15px;">
+                                            <a id="allday" class="btn btn-info text-white" style="width: fit-content;" (click)="toggleSelectAll()">Chọn tất cả</a>
+                                            <a href="javascript:void(0)" class="btn btn-warning text-dark" style="width: fit-content;" (click)="goToTicketExchange()">Pass vé</a>
+                                        </div>
+                                    </div>
+                                    <div class="col lunch-span pr-0" id="lunch-infor">
+                                        <p><label id="price" for="price" [attr.value]="pricePerMeal">{{ pricePerMeal |
+                                                formatMoney }} / vé</label></p><!--
+                                                number:'1.0-0'
+                                                }}</label>vnđ / vé</p>-->
+                                        <p><label id="countday" for="day">{{ totalDaysEat }}</label> ngày</p>
+                                        <p><label class="total" id="total" for="totalprice" [attr.value]="totalPrice">{{
+                                                totalPrice | formatMoney }}</label></p><!--
+                                                totalPrice | number:'1.0-0' }}</label> VNĐ</p>-->
+                                        <div class="d-flex flex-column" style="gap: 10px; margin-top: 15px;">
+                                            <a href="javascript:void(0)" class="btn btn-info text-white" style="width: fit-content;"
+                                                (click)="viewMenu()">Xem thực đơn >></a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -158,7 +170,7 @@
                     <div class="container">
                         <div class="row">
                             <div class="col-12 col-sm-8" style="padding-top: 1%; text-align: center">
-                                <button type="button" class="btn btn-primary register" id="update"
+                                <button type="button" class="btn btn-primary register" id="update" [disabled]="loading"
                                     (click)="saveRegistration()">Lưu đăng ký</button>
                             </div>
                             <div class="col-md-auto"></div>
@@ -179,8 +191,8 @@
     }
 </style>
 @if (showMenuModal) {
-<div class="modal fade show" id="exampleModalXl" tabindex="-1" aria-labelledby="exampleModalXlLabel" aria-hidden="true"
-    style="display: block; padding-right: 17px; background: rgba(0,0,0,0.5);">
+<div class="modal fade show" id="exampleModalXl" tabindex="-1" aria-labelledby="exampleModalXlLabel" aria-modal="true"
+    role="dialog" style="display: block; padding-right: 17px; background: rgba(0,0,0,0.5);">
     <div class="modal-dialog modal-xl">
         <div class="modal-content" style="overflow: auto">
             <div class="modal-header">
@@ -191,13 +203,58 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <div id="tablemenu" class="text-center">
-                    <ul class="list-unstyled text-left d-inline-block">
-                        @for (dish of selectedMenuDishes; track $index) {
-                        <li class="mb-2">🍽️ <strong>{{ dish }}</strong></li>
-                        }
-                    </ul>
+            <div class="modal-body" style="padding: 20px 40px;">
+                <div id="tablemenu">
+                    @if (isLoadingMenu) {
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                    } @else {
+                    @if (menuGrid.length > 0) {
+                    <div class="table-responsive">
+                        <table class="table table-bordered menu-grid-table">
+                            <thead style="border: 1px solid black;">
+                                <tr>
+                                    <th class="text-center align-middle"
+                                        style="width: 150px; background-color: #f8f9fa; border: 1px solid black;">Nội dung</th>
+                                    @for (day of gridDays; track $index) {
+                                    <th class="text-center align-middle" style="background-color: #f8f9fa; border: 1px solid black;">
+                                        <div style="color: #004b8c;">{{ day.dayOfWeek.split(',')[0] }}</div>
+                                        <div style="font-weight: normal; font-size: 14px;">{{
+                                            day.dayOfWeek.split(',')[1] }}</div>
+                                    </th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody style="border: 1px solid black;">
+                                @for (group of menuGrid; track $index) {
+                                    @for (dishRow of group.dishRows; track $index; let isFirst = $first) {
+                                    <tr>
+                                        @if (isFirst) {
+                                        <td [attr.rowspan]="group.maxDishes" class="text-center align-middle" style="border: 1px solid black; background-color: #f8f9fa;">
+                                            <div style="font-weight: bold; color: black;">{{ group.priceName }}</div>
+                                            <div style="font-weight: bold; color: red;">{{ group.priceAmount | formatMoney }}</div>
+                                        </td>
+                                        }
+                                        @for (dishText of dishRow.dayDishes; track $index) {
+                                        <td class="align-middle text-center" style="border: 1px solid black; padding: 8px 12px;" [class.empty-cell]="!dishText">
+                                            {{ dishText || '' }}
+                                        </td>
+                                        }
+                                    </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    } @else {
+                    <div class="col-12 text-center">
+                        <p class="text-muted p-4">Chưa có thông tin thực đơn cho tuần này.</p>
+                    </div>
+                    }
+                    }
                 </div>
             </div>
             <div class="modal-footer">

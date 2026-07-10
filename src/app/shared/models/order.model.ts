@@ -16,7 +16,7 @@ export interface Order {
 }
 
 export interface OrderCreateRequest {
-  menuIds: number[];
+  orderDates: string[];
 }
 
 export interface OrderStatusUpdateRequest {
@@ -41,6 +41,10 @@ export interface OrderResponse {
   isPrinted: boolean;
   errorMessage?: string;
   createdAt?: string;
+  userName?: string;
+  fullName?: string;
+  roleName?: string;
+  departmentName?: string;
 }
 
 export interface AdminOrderListResponse {

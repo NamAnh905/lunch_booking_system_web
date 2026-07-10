@@ -1,0 +1,83 @@
+<app-crud [loading]="loading" [total]="total" [page]="page" [size]="size" [selections]="selections" [hideAdd]="true"
+  (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)" (refresh)="onReset()">
+
+  <div crud-filters class="filters">
+    <div class="filter-group">
+      <label>Từ ngày</label>
+      <input type="date" [(ngModel)]="query.startDate" (ngModelChange)="onSearch()">
+    </div>
+
+    <div class="filter-group">
+      <label>Đến ngày</label>
+      <input type="date" [(ngModel)]="query.endDate" (ngModelChange)="onSearch()">
+    </div>
+
+    <div class="filter-group">
+      <label>Trạng thái</label>
+      <select [(ngModel)]="query.status" (ngModelChange)="onSearch()">
+        <option value="">Tất cả</option>
+        <option value="OPEN">Mở bán (OPEN)</option>
+        <option value="MATCHED">Đã ghép (MATCHED)</option>
+        <option value="CANCELLED">Đã hủy (CANCELLED)</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Tìm kiếm</label>
+      <div class="search-wrapper">
+        <input type="text" [(ngModel)]="query.keyword" (keyup.enter)="onSearch()" placeholder="Người pass/nhận..."
+          class="search-input">
+        <button class="search-btn" (click)="onSearch()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <table crud-table class="data-table">
+    <thead>
+      <tr>
+        <th class="checkbox-col">
+          <input type="checkbox" (change)="toggleAll($event)"
+            [checked]="selections.length === data.length && data.length > 0">
+        </th>
+        <th class="text-center" style="width: 60px;">STT</th>
+        <th>Ngày ăn</th>
+        <th>Người Pass</th>
+        <th>Người Nhận</th>
+        <th>Trạng thái</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of data; track item.exchangeId; let i = $index) {
+      <tr>
+        <td class="checkbox-col">
+          <input type="checkbox" [checked]="isSelected(item)" (change)="toggleSelection(item)">
+        </td>
+        <td class="text-center">{{ (page - 1) * size + i + 1 }}</td>
+        <td>{{ item.menuDate }}</td>
+        <td>{{ item.sellerName }}</td>
+        <td>{{ item.buyerName || '-' }}</td>
+        <td>
+          <span [ngClass]="{
+            'status-open': item.status === 'OPEN',
+            'status-matched': item.status === 'MATCHED',
+            'status-cancelled': item.status === 'CANCELLED'
+          }">
+            {{ item.status }}
+          </span>
+        </td>
+      </tr>
+      }
+      @if (data.length === 0 && !loading) {
+      <tr>
+        <td colspan="7" class="text-center empty-state">Không có dữ liệu</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</app-crud>

@@ -14,8 +14,69 @@
   (delete)="onDelete($event)">
   
   <div crud-filters class="filters">
-    <input type="text" placeholder="Tìm kiếm người dùng..." [(ngModel)]="query.keyword" (keyup.enter)="onSearch()">
-    <button class="btn btn-secondary" (click)="onSearch()">Tìm kiếm</button>
+    <div class="toolbar-top">
+      <div class="search-wrapper">
+        <input type="text" placeholder="Tìm kiếm người dùng..." [(ngModel)]="query.keyword" (keyup.enter)="onSearch()" class="search-input">
+        <button class="search-btn" (click)="onSearch()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="filter-wrapper">
+        <button class="btn-filter" (click)="toggleFilter()" [class.active]="activeFilters.length > 0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          Bộ lọc
+          @if (activeFilters.length > 0) {
+            <span class="filter-badge"></span>
+          }
+        </button>
+
+        @if (isFilterOpen) {
+          <div class="filter-dropdown">
+            <div class="filter-section">
+              <h4>Phòng ban</h4>
+              <div class="checkbox-list">
+                @for (dept of filterOptions.departments; track dept.value) {
+                  <label class="checkbox-item">
+                    <input type="checkbox" [(ngModel)]="dept.checked"> {{ dept.label }}
+                  </label>
+                }
+              </div>
+            </div>
+            <div class="filter-section">
+              <h4>Trạng thái</h4>
+              <div class="checkbox-list">
+                @for (status of filterOptions.isActives; track status.value) {
+                  <label class="checkbox-item">
+                    <input type="checkbox" [(ngModel)]="status.checked"> {{ status.label }}
+                  </label>
+                }
+              </div>
+            </div>
+            <div class="filter-actions">
+              <button class="btn btn-secondary" (click)="clearFilter()">Xóa</button>
+              <button class="btn btn-primary" (click)="applyFilter()">Áp dụng</button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+    
+    @if (activeFilters.length > 0) {
+      <div class="filter-chips">
+        @for (chip of activeFilters; track chip.label) {
+          <div class="chip">
+            {{ chip.label }}
+            <button class="btn-remove" (click)="removeFilter(chip)">&times;</button>
+          </div>
+        }
+      </div>
+    }
   </div>
 
   <table crud-table class="data-table">
@@ -44,8 +105,8 @@
           <td>{{ item.fullName }}</td>
           <td>{{ item.department }}</td>
           <td>
-            <span class="badge" [class.badge-success]="item.isActive" [class.badge-danger]="!item.isActive">
-              {{ item.isActive ? 'Hoạt động' : 'Khóa' }}
+            <span class="status-clean" [class.active]="item.isActive" [class.inactive]="!item.isActive">
+              <span class="status-dot"></span> {{ item.isActive ? 'Hoạt động' : 'Khóa' }}
             </span>
           </td>
           <td>{{ item.roles ? item.roles.join(', ') : '' }}</td>
@@ -101,7 +162,7 @@
           @if (formMode === 'add') {
             <div class="form-group">
               <label>Tài khoản <span class="required">*</span></label>
-              <input type="text" name="username" [(ngModel)]="formModel.username" required>
+              <input type="text" name="username" [(ngModel)]="formModel.username" required appAutoFocus>
             </div>
           } @else {
             <div class="form-group">
@@ -119,7 +180,7 @@
                 <span class="hint">(Để trống nếu không đổi)</span>
               }
             </label>
-            <input type="password" name="password" [(ngModel)]="formModel.password" [required]="formMode === 'add'">
+            <input type="password" name="password" [(ngModel)]="formModel.password" [required]="formMode === 'add'" [appAutoFocus]="formMode === 'edit'">
           </div>
           
           <div class="form-group">
@@ -129,7 +190,12 @@
           
           <div class="form-group">
             <label>Phòng ban <span class="required">*</span></label>
-            <input type="text" name="department" [(ngModel)]="formModel.department" required>
+            <select name="department" [(ngModel)]="formModel.department" required>
+              <option value="" disabled>-- Chọn phòng ban --</option>
+              @for (dept of availableDepartments; track dept.id) {
+                <option [value]="dept.name">{{ dept.name }}</option>
+              }
+            </select>
           </div>
           
           <div class="form-group">

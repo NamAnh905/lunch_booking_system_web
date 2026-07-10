@@ -7,6 +7,11 @@ export const portalRoutes: Routes = [
     title: 'Đăng ký cơm trưa - LunchOrder'
   },
   {
+    path: 'ticket-exchange',
+    loadComponent: () => import('./ticket-exchange/ticket-exchange.component').then(m => m.TicketExchangeComponent),
+    title: 'Chợ vé - LunchOrder'
+  },
+  {
     path: '',
     redirectTo: 'meal-order',
     pathMatch: 'full'

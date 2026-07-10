@@ -14,12 +14,18 @@ export class UserService {
 
   query(query: any, page: number, size: number): Observable<ApiResponse<PageResponse<UserResponse>>> {
     let params = new HttpParams()
-      .set('page', (page + 1).toString()); // Backend seems to be 1-indexed, let's verify but normally spring page is 0. Wait, UserController.java has defaultValue = "1". I will send page+1 since base-crud sends 0-indexed page!
-      // I will adjust based on how spring handles page param.
+      .set('page', (page + 1).toString())
+      .set('size', size.toString()); // Pass size parameter to backend
     
     // Add other query params if any
-    if (query.keyword) {
+    if (query && query.keyword) {
       params = params.set('keyword', query.keyword);
+    }
+    if (query && query.departmentIds && query.departmentIds.length > 0) {
+      params = params.set('departmentIds', query.departmentIds.join(','));
+    }
+    if (query && query.isActives && query.isActives.length > 0) {
+      params = params.set('isActives', query.isActives.join(','));
     }
 
     return this.http.get<ApiResponse<PageResponse<UserResponse>>>(this.apiUrl, { params });
@@ -35,5 +41,16 @@ export class UserService {
 
   delete(id: number | string): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
+  }
+
+  exportExcel(keyword?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (keyword) {
+      params = params.set('keyword', keyword);
+    }
+    return this.http.get(`${this.apiUrl}/export`, {
+      params,
+      responseType: 'blob'
+    });
   }
 }

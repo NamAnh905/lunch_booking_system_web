@@ -7,11 +7,12 @@ import { RoleService } from './role.service';
 import { RoleResponse, RoleCreateRequest, RoleUpdateRequest } from '@shared/models/role.model';
 import { PermissionService } from '../permission/permission.service';
 import { Permission } from '@shared/models/permission.model';
+import { AutoFocusDirective } from '../../../shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-role',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent],
+  imports: [CommonModule, FormsModule, CrudComponent, AutoFocusDirective],
   templateUrl: './role.component.html',
   styleUrl: './role.component.scss'
 })
@@ -74,7 +75,7 @@ export class RoleComponent extends BaseCrudComponent<RoleResponse, { keyword?: s
   onPermissionChange(action: string, event: Event) {
     const isChecked = (event.target as HTMLInputElement).checked;
     if (!this.formModel.permissions) this.formModel.permissions = [];
-    
+
     if (isChecked) {
       if (!this.formModel.permissions.includes(action)) {
         this.formModel.permissions.push(action);
@@ -87,9 +88,5 @@ export class RoleComponent extends BaseCrudComponent<RoleResponse, { keyword?: s
   getPermissionsDisplayText(): string {
     if (!this.formModel.permissions || this.formModel.permissions.length === 0) return 'Chọn quyền (Permissions)';
     return this.formModel.permissions.join(', ');
-  }
-
-  onExport() {
-    this.toastService.showWarning('Tính năng xuất Excel danh sách vai trò đang được phát triển!');
   }
 }

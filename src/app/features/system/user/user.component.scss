@@ -4,21 +4,199 @@
 // 1. FILTERS (Search Bar)
 .filters {
   display: flex;
+  flex-direction: column;
   gap: 12px;
-  align-items: center;
+  width: 100%;
 
-  input[type="text"] {
-    padding: 8px 12px;
-    border: 1px solid $border-color;
-    border-radius: 6px;
-    font-size: 14px;
-    outline: none;
+  .toolbar-top {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .search-wrapper {
+    position: relative;
+    display: inline-block;
     width: 250px;
-    transition: $transition-base;
 
-    &:focus {
-      border-color: $primary-color;
-      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    .search-input {
+      padding: 8px 40px 8px 12px;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      width: 100%;
+      transition: $transition-base;
+
+      &:focus {
+        border-color: $primary-color;
+        box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+      }
+    }
+
+    .search-btn {
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      color: $text-secondary;
+      transition: color $transition-base;
+
+      &:hover {
+        color: $primary-color;
+      }
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  .filter-wrapper {
+    position: relative;
+    
+    .btn-filter {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: white;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      color: $text-primary;
+      transition: all 0.2s;
+      
+      &:hover, &.active {
+        border-color: $primary-color;
+        color: $primary-color;
+      }
+      
+      svg { width: 16px; height: 16px; }
+      
+      .filter-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 10px;
+        height: 10px;
+        background-color: $error-color;
+        border-radius: 50%;
+        border: 2px solid white;
+      }
+    }
+
+    .filter-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 280px;
+      background: white;
+      border: 1px solid $border-color;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      z-index: 100;
+      
+      .filter-section {
+        padding: 16px;
+        border-bottom: 1px solid $border-color;
+        
+        h4 {
+          margin: 0 0 12px 0;
+          font-size: 14px;
+          color: $text-secondary;
+        }
+        
+        .checkbox-list {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          max-height: 150px;
+          overflow-y: auto;
+          
+          .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: $text-primary;
+            margin: 0;
+            font-weight: normal;
+            
+            input[type="checkbox"] {
+              width: 16px;
+              height: 16px;
+              cursor: pointer;
+              margin: 0;
+            }
+          }
+        }
+      }
+      
+      .filter-actions {
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        background: #f8fafc;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+        
+        .btn {
+          padding: 6px 12px;
+          font-size: 13px;
+        }
+      }
+    }
+  }
+
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba($primary-color, 0.1);
+      border: 1px solid rgba($primary-color, 0.2);
+      border-radius: 16px;
+      font-size: 13px;
+      color: $primary-color;
+      font-weight: 500;
+      
+      .btn-remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: rgba($primary-color, 0.2);
+        border: none;
+        color: $primary-color;
+        font-size: 14px;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0;
+        
+        &:hover {
+          background: rgba($primary-color, 0.3);
+        }
+      }
     }
   }
 
@@ -38,6 +216,15 @@
 
       &:hover {
         background-color: #e2e8f0;
+      }
+    }
+    
+    &.btn-primary {
+      background-color: $primary-color;
+      color: white;
+
+      &:hover {
+        background-color: $primary-hover;
       }
     }
   }

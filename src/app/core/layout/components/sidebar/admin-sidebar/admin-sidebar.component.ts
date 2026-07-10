@@ -31,14 +31,14 @@ export class AdminSidebarComponent {
       title: 'THỐNG KÊ',
       items: [
         {
-          label: 'Thống kê theo tháng',
+          label: 'Theo tháng',
           icon: 'pie-chart',
-          route: '/system/statistics/order-monthly'
+          route: '/statistic/order-monthly'
         },
         {
-          label: 'Thống kê theo ngày',
+          label: 'Theo ngày',
           icon: 'calendar-days',
-          route: '/system/statistics/order-daily'
+          route: '/statistic/order-daily'
         }
       ]
     },

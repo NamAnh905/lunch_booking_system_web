@@ -15,8 +15,10 @@ export class CrudComponent {
   @Input() page = 1;
   @Input() size = 10;
   @Input() selections: any[] = [];
+  @Input() hideAdd = false;
   
-  @Input() permissions = {
+  
+  @Input() permissions: { add?: string; edit?: string; delete?: string; export?: string } = {
     add: '',
     edit: '',
     delete: '',
@@ -84,7 +86,8 @@ export class CrudComponent {
     this.refresh.emit();
   }
 
-  hasPermission(permission: string): boolean {
+  hasPermission(permission?: string): boolean {
+    if (permission === undefined) return false;
     if (!permission) return true;
     // Connect auth verification logic here if needed
     return true;

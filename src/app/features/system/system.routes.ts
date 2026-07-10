@@ -1,24 +1,7 @@
 import { Routes } from '@angular/router';
 
 export const systemRoutes: Routes = [
-    {
-        path: 'statistics',
-        data: { breadcrumb: 'Thống kê' },
-        children: [
-            {
-                path: 'order-monthly',
-                data: { breadcrumb: 'Thống kê theo tháng' },
-                title: 'Thống kê theo tháng',
-                loadComponent: () => import('../../shared/components/placeholder/placeholder.component').then(m => m.PlaceholderComponent)
-            },
-            {
-                path: 'order-daily',
-                data: { breadcrumb: 'Thống kê theo ngày' },
-                title: 'Thống kê theo ngày',
-                loadComponent: () => import('../../shared/components/placeholder/placeholder.component').then(m => m.PlaceholderComponent)
-            }
-        ]
-    },
+
     {
         path: 'admin',
         data: { breadcrumb: 'Hệ thống' },
@@ -81,7 +64,7 @@ export const systemRoutes: Routes = [
                 path: 'ticket-exchange',
                 data: { breadcrumb: 'Trao đổi vé' },
                 title: 'Trao đổi vé',
-                loadComponent: () => import('../../shared/components/placeholder/placeholder.component').then(m => m.PlaceholderComponent)
+                loadComponent: () => import('./market/market.component').then(m => m.MarketComponent)
             },
             {
                 path: 'feedback',

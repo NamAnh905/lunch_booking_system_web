@@ -1,6 +1,7 @@
 export * from './base.model';
 export * from './permission.model';
 export * from './role.model';
+export * from './price.model';
 export * from './department.model';
 export * from './user.model';
 export * from './dish.model';

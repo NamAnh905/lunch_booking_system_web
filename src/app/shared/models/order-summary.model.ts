@@ -26,4 +26,5 @@ export interface MonthlyOrderSummaryResponse {
   totalPaid: number;
   totalRemaining: number;
   items: OrderSummaryItemResponse[];
+  dailyCounts?: { date: string, totalMeals: number }[];
 }

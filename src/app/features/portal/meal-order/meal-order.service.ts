@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import { shareReplay, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '@env/environment';
-import { ApiResponse, OrderResponse, OrderCreateRequest, MenuResponse } from '@shared/models';
+import { ApiResponse, OrderResponse, OrderCreateRequest, MenuResponse, PriceResponse } from '@shared/models';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,12 @@ import { ApiResponse, OrderResponse, OrderCreateRequest, MenuResponse } from '@s
 export class MealOrderService {
   private http = inject(HttpClient);
   private apiUrl = environment.apiUrl;
+
+  private weeklyMenusCache$: Observable<ApiResponse<MenuResponse[]>> | null = null;
+  private activePricesCache$: Observable<ApiResponse<PriceResponse[]>> | null = null;
+  
+  private refreshWeeklyMenus$ = new BehaviorSubject<void>(undefined);
+  private refreshActivePrices$ = new BehaviorSubject<void>(undefined);
 
   getMyOrders(fromDate: string, toDate: string): Observable<ApiResponse<OrderResponse[]>> {
     return this.http.get<ApiResponse<OrderResponse[]>>(`${this.apiUrl}/orders/me`, {
@@ -26,10 +33,47 @@ export class MealOrderService {
   }
 
   getMenus(date?: string): Observable<ApiResponse<any>> {
-    const params: any = {};
+    const params: any = { size: 100 };
     if (date) {
       params.date = date;
     }
     return this.http.get<ApiResponse<any>>(`${this.apiUrl}/admin/menus`, { params });
+  }
+
+  getWeeklyMenus(startDate: string, endDate: string): Observable<ApiResponse<MenuResponse[]>> {
+    if (!this.weeklyMenusCache$) {
+      this.weeklyMenusCache$ = this.refreshWeeklyMenus$.pipe(
+        switchMap(() => this.http.get<ApiResponse<MenuResponse[]>>(`${this.apiUrl}/admin/menus/weekly`, {
+          params: { startDate, endDate }
+        })),
+        shareReplay(1),
+        catchError(error => {
+          this.weeklyMenusCache$ = null;
+          return throwError(() => error);
+        })
+      );
+    }
+    return this.weeklyMenusCache$;
+  }
+
+  getActivePrices(): Observable<ApiResponse<PriceResponse[]>> {
+    if (!this.activePricesCache$) {
+      this.activePricesCache$ = this.refreshActivePrices$.pipe(
+        switchMap(() => this.http.get<ApiResponse<PriceResponse[]>>(`${this.apiUrl}/admin/prices/active`)),
+        shareReplay(1),
+        catchError(error => {
+          this.activePricesCache$ = null;
+          return throwError(() => error);
+        })
+      );
+    }
+    return this.activePricesCache$;
+  }
+
+  clearMenuCache(): void {
+    this.weeklyMenusCache$ = null;
+    this.activePricesCache$ = null;
+    this.refreshWeeklyMenus$.next();
+    this.refreshActivePrices$.next();
   }
 }

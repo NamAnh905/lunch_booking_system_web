@@ -17,6 +17,13 @@
 
 .page-content {
   flex: 1;
-  overflow-y: auto;
+  overflow: hidden;
   padding: 24px 24px 24px 32px; // Tăng padding-left lên 32px để cách xa sidebar
+}
+
+.portal-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
 }

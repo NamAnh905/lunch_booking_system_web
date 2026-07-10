@@ -5,15 +5,16 @@ import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
 import { DishService } from './dish.service';
 import { Dish, DishCreateRequest, DishUpdateRequest } from '@shared/models/dish.model';
+import { AutoFocusDirective } from '../../../shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-dish',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent],
+  imports: [CommonModule, FormsModule, CrudComponent, AutoFocusDirective],
   templateUrl: './dish.component.html',
   styleUrl: './dish.component.scss'
 })
-export class DishComponent extends BaseCrudComponent<Dish, { keyword?: string }, any> implements OnInit {
+export class DishComponent extends BaseCrudComponent<Dish, { keyword?: string, types?: string[], isActives?: boolean[] }, any> implements OnInit {
   private dishService = inject(DishService);
 
   getService() {
@@ -24,8 +25,78 @@ export class DishComponent extends BaseCrudComponent<Dish, { keyword?: string },
     return {
       name: '',
       description: '',
-      isActive: true
+      isActive: true,
+      type: 'REGULAR'
     };
+  }
+
+  isFilterOpen = false;
+  
+  filterOptions = {
+    types: [
+      { value: 'REGULAR', label: 'Món thường', checked: false },
+      { value: 'SPECIAL', label: 'Món đặc biệt', checked: false },
+      { value: 'DRINK', label: 'Nước uống', checked: false },
+      { value: 'VEGETABLE', label: 'Rau', checked: false },
+      { value: 'SOUP', label: 'Canh', checked: false },
+      { value: 'RICE', label: 'Cơm', checked: false }
+    ],
+    isActives: [
+      { value: true, label: 'Hoạt động', checked: false },
+      { value: false, label: 'Khóa', checked: false }
+    ]
+  };
+
+  activeFilters: { key: string, value: any, label: string }[] = [];
+
+  toggleFilter() {
+    this.isFilterOpen = !this.isFilterOpen;
+  }
+
+  applyFilter() {
+    this.isFilterOpen = false;
+    this.updateActiveFilters();
+    this.onSearch();
+  }
+
+  clearFilter() {
+    this.filterOptions.types.forEach(t => t.checked = false);
+    this.filterOptions.isActives.forEach(a => a.checked = false);
+    this.applyFilter();
+  }
+
+  updateActiveFilters() {
+    this.activeFilters = [];
+    const selectedTypes = this.filterOptions.types.filter(t => t.checked);
+    if (selectedTypes.length > 0) {
+      this.query.types = selectedTypes.map(t => t.value);
+      selectedTypes.forEach(t => {
+        this.activeFilters.push({ key: 'types', value: t.value, label: `Loại: ${t.label}` });
+      });
+    } else {
+      this.query.types = [];
+    }
+
+    const selectedActives = this.filterOptions.isActives.filter(a => a.checked);
+    if (selectedActives.length > 0) {
+      this.query.isActives = selectedActives.map(a => a.value);
+      selectedActives.forEach(a => {
+        this.activeFilters.push({ key: 'isActives', value: a.value, label: `Trạng thái: ${a.label}` });
+      });
+    } else {
+      this.query.isActives = [];
+    }
+  }
+
+  removeFilter(filter: any) {
+    if (filter.key === 'types') {
+      const option = this.filterOptions.types.find(t => t.value === filter.value);
+      if (option) option.checked = false;
+    } else if (filter.key === 'isActives') {
+      const option = this.filterOptions.isActives.find(a => a.value === filter.value);
+      if (option) option.checked = false;
+    }
+    this.applyFilter();
   }
 
   onEditRow(item: Dish) {
@@ -45,7 +116,8 @@ export class DishComponent extends BaseCrudComponent<Dish, { keyword?: string },
         const updatedForm: DishUpdateRequest = {
           name: item.name,
           description: item.description,
-          isActive: !item.isActive
+          isActive: !item.isActive,
+          type: item.type
         };
 
         this.loading = true;
@@ -64,6 +136,36 @@ export class DishComponent extends BaseCrudComponent<Dish, { keyword?: string },
   }
 
   onExport() {
-    alert('Tính năng xuất Excel đang được phát triển ở phía Backend!');
+    this.loading = true;
+    this.dishService.exportExcel(this.query.keyword).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'danh_sach_mon_an.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        this.loading = false;
+        this.toastService.showSuccess('Xuất file Excel thành công!');
+      },
+      error: (err) => {
+        console.error('Failed to export excel', err);
+        this.loading = false;
+        this.toastService.showError('Xuất file Excel thất bại!');
+      }
+    });
+  }
+
+  override onSave(formData: any) {
+    if (this.formMode === 'add') {
+      formData.type = formData.type || 'REGULAR';
+      formData.isActive = formData.isActive !== undefined ? formData.isActive : true;
+    } else {
+      formData.isActive = formData.isActive !== undefined ? formData.isActive : this.formModel.isActive;
+      formData.type = formData.type || this.formModel.type || 'REGULAR';
+    }
+    super.onSave(formData);
   }
 }

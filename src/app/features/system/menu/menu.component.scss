@@ -63,6 +63,7 @@
 
 .grid-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   margin-top: 16px;
   background-color: white;
@@ -89,7 +90,7 @@
     }
 
     &.weekday-col {
-      min-width: 160px;
+      width: calc((100% - 160px) / 5);
     }
   }
 
@@ -127,27 +128,29 @@
     padding-bottom: 4px;
     border-bottom: 1px dashed #cbd5e1;
 
-    .badge {
+    .status-clean {
       font-size: 11px;
-      padding: 2px 6px;
       cursor: pointer;
       font-weight: 500;
-      border-radius: 4px;
       transition: opacity 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #333;
 
       &:hover {
         opacity: 0.85;
       }
-    }
 
-    .badge-success {
-      background-color: #dcfce7;
-      color: #15803d;
-    }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+      }
 
-    .badge-danger {
-      background-color: #fee2e2;
-      color: #b91c1c;
+      &.active .status-dot { background-color: #28a745; }
+      &.inactive .status-dot { background-color: #dc3545; }
     }
 
     .btn-delete-menu {

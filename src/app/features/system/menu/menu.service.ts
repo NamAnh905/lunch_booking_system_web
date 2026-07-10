@@ -28,6 +28,10 @@ export class MenuService {
     return this.http.get<ApiResponse<Menu[]>>(`${this.apiUrl}?date=${date}`);
   }
 
+  getWeeklyMenus(startDate: string, endDate: string): Observable<ApiResponse<Menu[]>> {
+    return this.http.get<ApiResponse<Menu[]>>(`${this.apiUrl}/weekly?startDate=${startDate}&endDate=${endDate}`);
+  }
+
   add(form: MenuCreateRequest): Observable<ApiResponse<Menu>> {
     return this.http.post<ApiResponse<Menu>>(this.apiUrl, form);
   }
@@ -38,5 +42,16 @@ export class MenuService {
 
   delete(id: number | string): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
+  }
+
+  exportExcel(keyword?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (keyword) {
+      params = params.set('keyword', keyword);
+    }
+    return this.http.get(`${this.apiUrl}/export`, {
+      params,
+      responseType: 'blob'
+    });
   }
 }

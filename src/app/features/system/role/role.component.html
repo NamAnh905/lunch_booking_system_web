@@ -1,11 +1,20 @@
 <app-crud [loading]="loading" [total]="total" [page]="page" [size]="size" [selections]="selections"
-  [permissions]="{ add: 'MANAGE_ROLES', edit: 'MANAGE_ROLES', delete: 'MANAGE_ROLES', export: 'EXPORT_ROLES' }"
-  (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)" (refresh)="onReset()" (export)="onExport()"
-  (add)="onAdd()" (edit)="onEdit($event)" (delete)="onDelete($event)">
+  [permissions]="{ add: 'MANAGE_ROLES', edit: 'MANAGE_ROLES', delete: 'MANAGE_ROLES' }"
+  (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)" (refresh)="onReset()" (add)="onAdd()"
+  (edit)="onEdit($event)" (delete)="onDelete($event)">
 
   <div crud-filters class="filters">
-    <input type="text" placeholder="Tìm kiếm vai trò" [(ngModel)]="query.keyword" (keyup.enter)="onSearch()">
-    <button class="btn btn-secondary" (click)="onSearch()">Tìm kiếm</button>
+    <div class="search-wrapper">
+      <input type="text" placeholder="Tìm kiếm vai trò" [(ngModel)]="query.keyword" (keyup.enter)="onSearch()"
+        class="search-input">
+      <button class="search-btn" (click)="onSearch()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </button>
+    </div>
   </div>
 
   <table crud-table class="data-table">
@@ -29,7 +38,7 @@
           <input type="checkbox" [checked]="isSelected(item)" (change)="toggleSelection(item)">
         </td>
         <td class="text-center">{{ (page - 1) * size + i + 1 }}</td>
-        <td><span class="badge badge-info">{{ item.code }}</span></td>
+        <td>{{ item.code }}</td>
         <td>{{ item.name }}</td>
         <td>{{ item.description }}</td>
         <td class="action-column">
@@ -74,12 +83,13 @@
       <form #f="ngForm" (ngSubmit)="onSave(f.value)">
         <div class="form-group">
           <label class="required">Mã vai trò</label>
-          <input type="text" name="code" [(ngModel)]="formModel.code" required [disabled]="formMode === 'edit'">
+          <input type="text" name="code" [(ngModel)]="formModel.code" required [disabled]="formMode === 'edit'"
+            [appAutoFocus]="formMode === 'add'">
         </div>
 
         <div class="form-group">
           <label class="required">Tên vai trò</label>
-          <input type="text" name="name" [(ngModel)]="formModel.name" required>
+          <input type="text" name="name" [(ngModel)]="formModel.name" required [appAutoFocus]="formMode === 'edit'">
         </div>
 
         <div class="form-group">
@@ -94,18 +104,19 @@
               {{ getPermissionsDisplayText() }}
             </div>
             @if (isPermissionsDropdownOpen) {
-              <div class="dropdown-list" (click)="$event.stopPropagation()">
-                @for (perm of availablePermissions; track perm.id) {
-                  <label class="dropdown-item">
-                    <input type="checkbox" [value]="perm.action" (change)="onPermissionChange(perm.action, $event)" [checked]="formModel.permissions?.includes(perm.action)">
-                    <span class="fw-bold">{{ perm.action }}</span>
-                    <span class="text-muted ms-2" style="font-size: 0.8em;">- {{ perm.description }}</span>
-                  </label>
-                }
-                @if (availablePermissions.length === 0) {
-                  <div class="p-2 text-center text-muted">Chưa có dữ liệu phân quyền</div>
-                }
-              </div>
+            <div class="dropdown-list" (click)="$event.stopPropagation()">
+              @for (perm of availablePermissions; track perm.id) {
+              <label class="dropdown-item">
+                <input type="checkbox" [value]="perm.action" (change)="onPermissionChange(perm.action, $event)"
+                  [checked]="formModel.permissions?.includes(perm.action)">
+                <span class="fw-bold">{{ perm.action }}</span>
+                <span class="text-muted ms-2" style="font-size: 0.8em;">- {{ perm.description }}</span>
+              </label>
+              }
+              @if (availablePermissions.length === 0) {
+              <div class="p-2 text-center text-muted">Chưa có dữ liệu phân quyền</div>
+              }
+            </div>
             }
           </div>
         </div>

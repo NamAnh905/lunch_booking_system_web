@@ -18,10 +18,9 @@ export const routes: Routes = [
         pathMatch: 'full'
       },
       {
-        path: 'dashboard',
-        loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
-        title: 'Bảng điều khiển - LunchOrder',
-        data: { breadcrumb: 'SKIP' }
+        path: 'statistic',
+        data: { breadcrumb: 'Thống kê' },
+        loadChildren: () => import('./features/statistic/statistic.routes').then(m => m.statisticRoutes)
       },
       {
         path: 'portal',

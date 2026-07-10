@@ -5,11 +5,12 @@ import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
 import { PriceService } from './price.service';
 import { PriceResponse, PriceCreateRequest, PriceUpdateRequest } from '@shared/models/price.model';
+import { AutoFocusDirective } from '../../../shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-price',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent],
+  imports: [CommonModule, FormsModule, CrudComponent, AutoFocusDirective],
   templateUrl: './price.component.html',
   styleUrl: './price.component.scss'
 })
@@ -87,7 +88,4 @@ export class PriceComponent extends BaseCrudComponent<PriceResponse, { keyword?:
     });
   }
 
-  onExport() {
-    this.toastService.showWarning('Tính năng xuất Excel danh sách giá đang được phát triển ở phía Backend!');
-  }
 }

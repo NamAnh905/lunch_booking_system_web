@@ -56,8 +56,8 @@
               <!-- Menu Header (Status & Delete menu) -->
               @if (menu && slots.length > 0) {
                 <div class="menu-cell-header">
-                  <span class="badge" [class.badge-success]="menu.status === 'ACTIVE'" [class.badge-danger]="menu.status !== 'ACTIVE'" (click)="onToggleCellStatus(menu)" title="Click để thay đổi trạng thái">
-                    {{ menu.status === 'ACTIVE' ? 'Hoạt động' : 'Khóa' }}
+                  <span class="status-clean" [class.active]="menu.status === 'ACTIVE'" [class.inactive]="menu.status !== 'ACTIVE'" (click)="onToggleCellStatus(menu)" title="Click để thay đổi trạng thái">
+                    <span class="status-dot"></span> {{ menu.status === 'ACTIVE' ? 'Hoạt động' : 'Khóa' }}
                   </span>
                   
                   <button class="btn-delete-menu" (click)="onDeleteCell(menu)" title="Xóa thực đơn ngày này">
@@ -73,9 +73,9 @@
               @if (slots.length > 0) {
                 <div class="menu-slots-container" [class.inactive-menu]="menu && menu.status === 'INACTIVE'">
                   @for (slot of slots; track $index; let idx = $index) {
-                    <div class="menu-slot-row" [class.empty-slot]="!slot.dish" [class.drink-slot]="slot.isDrinkSlot">
+                    <div class="menu-slot-row" [class.empty-slot]="!slot.dish" [class.drink-slot]="slot.expectedType === 'DRINK'">
                       
-                      <div class="slot-text-wrapper" (click)="openSlotDropdown(day.dateStr, price.id!, idx, slot.isDrinkSlot, $event)">
+                      <div class="slot-text-wrapper" (click)="openSlotDropdown(day.dateStr, price.id!, idx, slot.expectedType, $event)">
                         @if (slot.dish) {
                           <span class="dish-name">{{ slot.dish.name }}</span>
                         } @else {
@@ -84,7 +84,7 @@
                       </div>
 
                       @if (slot.dish) {
-                        <button class="btn-remove-slot" (click)="removeDishFromSlot(day.dateStr, price.id!, idx, slot.isDrinkSlot, $event)" title="Xóa món này">
+                        <button class="btn-remove-slot" (click)="removeDishFromSlot(day.dateStr, price.id!, idx, $event)" title="Xóa món này">
                           &times;
                         </button>
                       }
@@ -93,15 +93,15 @@
                       @if (activeEditSlot && activeEditSlot.dateStr === day.dateStr && activeEditSlot.priceId === price.id && activeEditSlot.slotIndex === idx) {
                         <div class="slot-dropdown-popup" (click)="$event.stopPropagation()">
                           <div class="dropdown-search-box">
-                            <input type="text" placeholder="Tìm nhanh..." [(ngModel)]="dishSearchKeyword" autofocus>
+                            <input type="text" placeholder="Tìm nhanh..." [(ngModel)]="dishSearchKeyword" appAutoFocus>
                           </div>
                           <div class="dropdown-options-list">
-                            @for (availDish of getFilteredDishes(slot.isDrinkSlot); track availDish.id) {
+                            @for (availDish of getFilteredDishes(slot.expectedType); track availDish.id) {
                               <div class="dropdown-option-item" (click)="selectDishForSlot(availDish)">
                                 {{ availDish.name }}
                               </div>
                             }
-                            @if (getFilteredDishes(slot.isDrinkSlot).length === 0) {
+                            @if (getFilteredDishes(slot.expectedType).length === 0) {
                               <div class="no-options-item">Không tìm thấy món</div>
                             }
                           </div>

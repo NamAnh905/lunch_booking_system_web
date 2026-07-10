@@ -14,8 +14,69 @@
   (delete)="onDelete($event)">
   
   <div crud-filters class="filters">
-    <input type="text" placeholder="Tìm kiếm món ăn..." [(ngModel)]="query.keyword" (keyup.enter)="onSearch()">
-    <button class="btn btn-secondary" (click)="onSearch()">Tìm kiếm</button>
+    <div class="toolbar-top">
+      <div class="search-wrapper">
+        <input type="text" placeholder="Tìm kiếm món ăn..." [(ngModel)]="query.keyword" (keyup.enter)="onSearch()" class="search-input">
+        <button class="search-btn" (click)="onSearch()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="filter-wrapper">
+        <button class="btn-filter" (click)="toggleFilter()" [class.active]="activeFilters.length > 0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          Bộ lọc
+          @if (activeFilters.length > 0) {
+            <span class="filter-badge"></span>
+          }
+        </button>
+
+        @if (isFilterOpen) {
+          <div class="filter-dropdown">
+            <div class="filter-section">
+              <h4>Loại món ăn</h4>
+              <div class="checkbox-list">
+                @for (type of filterOptions.types; track type.value) {
+                  <label class="checkbox-item">
+                    <input type="checkbox" [(ngModel)]="type.checked"> {{ type.label }}
+                  </label>
+                }
+              </div>
+            </div>
+            <div class="filter-section">
+              <h4>Trạng thái</h4>
+              <div class="checkbox-list">
+                @for (status of filterOptions.isActives; track status.value) {
+                  <label class="checkbox-item">
+                    <input type="checkbox" [(ngModel)]="status.checked"> {{ status.label }}
+                  </label>
+                }
+              </div>
+            </div>
+            <div class="filter-actions">
+              <button class="btn btn-secondary" (click)="clearFilter()">Xóa</button>
+              <button class="btn btn-primary" (click)="applyFilter()">Áp dụng</button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+    
+    @if (activeFilters.length > 0) {
+      <div class="filter-chips">
+        @for (chip of activeFilters; track chip.label) {
+          <div class="chip">
+            {{ chip.label }}
+            <button class="btn-remove" (click)="removeFilter(chip)">&times;</button>
+          </div>
+        }
+      </div>
+    }
   </div>
 
   <table crud-table class="data-table">
@@ -26,6 +87,7 @@
         </th>
         <th class="text-center" style="width: 60px;">STT</th>
         <th>Tên món ăn</th>
+        <th>Loại món</th>
         <th>Mô tả</th>
         <th>Trạng thái</th>
         <th class="action-column">Thao tác</th>
@@ -39,10 +101,21 @@
           </td>
           <td class="text-center">{{ (page - 1) * size + i + 1 }}</td>
           <td>{{ item.name }}</td>
+          <td>
+            @switch (item.type) {
+              @case ('REGULAR') { <span>Món thường</span> }
+              @case ('SPECIAL') { <span>Món đặc biệt</span> }
+              @case ('DRINK') { <span>Nước uống</span> }
+              @case ('VEGETABLE') { <span>Rau</span> }
+              @case ('SOUP') { <span>Canh</span> }
+              @case ('RICE') { <span>Cơm</span> }
+              @default { <span>{{ item.type }}</span> }
+            }
+          </td>
           <td>{{ item.description }}</td>
           <td>
-            <span class="badge" [class.badge-success]="item.isActive" [class.badge-danger]="!item.isActive">
-              {{ item.isActive ? 'Hoạt động' : 'Khóa' }}
+            <span class="status-clean" [class.active]="item.isActive" [class.inactive]="!item.isActive">
+              <span class="status-dot"></span> {{ item.isActive ? 'Hoạt động' : 'Khóa' }}
             </span>
           </td>
           <td class="action-column">
@@ -88,7 +161,7 @@
       }
       @if (data.length === 0 && !loading) {
         <tr>
-          <td colspan="6" class="text-center empty-state">Không có dữ liệu</td>
+          <td colspan="7" class="text-center empty-state">Không có dữ liệu</td>
         </tr>
       }
     </tbody>
@@ -107,7 +180,19 @@
         <form #f="ngForm" (ngSubmit)="onSave(f.value)">
           <div class="form-group">
             <label class="required">Tên món ăn</label>
-            <input type="text" name="name" [(ngModel)]="formModel.name" required>
+            <input type="text" name="name" [(ngModel)]="formModel.name" required appAutoFocus>
+          </div>
+          
+          <div class="form-group">
+            <label class="required">Loại món ăn</label>
+            <select name="type" [(ngModel)]="formModel.type" required class="form-control">
+              <option value="REGULAR">Món thường</option>
+              <option value="SPECIAL">Món đặc biệt</option>
+              <option value="DRINK">Nước uống</option>
+              <option value="VEGETABLE">Rau</option>
+              <option value="SOUP">Canh</option>
+              <option value="RICE">Cơm</option>
+            </select>
           </div>
           
           <div class="form-group">

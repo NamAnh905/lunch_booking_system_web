@@ -1,0 +1,156 @@
+<div class="monthly-meal-container">
+  <div class="header-section">
+    <h2>Thống kê ăn trưa tháng {{ selectedMonth }}/{{ selectedYear }}</h2>
+  </div>
+
+  <div class="summary-cards">
+    <div class="card card-blue">
+      <div class="card-icon"><i class="fas fa-utensils"></i></div>
+      <div class="card-content">
+        <span class="label">Tổng suất ăn</span>
+        <span class="value">{{ (summary?.totalNormalMeals || 0) + (summary?.totalSpecialMeals || 0) }}</span>
+      </div>
+    </div>
+    <div class="card card-green">
+      <div class="card-icon"><i class="fas fa-money-bill-wave"></i></div>
+      <div class="card-content">
+        <span class="label">Tổng tiền</span>
+        <span class="value">{{ summary?.totalAmount || 0 | formatMoney }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <div class="toolbar-top">
+      <div class="filters-inline">
+        <div class="filter-item">
+          <select [(ngModel)]="selectedMonth" (change)="onFilterChange()">
+            @for (m of months; track m) {
+              <option [ngValue]="m">Tháng {{ m }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-item">
+          <select [(ngModel)]="selectedYear" (change)="onFilterChange()">
+            @for (y of years; track y) {
+              <option [ngValue]="y">{{ y }}</option>
+            }
+          </select>
+        </div>
+        <div class="filter-item">
+          <select [(ngModel)]="selectedDepartmentId" (change)="onFilterChange()">
+            <option [ngValue]="null">Tất cả phòng ban</option>
+            @for (dept of departments; track dept.id) {
+              <option [ngValue]="dept.id">{{ dept.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="action-buttons" style="display: flex; align-items: center; gap: 12px;">
+        <button class="btn btn-info" (click)="exportExcel()" [disabled]="isExporting">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" *ngIf="!isExporting">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <i class="fas fa-spinner fa-spin" *ngIf="isExporting"></i>
+          {{ isExporting ? 'Đang xuất...' : 'Xuất Excel' }}
+        </button>
+        <div class="view-toggle">
+          <button [class.active]="viewMode === 'overview'" (click)="setViewMode('overview')">Tổng quan Lịch</button>
+          <button [class.active]="viewMode === 'list'" (click)="setViewMode('list')">Chi tiết tháng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERVIEW CALENDAR MODE -->
+  <div class="overview-mode-container" *ngIf="viewMode === 'overview'">
+    <div class="legend-container">
+      <div class="legend-item">
+        <span class="legend-box box-yellow"></span>
+        <span>Có phát sinh suất ăn</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-box box-gray"></span>
+        <span>Không có suất ăn</span>
+      </div>
+    </div>
+
+    <div class="calendar-container">
+      <div class="dense-grid">
+        <ng-container *ngFor="let day of daysInMonth">
+          <div *ngIf="!day.isPadding" class="dense-cell" 
+               [ngClass]="{
+                 'has-meals': day.totalMeals > 0,
+                 'no-meals': day.totalMeals === 0
+               }"
+               (click)="goToDailyDetail(day.date)">
+            <div class="cell-date">
+              {{ day.day! < 10 ? '0' + day.day : day.day }}
+            </div>
+            <div class="cell-content">
+              {{ day.totalMeals }}
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIST VIEW MODE -->
+  <div class="table-container" *ngIf="viewMode === 'list'">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="text-center" style="width: 60px;">STT</th>
+          <th>Họ và Tên</th>
+          <th>Phòng ban</th>
+          <th>Tổng suất ăn</th>
+          <th>Tổng tiền ăn</th>
+          <th class="action-column">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items; let i = index">
+          <td class="text-center">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+          <td>{{ item.fullName }}</td>
+          <td>{{ item.departmentName }}</td>
+          <td>{{ item.normalMealCount + item.specialMealCount }}</td>
+          <td>{{ item.totalAmount | formatMoney }}</td>
+          <td class="action-column">
+            <div class="row-actions" *ngIf="item.hasData">
+              <button class="btn-icon view" (click)="openUserDetail(item)" title="Xem chi tiết">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+            <span *ngIf="!item.hasData" style="color: #94a3b8; font-style: italic; font-size: 13px;">
+              Chưa có dữ liệu
+            </span>
+          </td>
+        </tr>
+        <tr *ngIf="items.length === 0">
+          <td colspan="6" class="text-center empty-state">Không có dữ liệu</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination" *ngIf="totalPages.length > 1">
+      <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">&laquo;</button>
+      <button *ngFor="let page of totalPages" [class.active]="page === currentPage" (click)="onPageChange(page)">
+        {{ page }}
+      </button>
+      <button [disabled]="currentPage === totalPages.length" (click)="onPageChange(currentPage + 1)">&raquo;</button>
+    </div>
+  </div>
+</div>
+
+<app-monthly-meal-detail-modal *ngIf="isModalOpen" [userId]="selectedUserId!" [userName]="selectedUserName!"
+  [totalMeals]="selectedUserTotalMeals" [month]="selectedMonth" [year]="selectedYear" (close)="isModalOpen = false">
+</app-monthly-meal-detail-modal>

@@ -51,7 +51,7 @@ export class LoginComponent {
         this.loading = false;
         if (res.authenticated) {
           if (this.authService.hasRole('ADMIN') || this.authService.hasRole('SUPER_ADMIN') || this.authService.hasRole('ADMIN')) {
-            this.router.navigate(['/system/statistics/order-monthly']);
+            this.router.navigate(['statistic/order-monthly']);
           } else {
             this.router.navigate(['/portal/meal-order']);
           }

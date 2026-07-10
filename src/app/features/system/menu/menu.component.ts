@@ -11,11 +11,12 @@ import { PriceResponse } from '@shared/models/price.model';
 import { Dish } from '@shared/models/dish.model';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { AutoFocusDirective } from '../../../shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent],
+  imports: [CommonModule, FormsModule, CrudComponent, AutoFocusDirective],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
 })
@@ -33,7 +34,7 @@ export class MenuComponent extends BaseCrudComponent<Menu, { keyword?: string },
   menuGrid: { [key: string]: Menu } = {};
 
   // Inline slot editing state
-  activeEditSlot: { dateStr: string; priceId: number; slotIndex: number; isDrinkSlot: boolean } | null = null;
+  activeEditSlot: { dateStr: string; priceId: number; slotIndex: number; expectedType: string } | null = null;
   dishSearchKeyword = '';
 
   override ngOnInit() {
@@ -124,24 +125,24 @@ export class MenuComponent extends BaseCrudComponent<Menu, { keyword?: string },
 
   loadWeekMenus() {
     this.loading = true;
-    const dates = this.weekDays.map(d => d.dateStr);
-    const requests = dates.map(date => 
-      this.menuService.getByDate(date).pipe(
-        catchError(() => of({ result: [] as Menu[] }))
-      )
-    );
-
-    forkJoin(requests).subscribe({
-      next: (responses) => {
+    if (this.weekDays.length === 0) {
+      this.loading = false;
+      return;
+    }
+    
+    const startDate = this.weekDays[0].dateStr;
+    const endDate = this.weekDays[this.weekDays.length - 1].dateStr;
+    
+    this.menuService.getWeeklyMenus(startDate, endDate).pipe(
+      catchError(() => of({ result: [] as Menu[] }))
+    ).subscribe({
+      next: (res: any) => {
         this.menuGrid = {};
-        responses.forEach((res: any, index) => {
-          const dateStr = dates[index];
-          const menus = res.result || [];
-          menus.forEach((menu: Menu) => {
-            if (menu.price && menu.price.id) {
-              this.menuGrid[`${dateStr}_${menu.price.id}`] = menu;
-            }
-          });
+        const menus = res.result || [];
+        menus.forEach((menu: Menu) => {
+          if (menu.price && menu.price.id) {
+            this.menuGrid[`${menu.menuDate}_${menu.price.id}`] = menu;
+          }
         });
         this.loading = false;
       },
@@ -183,17 +184,36 @@ export class MenuComponent extends BaseCrudComponent<Menu, { keyword?: string },
     return this.menuGrid[`${dateStr}_${priceId}`];
   }
 
+  getDishType(dish: Dish): string {
+    if (!dish) return 'REGULAR';
+    if (dish.type === 'VEGETABLE') return 'VEGETABLE';
+    if (dish.type === 'SOUP') return 'SOUP';
+    if (dish.type === 'RICE') return 'RICE';
+    if (dish.type === 'DRINK') return 'DRINK';
+    
+    if (this.isDrink(dish)) return 'DRINK';
+    
+    return 'REGULAR';
+  }
+
   isDrink(dish: Dish): boolean {
-    if (!dish || !dish.name) return false;
+    if (!dish) return false;
+    if (dish.type === 'DRINK') return true;
+    if (dish.type === 'REGULAR' || dish.type === 'SPECIAL' || dish.type === 'VEGETABLE' || dish.type === 'SOUP' || dish.type === 'RICE') return false;
+    
+    // Fallback for legacy data
+    if (!dish.name) return false;
     const name = dish.name.toLowerCase();
     const keywords = ['trà', 'nước', 'sữa', 'sinh tố', 'coca', 'pepsi', 'lavie', 'café', 'cà phê', 'soda', 'chanh', 'la hán', 'nhân trần', 'bí đao', 'cam ép'];
     return keywords.some(keyword => name.includes(keyword));
   }
 
-  getFilteredDishes(isDrinkSlot: boolean): Dish[] {
-    const list = isDrinkSlot 
-      ? this.availableDishes.filter(d => this.isDrink(d))
-      : this.availableDishes.filter(d => !this.isDrink(d));
+  getFilteredDishes(expectedType: string): Dish[] {
+    let list = this.availableDishes;
+    
+    if (expectedType) {
+      list = list.filter(d => this.getDishType(d) === expectedType);
+    }
     
     if (!this.dishSearchKeyword) return list;
     
@@ -207,98 +227,101 @@ export class MenuComponent extends BaseCrudComponent<Menu, { keyword?: string },
     return name.includes('đặc biệt') || name.includes('vip') || price.amount === 40000;
   }
 
-  getMenuSlots(menu: Menu | undefined, dayName: string, price: PriceResponse): { isDrinkSlot: boolean; dish?: Dish; label: string }[] {
-    const slots: { isDrinkSlot: boolean; dish?: Dish; label: string }[] = [];
-    
-    // Check if it is a special lunch
+  getMenuSlots(menu: Menu | undefined, dayName: string, price: PriceResponse): { expectedType: string; dish?: Dish; label: string }[] {
     const isSpecial = this.isSpecialPrice(price);
     
     if (isSpecial) {
       if (dayName !== 'Thứ sáu') {
-        // Monday to Thursday for special lunch: no slots
         return [];
       } else {
-        // Friday for special lunch: exactly 1 food slot
         let dish: Dish | undefined = undefined;
         if (menu && menu.dishes && menu.dishes.length > 0) {
           dish = menu.dishes[0];
         }
         return [{
-          isDrinkSlot: false,
+          expectedType: 'REGULAR',
           dish,
           label: 'Thêm món ăn'
         }];
       }
     }
     
-    // Regular lunch: 7 slots (6 food + 1 drink)
-    let foods: Dish[] = [];
-    let drinks: Dish[] = [];
+    const slotDefs = [
+      { type: 'REGULAR', label: 'Thêm món ăn' },
+      { type: 'REGULAR', label: 'Thêm món ăn' },
+      { type: 'VEGETABLE', label: 'Thêm rau' },
+      { type: 'VEGETABLE', label: 'Thêm rau' },
+      { type: 'SOUP', label: 'Thêm canh' },
+      { type: 'RICE', label: 'Thêm cơm' },
+      { type: 'DRINK', label: 'Thêm nước' }
+    ];
+    
+    const mappedSlots = slotDefs.map(def => ({ expectedType: def.type, dish: undefined as Dish | undefined, label: def.label }));
     
     if (menu && menu.dishes) {
-      foods = menu.dishes.filter(d => !this.isDrink(d));
-      drinks = menu.dishes.filter(d => this.isDrink(d));
+      const unassignedDishes = [...menu.dishes];
+      
+      // First pass: strict match
+      for (let i = 0; i < unassignedDishes.length; i++) {
+        const dish = unassignedDishes[i];
+        if (!dish) continue;
+        const dType = this.getDishType(dish);
+        const slot = mappedSlots.find(s => !s.dish && s.expectedType === dType);
+        if (slot) {
+          slot.dish = dish;
+          unassignedDishes[i] = null as any;
+        }
+      }
+      
+      // Second pass: fill any empty slots for leftovers
+      for (const dish of unassignedDishes) {
+        if (!dish) continue;
+        const emptySlot = mappedSlots.find(s => !s.dish);
+        if (emptySlot) {
+          emptySlot.dish = dish;
+        }
+      }
     }
     
-    // 6 food slots
-    for (let i = 0; i < 6; i++) {
-      slots.push({
-        isDrinkSlot: false,
-        dish: foods[i] || undefined,
-        label: foods[i] ? foods[i].name : 'Thêm món ăn'
-      });
-    }
-    
-    // 1 drink slot
-    slots.push({
-      isDrinkSlot: true,
-      dish: drinks[0] || undefined,
-      label: drinks[0] ? drinks[0].name : 'Thêm nước'
-    });
-    
-    return slots;
+    return mappedSlots;
   }
 
-  openSlotDropdown(dateStr: string, priceId: number, slotIndex: number, isDrinkSlot: boolean, event: Event) {
+  openSlotDropdown(dateStr: string, priceId: number, slotIndex: number, expectedType: string, event: Event) {
     event.stopPropagation();
-    this.activeEditSlot = { dateStr, priceId, slotIndex, isDrinkSlot };
+    this.activeEditSlot = { dateStr, priceId, slotIndex, expectedType };
     this.dishSearchKeyword = '';
   }
 
-  validateDishForSlot(dish: Dish, dateStr: string, priceId: number, slotIndex: number): string | null {
+  validateDishForSlot(dish: Dish, dateStr: string, priceId: number, slotIndex: number, expectedType: string): string | null {
     const menu = this.getMenuAt(dateStr, priceId);
     if (!menu || !menu.dishes) return null;
 
-    const foods = menu.dishes.filter(d => !this.isDrink(d));
+    const price = this.availablePrices.find(p => p.id === priceId);
+    const day = this.weekDays.find(d => d.dateStr === dateStr);
+    if (!price || !day) return null;
+    
+    const slots = this.getMenuSlots(menu, day.name, price);
 
-    // 1. General duplication check: A dish cannot appear twice in the menu
-    const isDuplicate = menu.dishes.some((d, idx) => {
-      // If we are replacing the dish at the current slot, it's not a duplicate
-      const isCurrentSlot = this.isDrink(dish)
-        ? (this.isDrink(d) && idx === slotIndex - 6)
-        : (!this.isDrink(d) && foods.indexOf(d) === slotIndex);
-      return d.id === dish.id && !isCurrentSlot;
+    const isDuplicate = slots.some((s, idx) => {
+      return s.dish && s.dish.id === dish.id && idx !== slotIndex;
     });
 
     if (isDuplicate) {
       return `Món "${dish.name}" đã tồn tại trong thực đơn này!`;
     }
 
-    // 2. Tofu conflict check
-    if (!this.isDrink(dish)) {
+    if (expectedType !== 'DRINK') {
       const isTofu = dish.name.toLowerCase().includes('đậu');
       if (isTofu) {
         if (slotIndex === 0) {
-          // Setting the first slot to Tofu. Check if any other slots have Tofu.
-          for (let i = 1; i < 6; i++) {
-            if (foods[i] && foods[i].name.toLowerCase().includes('đậu')) {
+          for (let i = 1; i <= 5; i++) {
+            if (slots[i] && slots[i].dish && slots[i].dish!.name.toLowerCase().includes('đậu')) {
               return `Vì hàng khác đã có món chứa "đậu", hàng đầu tiên không thể là món "đậu"!`;
             }
           }
-        } else {
-          // Setting slot 1-5 to Tofu. Check if the first slot is Tofu.
-          if (foods[0] && foods[0].name.toLowerCase().includes('đậu')) {
-            return `Vì hàng đầu tiên đã là món chứa "đậu", các hàng còn lại không thể chọn món "đậu" nữa!`;
+        } else if (slotIndex > 0 && slotIndex <= 5) {
+          if (slots[0] && slots[0].dish && slots[0].dish!.name.toLowerCase().includes('đậu')) {
+             return `Vì hàng đầu tiên đã là món chứa "đậu", các hàng còn lại không thể chọn món "đậu" nữa!`;
           }
         }
       }
@@ -309,65 +332,42 @@ export class MenuComponent extends BaseCrudComponent<Menu, { keyword?: string },
 
   selectDishForSlot(dish: Dish) {
     if (!this.activeEditSlot) return;
-    const { dateStr, priceId, slotIndex, isDrinkSlot } = this.activeEditSlot;
+    const { dateStr, priceId, slotIndex, expectedType } = this.activeEditSlot;
     
-    // Check validation first
-    const errorMsg = this.validateDishForSlot(dish, dateStr, priceId, slotIndex);
+    const errorMsg = this.validateDishForSlot(dish, dateStr, priceId, slotIndex, expectedType);
     if (errorMsg) {
       this.toastService.showError(errorMsg);
       this.activeEditSlot = null;
       return;
     }
 
-    // Find if menu exists
     let menu = this.getMenuAt(dateStr, priceId);
+    const price = this.availablePrices.find(p => p.id === priceId);
+    const day = this.weekDays.find(d => d.dateStr === dateStr);
+    if (!price || !day) return;
     
-    let currentDishes = menu ? [...(menu.dishes || [])] : [];
+    const slots = this.getMenuSlots(menu, day.name, price);
+    slots[slotIndex].dish = dish;
     
-    // Separate food and drinks
-    let foods = currentDishes.filter(d => !this.isDrink(d));
-    let drinks = currentDishes.filter(d => this.isDrink(d));
-    
-    if (isDrinkSlot) {
-      // For drink slot, we replace or set the drink
-      drinks = [dish];
-    } else {
-      // For food slot, we replace the food at slotIndex
-      // Pad foods if needed
-      while (foods.length <= slotIndex) {
-        foods.push(null as any);
-      }
-      foods[slotIndex] = dish;
-      // Filter out nulls
-      foods = foods.filter(f => f !== null);
-    }
-    
-    const newDishes = [...foods, ...drinks];
-    const dishIds = newDishes.map(d => d.id!);
+    const dishIds = slots.filter(s => s.dish).map(s => s.dish!.id!);
     
     this.saveMenuDishes(menu, dateStr, priceId, dishIds);
     this.activeEditSlot = null;
   }
 
-  removeDishFromSlot(dateStr: string, priceId: number, slotIndex: number, isDrinkSlot: boolean, event: Event) {
+  removeDishFromSlot(dateStr: string, priceId: number, slotIndex: number, event: Event) {
     event.stopPropagation();
     let menu = this.getMenuAt(dateStr, priceId);
     if (!menu) return;
     
-    let currentDishes = [...(menu.dishes || [])];
-    let foods = currentDishes.filter(d => !this.isDrink(d));
-    let drinks = currentDishes.filter(d => this.isDrink(d));
+    const price = this.availablePrices.find(p => p.id === priceId);
+    const day = this.weekDays.find(d => d.dateStr === dateStr);
+    if (!price || !day) return;
     
-    if (isDrinkSlot) {
-      drinks = [];
-    } else {
-      if (slotIndex < foods.length) {
-        foods.splice(slotIndex, 1);
-      }
-    }
+    const slots = this.getMenuSlots(menu, day.name, price);
+    slots[slotIndex].dish = undefined;
     
-    const newDishes = [...foods, ...drinks];
-    const dishIds = newDishes.map(d => d.id!);
+    const dishIds = slots.filter(s => s.dish).map(s => s.dish!.id!);
     
     this.saveMenuDishes(menu, dateStr, priceId, dishIds);
   }
@@ -469,6 +469,25 @@ export class MenuComponent extends BaseCrudComponent<Menu, { keyword?: string },
   }
 
   onExport() {
-    alert('Tính năng xuất Excel đang được phát triển ở phía Backend!');
+    this.loading = true;
+    this.menuService.exportExcel().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'danh_sach_thuc_don.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        this.loading = false;
+        this.toastService.showSuccess('Xuất file Excel thành công!');
+      },
+      error: (err) => {
+        console.error('Failed to export excel', err);
+        this.loading = false;
+        this.toastService.showError('Xuất file Excel thất bại!');
+      }
+    });
   }
 }
