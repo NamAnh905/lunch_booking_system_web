@@ -1,7 +1,7 @@
 .breadcrumb-nav {
   display: flex;
   align-items: center;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: var(--font-sans-serif);
   font-size: 13.5px;
   transition: all 0.3s ease;
 }

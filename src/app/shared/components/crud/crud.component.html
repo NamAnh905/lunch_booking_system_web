@@ -7,6 +7,9 @@
     </div>
     
     <div class="crud-right-actions">
+      <!-- Custom add control (e.g. dropdown) projected from parent -->
+      <ng-content select="[crud-add]"></ng-content>
+
       <!-- Add Button -->
       @if (hasPermission(permissions.add) && !hideAdd) {
         <button class="btn btn-primary" (click)="onAdd()" [disabled]="loading">

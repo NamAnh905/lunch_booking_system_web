@@ -71,68 +71,67 @@
 </app-crud>
 
 <!-- Form Modal -->
-@if (isFormOpen) {
-<div class="modal-overlay">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>{{ formMode === 'add' ? 'Thêm mới' : 'Cập nhật' }} vai trò</h3>
-      <button class="close-btn" (click)="closeForm()">&times;</button>
+<app-form-modal
+  [open]="isFormOpen"
+  [title]="(formMode === 'add' ? 'Thêm mới' : 'Cập nhật') + ' vai trò'"
+  [saving]="loading"
+  [saveDisabled]="f.invalid"
+  (save)="onSave(f.value)"
+  (cancel)="closeForm()">
+  <form #f="ngForm" style="display: contents">
+    <div class="form-field">
+      <label class="required">Mã vai trò</label>
+      <input type="text" name="code" #code="ngModel" [(ngModel)]="formModel.code" required [disabled]="formMode === 'edit'"
+        [pattern]="VALIDATION.CODE" [maxlength]="VALIDATION_LEN.ROLE_CODE.max" [appAutoFocus]="formMode === 'add'">
+      @if (code.invalid && (code.dirty || code.touched)) {
+        <span class="error-text">
+          @if (code.errors?.['required']) { Mã vai trò không được để trống. }
+          @else if (code.errors?.['pattern']) { Mã vai trò chỉ được chứa chữ in hoa và dấu gạch dưới. }
+          @else if (code.errors?.['maxlength']) { Mã vai trò không được vượt quá 50 ký tự. }
+        </span>
+      }
     </div>
 
-    <div class="modal-body">
-      <form #f="ngForm" (ngSubmit)="onSave(f.value)">
-        <div class="form-group">
-          <label class="required">Mã vai trò</label>
-          <input type="text" name="code" [(ngModel)]="formModel.code" required [disabled]="formMode === 'edit'"
-            [appAutoFocus]="formMode === 'add'">
-        </div>
-
-        <div class="form-group">
-          <label class="required">Tên vai trò</label>
-          <input type="text" name="name" [(ngModel)]="formModel.name" required [appAutoFocus]="formMode === 'edit'">
-        </div>
-
-        <div class="form-group">
-          <label>Mô tả</label>
-          <textarea name="description" [(ngModel)]="formModel.description" rows="3"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Phân quyền (Permissions)</label>
-          <div class="multi-select-dropdown" (click)="togglePermissionsDropdown()">
-            <div class="dropdown-header">
-              {{ getPermissionsDisplayText() }}
-            </div>
-            @if (isPermissionsDropdownOpen) {
-            <div class="dropdown-list" (click)="$event.stopPropagation()">
-              @for (perm of availablePermissions; track perm.id) {
-              <label class="dropdown-item">
-                <input type="checkbox" [value]="perm.action" (change)="onPermissionChange(perm.action, $event)"
-                  [checked]="formModel.permissions?.includes(perm.action)">
-                <span class="fw-bold">{{ perm.action }}</span>
-                <span class="text-muted ms-2" style="font-size: 0.8em;">- {{ perm.description }}</span>
-              </label>
-              }
-              @if (availablePermissions.length === 0) {
-              <div class="p-2 text-center text-muted">Chưa có dữ liệu phân quyền</div>
-              }
-            </div>
-            }
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeForm()">Hủy</button>
-          <button type="submit" class="btn btn-primary" [disabled]="!f.valid || loading">
-            @if (loading) {
-            <i class="fas fa-spinner fa-spin"></i> Đang lưu...
-            } @else {
-            Lưu
-            }
-          </button>
-        </div>
-      </form>
+    <div class="form-field">
+      <label class="required">Tên vai trò</label>
+      <input type="text" name="name" #name="ngModel" [(ngModel)]="formModel.name" required
+        [pattern]="VALIDATION.GENERAL_NAME" [maxlength]="VALIDATION_LEN.ROLE_NAME.max" [appAutoFocus]="formMode === 'edit'">
+      @if (name.invalid && (name.dirty || name.touched)) {
+        <span class="error-text">
+          @if (name.errors?.['required']) { Tên vai trò không được để trống. }
+          @else if (name.errors?.['pattern']) { Tên vai trò không được chứa ký tự đặc biệt. }
+          @else if (name.errors?.['maxlength']) { Tên vai trò không được vượt quá 255 ký tự. }
+        </span>
+      }
     </div>
-  </div>
-</div>
-}
+
+    <div class="form-field full-span">
+      <label>Mô tả</label>
+      <textarea name="description" [(ngModel)]="formModel.description" rows="3"></textarea>
+    </div>
+
+    <div class="form-field full-span">
+      <label>Phân quyền (Permissions)</label>
+      <div class="multi-select-dropdown" (click)="togglePermissionsDropdown()">
+        <div class="dropdown-header">
+          {{ getPermissionsDisplayText() }}
+        </div>
+        @if (isPermissionsDropdownOpen) {
+        <div class="dropdown-list" (click)="$event.stopPropagation()">
+          @for (perm of availablePermissions; track perm.id) {
+          <label class="dropdown-item">
+            <input type="checkbox" [value]="perm.action" (change)="onPermissionChange(perm.action, $event)"
+              [checked]="formModel.permissions?.includes(perm.action)">
+            <span class="fw-bold">{{ perm.action }}</span>
+            <span class="text-muted ms-2" style="font-size: 0.8em;">- {{ perm.description }}</span>
+          </label>
+          }
+          @if (availablePermissions.length === 0) {
+          <div class="p-2 text-center text-muted">Chưa có dữ liệu phân quyền</div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+  </form>
+</app-form-modal>

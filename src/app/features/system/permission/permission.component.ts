@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
+import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { PermissionService } from './permission.service';
 import { Permission, PermissionCreateRequest, PermissionUpdateRequest } from '@shared/models/permission.model';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-permission',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent],
+  imports: [CommonModule, FormsModule, CrudComponent, FormModalComponent],
   templateUrl: './permission.component.html',
   styleUrl: './permission.component.scss'
 })

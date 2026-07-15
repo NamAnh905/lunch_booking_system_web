@@ -1,0 +1,33 @@
+@if (tickets().length > 0) {
+  <div class="tickets-grid">
+    @for (ticket of tickets(); track ticket.exchangeId) {
+      <mat-card class="ticket-card">
+        <mat-card-header>
+          <mat-card-title>{{ ticket.menuDate | date }}</mat-card-title>
+          <mat-card-subtitle>Suất ăn {{ ticket.isSpecial ? 'đặc biệt' : 'thường' }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-row">
+            <span>Người pass: <strong>{{ ticket.sellerName }}</strong></span>
+          </div>
+          <div class="info-row">
+            <span>Trạng thái:
+              <span class="status-badge" [ngClass]="ticket.status.toLowerCase()">{{ ticket.status }}</span>
+            </span>
+          </div>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          @if (ticket.sellerId !== currentUserId()) {
+            <button mat-flat-button color="primary" (click)="claim.emit(ticket)" [disabled]="isLoading()">
+              Nhận vé
+            </button>
+          }
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+} @else if (!isLoading()) {
+  <div class="empty-state">
+    <p>Hiện tại chưa có vé nào trên chợ.</p>
+  </div>
+}

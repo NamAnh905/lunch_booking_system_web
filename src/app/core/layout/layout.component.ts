@@ -2,13 +2,15 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AdminSidebarComponent } from './components/sidebar/admin-sidebar/admin-sidebar.component';
 import { AdminNavbarComponent } from './components/navbar/admin-navbar/admin-navbar.component';
+import { UserNavbarComponent } from './components/navbar/user-navbar/user-navbar.component';
 
 @Component({
   selector: 'app-layout',
   imports: [
     RouterOutlet,
     AdminSidebarComponent,
-    AdminNavbarComponent
+    AdminNavbarComponent,
+    UserNavbarComponent
   ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',

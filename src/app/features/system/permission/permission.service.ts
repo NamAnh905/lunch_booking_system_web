@@ -13,6 +13,10 @@ export class PermissionService {
 
   constructor(private http: HttpClient) {}
 
+  getAllPermissions(): Observable<ApiResponse<Permission[]>> {
+    return this.http.get<ApiResponse<Permission[]>>(`${this.apiUrl}/all`);
+  }
+
   getPermissions(page: number, size: number, keyword: string = ''): Observable<ApiResponse<PageResponse<Permission>>> {
     let params = new HttpParams()
       .set('page', page.toString())

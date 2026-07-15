@@ -1,13 +1,18 @@
 import { Directive, OnInit, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PageResponse } from '@shared/models';
+import { VALIDATION_PATTERNS, VALIDATION_LENGTHS } from '@shared/constants/validation.constants';
 import { ToastService } from '../../../core/services/toast.service';
 import { ConfirmService } from '../../../core/services/confirm.service';
 
 @Directive()
 export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
   protected toastService = inject(ToastService);
-  
+
+  /** Regex/độ dài dùng chung cho template form (đồng bộ với validation Backend). */
+  readonly VALIDATION = VALIDATION_PATTERNS;
+  readonly VALIDATION_LEN = VALIDATION_LENGTHS;
+
   data: T[] = [];
   loading = false;
   total = 0;

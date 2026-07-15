@@ -1,35 +1,57 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { CanComponentDeactivate } from '@core/guards/pending-changes-guard';
 import { MealOrderService } from './meal-order.service';
 import { AuthService } from '@core/auth/auth.service';
-import { OrderResponse, MenuResponse } from '@shared/models';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { OrderResponse } from '@shared/models';
 import Swal from 'sweetalert2';
 
 import { CalendarDay } from '@shared/models/meal-order.model';
 import { FormatMoneyPipe } from '../../../shared/pipes/format-money.pipe';
+import { MoneyShortPipe } from '@shared/pipes/money-short.pipe';
+import { MealCalendarService } from './services/meal-calendar.service';
+import { MealSummaryCalculator } from './services/meal-summary.calculator';
+import { WeeklyMenuGridBuilder } from './services/weekly-menu-grid.builder';
+import { MealOrderFacade } from './meal-order.facade';
+import { MEAL_PRICE, SWAL_COLORS } from '@shared/constants/business.constants';
+import { BusinessConfigService, formatVnTime } from '@shared/services/business-config.service';
+import { OrderStatus } from '@shared/enums';
+import { MenuType } from '@shared/enums/menu-type.enum';
+import { toIsoDate, getWeekRange } from '@shared/utils/date.util';
 
 @Component({
   selector: 'app-meal-order',
   standalone: true,
   imports: [CommonModule, RouterModule, FormatMoneyPipe],
   templateUrl: './meal-order.component.html',
-  styleUrl: './meal-order.component.scss'
+  styleUrl: './meal-order.component.scss',
+  providers: [MealOrderFacade]
 })
-export class MealOrderComponent implements OnInit {
+export class MealOrderComponent implements OnInit, CanComponentDeactivate {
   private mealOrderService = inject(MealOrderService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private calendarService = inject(MealCalendarService);
+  private summaryCalculator = inject(MealSummaryCalculator);
+  private menuGridBuilder = inject(WeeklyMenuGridBuilder);
+  private facade = inject(MealOrderFacade);
+  private businessConfig = inject(BusinessConfigService);
+  private moneyShort = new MoneyShortPipe();
 
-  // Calendar State - Initialize to July 2026 to match screenshot
-  selectedDay = 5;
-  currentMonth = 6; // 0-indexed, July = 6
-  currentYear = 2026;
+  get cutOffTimeLabel(): string {
+    return formatVnTime(this.businessConfig.cutOffTime);
+  }
 
-  pricePerMeal = 25000;
+  // Calendar State - khởi tạo theo ngày hiện tại của hệ thống.
+  selectedDay = new Date().getDate();
+  currentMonth = new Date().getMonth(); // 0-indexed
+  currentYear = new Date().getFullYear();
+
+  pricePerMeal: number = MEAL_PRICE.NORMAL;
+  specialPricePerMeal: number = MEAL_PRICE.SPECIAL;
   totalDaysEat = 0;
+  totalDaysSpecial = 0;
   totalPrice = 0;
 
   calendarDays: CalendarDay[] = [];
@@ -41,11 +63,13 @@ export class MealOrderComponent implements OnInit {
   orderMap: Record<string, OrderResponse> = {};
   originalOrders: OrderResponse[] = [];
 
-  // Cache for loaded months
-  private monthCache: Record<string, { orders: OrderResponse[], menus: any[] }> = {};
+  /**
+   * Ảnh chụp trạng thái đăng ký gốc từ backend: key = 'YYYY-MM-DD', value = có phải suất đặc biệt.
+   * Ô nào có mặt trong map = đã đăng ký. Dùng để so sánh phát hiện thay đổi chưa lưu (dirty).
+   */
+  private originalState = new Map<string, boolean>();
 
   // UI State
-  dropdownOpen = false;
   showMenuModal = false;
   menuGrid: { 
     priceName: string, 
@@ -54,255 +78,113 @@ export class MealOrderComponent implements OnInit {
     dishRows: { dayDishes: string[] }[] 
   }[] = [];
   gridDays: { date: string, dayOfWeek: string }[] = [];
+  // Thực đơn dạng ảnh (fallback khi tuần không có thực đơn dạng danh sách)
+  menuImageUrl: string | null = null;
+  menuImageName = '';
   isLoadingMenu = false;
   loading = false;
   toastMessage = '';
   toastType: 'success' | 'danger' = 'success';
-  usernameDisplay = 'CNVT Đặng Nam Anh';
 
-  MONTH_NAMES = [
-    'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
-    'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'
-  ];
-
-  WEEK_DISHES: Record<number, string[]> = {
-    0: ['Thịt gà kho sả', 'Đậu phụ sốt cà chua', 'Canh rau cải ngọt', 'Cơm tẻ dẻo'],
-    1: ['Thịt ba chỉ cháy cạnh', 'Cá rô phi rán giòn', 'Canh bí đao sườn heo', 'Cơm tẻ dẻo'],
-    2: ['Gà rang gừng hành', 'Đậu phụ nhồi thịt sốt', 'Canh cà chua trứng lạp', 'Cơm tẻ dẻo'],
-    3: ['Sườn xào chua ngọt', 'Cá quả kho tộ tiêu', 'Canh cải ngọt thịt băm', 'Cơm tẻ dẻo'],
-    4: ['Thịt bò xào cần tỏi', 'Chả lá lốt rán giòn', 'Canh rau muống luộc sấu', 'Cơm tẻ dẻo'],
-    5: ['Tôm rim ba chỉ cháy ngọt', 'Trứng đúc thịt băm', 'Canh bí đỏ xương hầm', 'Cơm tẻ dẻo'],
-    6: ['Thịt chân giò luộc', 'Cá chép kho riềng', 'Canh cải xanh cá rô', 'Cơm tẻ dẻo']
-  };
-
-  SOLAR_HOLIDAYS = ['01-01', '04-30', '05-01', '09-02', '09-03'];
+  /** Ngày đại diện tháng đang xem — để hiển thị tên tháng qua DatePipe (bỏ mảng MONTH_NAMES cứng). */
+  get headerDate(): Date {
+    return new Date(this.currentYear, this.currentMonth, 1);
+  }
 
   ngOnInit(): void {
-    const user = this.authService.currentUserValue;
-    if (user) {
-      this.usernameDisplay = `CNVT ${user.username}`;
-    }
-    
-    // Đảm bảo clear cache mỗi khi vào trang (tránh lỗi cache khi mua/bán vé xong quay lại)
-    this.monthCache = {};
+    // Clear cache mỗi khi vào trang (tránh dùng dữ liệu cũ sau khi mua/bán vé).
+    this.facade.clearCache();
 
-    this.mealOrderService.getActivePrices().subscribe({
-      next: (res) => {
-        if (res && res.result && res.result.length > 0) {
-          this.pricePerMeal = res.result[0].amount;
-        } else {
-          this.pricePerMeal = 25000;
-        }
-        this.loadData();
-      },
-      error: () => {
-        this.pricePerMeal = 25000;
-        this.loadData();
-      }
+    this.facade.loadPrices().subscribe((prices) => {
+      this.pricePerMeal = prices.normal;
+      this.specialPricePerMeal = prices.special;
+      this.loadData();
     });
   }
 
   loadData(): void {
     this.loading = true;
+    this.facade.loadMonth(this.currentYear, this.currentMonth).subscribe((data) => {
+      this.originalOrders = data.orders;
+      this.orderMap = data.orderMap;
+      this.menuMap = data.menuMap;
+      this.registeredDates = data.registeredDates;
 
-    const startStr = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-01`;
-    const endDay = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
-    const endStr = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(endDay).padStart(2, '0')}`;
-    const cacheKey = `${this.currentYear}-${this.currentMonth}`;
+      // Chụp lại trạng thái gốc để phát hiện thay đổi chưa lưu (dirty).
+      this.originalState.clear();
+      this.originalOrders.forEach((order) => {
+        if (order.menuDate && order.status !== OrderStatus.CANCELLED) {
+          const key = order.menuDate.toString().split('T')[0];
+          this.originalState.set(key, order.isSpecial ?? false);
+        }
+      });
 
-    // Return cached data if available
-    if (this.monthCache[cacheKey]) {
-      this.applyData(this.monthCache[cacheKey].orders, this.monthCache[cacheKey].menus);
+      this.setupCalendar();
+
+      // Khôi phục cờ suất đặc biệt từ đơn trên backend sau khi dựng lịch.
+      this.calendarDays.forEach((day) => {
+        if (day.dayNumber && day.isRegistered && day.dateString) {
+          const order = this.orderMap[day.dateString];
+          if (order) {
+            day.isSpecial = order.isSpecial ?? false;
+          }
+        }
+      });
+
+      this.updateSummary();
       this.loading = false;
-      return;
-    }
-
-    // Call APIs in parallel using forkJoin
-    forkJoin({
-      orders: this.mealOrderService.getMyOrders(startStr, endStr).pipe(catchError(() => of({ result: null }))),
-      menus: this.mealOrderService.getMenus().pipe(catchError(() => of({ result: null })))
-    }).pipe(
-      catchError(err => {
-        console.error(err);
-        return of({ orders: { result: null }, menus: { result: null } } as any);
-      })
-    ).subscribe({
-      next: (res) => {
-        const orders = res.orders?.result || [];
-        const menus = Array.isArray(res.menus?.result) ? res.menus.result : (res.menus?.result?.data || res.menus?.result?.content || []);
-
-        // Save to cache
-        this.monthCache[cacheKey] = { orders, menus };
-
-        this.applyData(orders, menus);
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error(err);
-        this.showToast('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại!', 'danger');
-        this.applyData([], []);
-        this.loading = false;
-      }
     });
   }
-
-  applyData(orders: OrderResponse[], menusList: any[]): void {
-    this.originalOrders = orders;
-    this.orderMap = {};
-    this.registeredDates.clear();
-
-    // Populate order map
-    this.originalOrders.forEach(order => {
-      if (order.menuDate && order.status !== 'CANCELLED') {
-        const dateKey = order.menuDate.toString().split('T')[0];
-        this.orderMap[dateKey] = order;
-        this.registeredDates.add(dateKey);
-      }
-    });
-
-    // Populate menu map
-    this.menuMap = {};
-    menusList.forEach(menu => {
-      if (menu.menuDate) {
-        const dateKey = menu.menuDate.toString().split('T')[0];
-        this.menuMap[dateKey] = menu;
-      } else if (menu.date) {
-        const dateKey = menu.date.toString().split('T')[0];
-        this.menuMap[dateKey] = menu; // Fallback in case backend returns date
-      }
-    });
-
-    this.setupCalendar();
-  }
-
 
   setupCalendar(): void {
-    const year = this.currentYear;
-    const month = this.currentMonth;
-
-    // Day of week of the 1st
-    const firstDay = new Date(year, month, 1).getDay(); // 0 = Sun, 1 = Mon...
-
-    // Total days in the month
-    const totalDays = new Date(year, month + 1, 0).getDate();
-
-    const days: CalendarDay[] = [];
-    const today = new Date();
-    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-    // Check cutoff time (14:45)
-    const currentHour = today.getHours();
-    const currentMinute = today.getMinutes();
-    const isPastCutoff = (currentHour > 14) || (currentHour === 14 && currentMinute >= 45);
-
-    let earliestSelectableDate: Date;
-    if (isPastCutoff) {
-      // Past 14:45 today -> only selectable starting from day after tomorrow
-      earliestSelectableDate = new Date(todayStart.getTime() + 2 * 24 * 60 * 60 * 1000);
-    } else {
-      // Before 14:45 today -> selectable starting from tomorrow
-      earliestSelectableDate = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
-    }
-
-    // Pad empty cells before the 1st
-    for (let i = 0; i < firstDay; i++) {
-      days.push({ dayNumber: null, dateString: '', isRegistered: false });
-    }
-
-    // Generate actual days
-    for (let i = 1; i <= totalDays; i++) {
-      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-      const cellDate = new Date(year, month, i);
-      const isReg = this.registeredDates.has(dateStr);
-
-      // Check for weekends (0 = Sunday, 6 = Saturday)
-      const dayOfWeek = cellDate.getDay();
-      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-
-      // Check for public holidays (Solar dates)
-      const solarHolidays = this.SOLAR_HOLIDAYS;
-      const mmdd = `${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-      const isHoliday = solarHolidays.includes(mmdd);
-
-      // Check if it's past cutoff time or weekend/holiday
-      const isPastOrCutoff = cellDate.getTime() < earliestSelectableDate.getTime();
-      const isDisabled = isWeekend || isHoliday;
-
-      // Check if claimed from market
-      const order = this.orderMap[dateStr];
-      const originalUserId = order?.originalUserId;
-      const currentUserId = this.authService.currentUserValue?.userId;
-      const isClaimedTicket = isReg && originalUserId != null && originalUserId !== currentUserId;
-
-      days.push({
-        dayNumber: i,
-        dateString: dateStr,
-        isRegistered: isReg, // ONLY depends on having an order (isReg)
-        menuId: this.menuMap[dateStr]?.id || (1000 + i), // fallback mock ID
-        orderId: this.orderMap[dateStr]?.id,
-        isPast: cellDate.getTime() < todayStart.getTime(),
-        isDisabled: isDisabled,
-        isPastOrCutoff: isPastOrCutoff,
-        isClaimedTicket: isClaimedTicket
-      });
-    }
-
-    this.calendarDays = days;
-
-    const rows: CalendarDay[][] = [];
-    for (let i = 0; i < days.length; i += 7) {
-      rows.push(days.slice(i, i + 7));
-    }
-    this.calendarRows = rows;
-
+    this.calendarDays = this.calendarService.buildCalendar({
+      year: this.currentYear,
+      month: this.currentMonth,
+      registeredDates: this.registeredDates,
+      orderMap: this.orderMap,
+      menuMap: this.menuMap,
+      currentUserId: this.authService.currentUserValue?.userId
+    });
+    this.calendarRows = this.calendarService.toRows(this.calendarDays);
     this.updateSummary();
   }
 
   updateSummary(): void {
-    // Count selected days in active month
-    let count = 0;
-    this.calendarDays.forEach(day => {
-      if (day.dayNumber && day.isRegistered) {
-        count++;
-      }
+    const summary = this.summaryCalculator.calculate(this.calendarDays, {
+      normal: this.pricePerMeal,
+      special: this.specialPricePerMeal
     });
-    this.totalDaysEat = count;
-    this.totalPrice = count * this.pricePerMeal;
+    this.totalDaysEat = summary.totalDaysEat;
+    this.totalDaysSpecial = summary.totalDaysSpecial;
+    this.totalPrice = summary.totalPrice;
   }
 
   // Navigation arrows
   prevMonth(): void {
-    if (this.currentMonth === 0) {
-      this.currentMonth = 11;
-      this.currentYear--;
-    } else {
-      this.currentMonth--;
-    }
-    this.selectedDay = 1; // Default to first day of new month
-    this.loadData();
+    this.confirmDiscardChanges().then((canLeave) => {
+      if (!canLeave) return;
+      if (this.currentMonth === 0) {
+        this.currentMonth = 11;
+        this.currentYear--;
+      } else {
+        this.currentMonth--;
+      }
+      this.selectedDay = 1; // Default to first day of new month
+      this.loadData();
+    });
   }
 
   nextMonth(): void {
-    if (this.currentMonth === 11) {
-      this.currentMonth = 0;
-      this.currentYear++;
-    } else {
-      this.currentMonth++;
-    }
-    this.selectedDay = 1; // Default to first day of new month
-    this.loadData();
-  }
-
-  // Toggle dropdown / Menu actions
-  toggleDropdown(): void {
-    this.dropdownOpen = !this.dropdownOpen;
-  }
-
-  onLogout(event: Event): void {
-    event.preventDefault();
-    this.authService.logout().subscribe({
-      next: () => this.router.navigate(['/login']),
-      error: () => this.router.navigate(['/login'])
+    this.confirmDiscardChanges().then((canLeave) => {
+      if (!canLeave) return;
+      if (this.currentMonth === 11) {
+        this.currentMonth = 0;
+        this.currentYear++;
+      } else {
+        this.currentMonth++;
+      }
+      this.selectedDay = 1; // Default to first day of new month
+      this.loadData();
     });
   }
 
@@ -316,27 +198,82 @@ export class MealOrderComponent implements OnInit {
     }
 
     this.selectedDay = day.dayNumber;
-    day.isRegistered = !day.isRegistered;
 
+    // If user is toggling OFF (deselecting), handle immediately
     if (day.isRegistered) {
-      this.registeredDates.add(day.dateString);
-    } else {
+      day.isRegistered = false;
+      day.isSpecial = false;
       this.registeredDates.delete(day.dateString);
+      this.updateSummary();
+      return;
     }
 
-    this.updateSummary();
+    // Check if this day is a Friday (getDay() === 5)
+    const dateObj = new Date(day.dateString + 'T00:00:00');
+    const isFriday = dateObj.getDay() === 5;
+
+    if (isFriday) {
+      // Show SweetAlert popup for Friday special meal choice
+      Swal.fire({
+        title: 'Chọn suất ăn ngày Thứ 6',
+        text: 'Bạn muốn đăng ký suất thường hay suất đặc biệt?',
+        icon: 'question',
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: `Suất đặc biệt (${this.moneyShort.transform(this.specialPricePerMeal)})`,
+        denyButtonText: `Suất thường (${this.moneyShort.transform(this.pricePerMeal)})`,
+        cancelButtonText: 'Hủy',
+        confirmButtonColor: SWAL_COLORS.SPECIAL,
+        denyButtonColor: SWAL_COLORS.NORMAL,
+        allowOutsideClick: false
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Special meal
+          day.isRegistered = true;
+          day.isSpecial = true;
+          this.registeredDates.add(day.dateString);
+          this.updateSummary();
+        } else if (result.isDenied) {
+          // Normal meal
+          day.isRegistered = true;
+          day.isSpecial = false;
+          this.registeredDates.add(day.dateString);
+          this.updateSummary();
+        }
+        // If cancelled, do nothing
+      });
+    } else {
+      // Non-Friday: register as normal meal
+      day.isRegistered = true;
+      day.isSpecial = false;
+      this.registeredDates.add(day.dateString);
+      this.updateSummary();
+    }
   }
 
   // Action Buttons
+
+  /** Các ô hợp lệ có thể chọn/bỏ chọn trong tháng (bỏ qua ô trống, ngày bị khoá, ngày đã qua giờ chốt). */
+  private getSelectableDays(): CalendarDay[] {
+    return this.calendarDays.filter(d => d.dayNumber !== null && !d.isDisabled && !d.isPastOrCutoff);
+  }
+
+  /** True khi mọi ngày hợp lệ trong tháng đều đã được đăng ký (dùng để đổi text nút "Chọn tất cả"). */
+  get isAllSelected(): boolean {
+    const selectableDays = this.getSelectableDays();
+    return selectableDays.length > 0 && selectableDays.every(d => d.isRegistered);
+  }
+
   toggleSelectAll(): void {
-    const activeSelectableDays = this.calendarDays.filter(d => d.dayNumber !== null && !d.isDisabled && !d.isPastOrCutoff);
+    const activeSelectableDays = this.getSelectableDays();
     if (activeSelectableDays.length === 0) return;
 
-    const allSelected = activeSelectableDays.every(d => d.isRegistered);
+    const allSelected = this.isAllSelected;
 
     activeSelectableDays.forEach(day => {
       if (allSelected) {
         day.isRegistered = false;
+        day.isSpecial = false;
         this.registeredDates.delete(day.dateString);
       } else {
         day.isRegistered = true;
@@ -349,23 +286,14 @@ export class MealOrderComponent implements OnInit {
 
   // Show detailed menu list of the current week
   viewMenu(): void {
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    // Calculate Monday (1) and Friday (5) of the current week
-    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-    const monday = new Date(today);
-    monday.setDate(today.getDate() + diffToMonday);
-
-    const friday = new Date(monday);
-    friday.setDate(monday.getDate() + 4);
-
-    const startStr = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
-    const endStr = `${friday.getFullYear()}-${String(friday.getMonth() + 1).padStart(2, '0')}-${String(friday.getDate()).padStart(2, '0')}`;
+    const { monday, start: startStr, end: endStr } = getWeekRange(new Date());
 
     this.showMenuModal = true;
     this.isLoadingMenu = true;
     this.menuGrid = [];
     this.gridDays = [];
+    this.menuImageUrl = null;
+    this.menuImageName = '';
 
     this.mealOrderService.getWeeklyMenus(startStr, endStr).subscribe({
       next: (res) => {
@@ -382,69 +310,19 @@ export class MealOrderComponent implements OnInit {
   }
 
   buildMenuGrid(menus: any[], monday: Date): void {
-    // Build days (Mon - Fri)
-    const dayNames = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu'];
-    this.gridDays = [];
-    for (let i = 0; i < 5; i++) {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
-      const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      const displayDateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-      this.gridDays.push({
-        date: dateStr,
-        dayOfWeek: `${dayNames[i]}, ${displayDateStr}`
-      });
+    const grid = this.menuGridBuilder.build(menus, monday);
+    this.gridDays = grid.gridDays;
+    this.menuGrid = grid.menuGrid;
+
+    // Fallback: nếu tuần không có thực đơn dạng danh sách nhưng có thực đơn dạng ảnh,
+    // hiển thị ảnh thay cho lưới.
+    if (this.menuGrid.length === 0) {
+      const imageMenu = menus.find((m) => m?.type === MenuType.IMAGE && m?.imageUrl);
+      if (imageMenu) {
+        this.menuImageUrl = imageMenu.imageUrl;
+        this.menuImageName = imageMenu.name || '';
+      }
     }
-
-    // Group menus by priceId or priceName
-    const priceGroups = new Map<number, { name: string, amount: number, menus: any[] }>();
-    menus.forEach((m: any) => {
-      if (!m || !m.price) return;
-      // Filter out breakfast (Ăn sáng) if it exists
-      if (m.price.name.toLowerCase().includes('sáng')) return;
-      
-      const priceId = m.price.id;
-      if (!priceGroups.has(priceId)) {
-        priceGroups.set(priceId, {
-          name: m.price.name,
-          amount: m.price.amount,
-          menus: []
-        });
-      }
-      priceGroups.get(priceId)?.menus.push(m);
-    });
-
-    this.menuGrid = [];
-    priceGroups.forEach((group, priceId) => {
-      const rowDays = this.gridDays.map(gd => {
-        const menuForDay = group.menus.find(m => m.menuDate === gd.date);
-        const dishes = (menuForDay?.dishes || [])
-          .filter((d: any) => d != null)
-          .map((d: any) => d?.name)
-          .filter((name: string) => name);
-        return {
-          date: gd.date,
-          dayOfWeek: gd.dayOfWeek,
-          dishes: dishes
-        };
-      });
-      const maxDishes = Math.max(1, ...rowDays.map(rd => rd.dishes.length));
-      const dishRows = [];
-      for (let i = 0; i < maxDishes; i++) {
-         const dayDishes = rowDays.map(rd => rd.dishes[i] || '');
-         dishRows.push({ dayDishes });
-      }
-
-      this.menuGrid.push({
-        priceName: group.name,
-        priceAmount: group.amount,
-        maxDishes: maxDishes,
-        dishRows: dishRows
-      });
-    });
-
-    // sort rows by price amount
-    this.menuGrid.sort((a, b) => a.priceAmount - b.priceAmount);
   }
 
   closeMenuModal(): void {
@@ -456,116 +334,105 @@ export class MealOrderComponent implements OnInit {
   }
 
   getSelectedDateString(): string {
-    return `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(this.selectedDay).padStart(2, '0')}`;
+    return toIsoDate(new Date(this.currentYear, this.currentMonth, this.selectedDay));
   }
 
   // Save Registration to Database
   saveRegistration(): void {
-    this.loading = true;
+    // Ngày mới đăng ký (chưa có đơn hợp lệ trên backend), kèm cờ suất đặc biệt.
+    const datesToRegister = Array.from(this.registeredDates)
+      .filter((date) => !this.originalOrders.find((o) => o.menuDate === date && o.status !== OrderStatus.CANCELLED))
+      .map((dateStr) => ({
+        orderDate: dateStr,
+        isSpecial: this.calendarDays.find((d) => d.dateString === dateStr)?.isSpecial ?? false
+      }));
 
-    // 1. Identify which dates are newly registered (not in original database orders)
-    let datesToRegister = Array.from(this.registeredDates).filter(date => {
-      const original = this.originalOrders.find(o => o.menuDate === date && o.status !== 'CANCELLED');
-      return !original;
-    });
+    // Đơn cần huỷ (đang có trên backend nhưng người dùng đã bỏ chọn).
+    const ordersToCancel = this.originalOrders.filter(
+      (order) => order.menuDate && order.status !== OrderStatus.CANCELLED && !this.registeredDates.has(order.menuDate)
+    );
 
-    // 2. Identify which dates are newly deselected (present in original database orders but not selected now)
-    const ordersToCancel = this.originalOrders.filter(order => {
-      return order.menuDate && order.status !== 'CANCELLED' && !this.registeredDates.has(order.menuDate);
-    });
-
-    // 3. (Removed) Filter out invalid dates (no menu) to ensure valid state, since menu_id is no longer required.
-
-    // If no changes, show notification immediately
     if (datesToRegister.length === 0 && ordersToCancel.length === 0) {
       this.showToast('Không có thay đổi đăng ký nào cần lưu.', 'success');
-      this.loading = false;
       return;
     }
 
-    // Process cancellations and registrations sequentially
-    let cancelCount = ordersToCancel.length;
-    let registerCount = datesToRegister.length;
+    this.loading = true;
+    this.facade.save({ datesToRegister, ordersToCancel }).subscribe((result) => {
+      this.facade.invalidateMonth(this.currentYear, this.currentMonth);
+      this.showSaveResult(result.hasError);
+    });
+  }
 
-    let hasError = false;
-
-    const checkCompletion = () => {
-      if (cancelCount === 0 && registerCount === 0) {
-        const cacheKey = `${this.currentYear}-${this.currentMonth}`;
-        delete this.monthCache[cacheKey]; // Clear cache to fetch latest DB state
-
-        if (!hasError) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Successfully',
-            text: 'Đăng ký ngày ăn thành công !',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#70c4f4',
-            allowOutsideClick: false
-          }).then((result) => {
-            if (result.isConfirmed) {
-              this.loadData(); // Reload to refresh mappings
-            }
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Failed',
-            text: 'Đăng ký vé ăn không thành công',
-            confirmButtonText: 'OK',
-            confirmButtonColor: '#70c4f4',
-            allowOutsideClick: false
-          }).then((result) => {
-            if (result.isConfirmed) {
-              this.loadData();
-            }
-          });
-        }
+  private showSaveResult(hasError: boolean): void {
+    Swal.fire({
+      icon: hasError ? 'error' : 'success',
+      title: hasError ? 'Failed' : 'Successfully',
+      text: hasError ? 'Đăng ký vé ăn không thành công' : 'Đăng ký ngày ăn thành công !',
+      confirmButtonText: 'OK',
+      confirmButtonColor: SWAL_COLORS.PRIMARY,
+      allowOutsideClick: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.loadData(); // Tải lại để làm mới mappings.
       }
-    };
+    });
+  }
 
-    // Execute cancellations
-    if (ordersToCancel.length > 0) {
-      ordersToCancel.forEach(order => {
-        this.mealOrderService.cancelOrder(order.id).subscribe({
-          next: () => {
-            cancelCount--;
-            checkCompletion();
-          },
-          error: () => {
-            hasError = true;
-            cancelCount--;
-            checkCompletion();
-          }
-        });
-      });
+  // ---- Bảo vệ thay đổi chưa lưu (unsaved changes) ----
+
+  /** Một ô đang ở trạng thái nháp nếu trạng thái hiện tại khác với trạng thái gốc từ backend. */
+  isDayDirty(day: CalendarDay): boolean {
+    if (!day.dayNumber || !day.dateString) return false;
+
+    const wasRegistered = this.originalState.has(day.dateString);
+    const originalSpecial = this.originalState.get(day.dateString) ?? false;
+
+    // Đổi giữa đăng ký / huỷ.
+    if (day.isRegistered !== wasRegistered) return true;
+    // Vẫn đăng ký nhưng đổi loại suất (thường <-> đặc biệt).
+    if (day.isRegistered && (day.isSpecial ?? false) !== originalSpecial) return true;
+
+    return false;
+  }
+
+  /** Còn thay đổi chưa lưu nếu có bất kỳ ô nào khác trạng thái gốc. */
+  get hasUnsavedChanges(): boolean {
+    return this.calendarDays.some((day) => this.isDayDirty(day));
+  }
+
+  /** Chặn F5 / đóng tab bằng hộp thoại cảnh báo mặc định của trình duyệt khi còn thay đổi chưa lưu. */
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (this.hasUnsavedChanges) {
+      event.preventDefault();
+      event.returnValue = true; // Bắt buộc cho một số trình duyệt cũ để hiện cảnh báo.
     }
+  }
 
-    // Execute new orders
-    if (datesToRegister.length > 0) {
-      console.log('Payload gửi đi (orderDates):', datesToRegister);
+  /** Guard CanDeactivate gọi hàm này khi điều hướng nội bộ Angular. */
+  canDeactivate(): boolean | Promise<boolean> {
+    return this.confirmDiscardChanges();
+  }
 
-      this.mealOrderService.createOrders({ orderDates: datesToRegister }).subscribe({
-        next: (res) => {
-          const failedOrders = res.result?.filter(o => o.status === 'FAILED') || [];
-          if (failedOrders.length > 0) {
-            hasError = true;
-          }
-          registerCount = 0;
-          checkCompletion();
-        },
-        error: (err) => {
-          hasError = true;
-          registerCount = 0;
-          checkCompletion();
-        }
-      });
-    } else {
-      if (ordersToCancel.length > 0 && datesToRegister.length === 0) {
-        // only cancellations
-        checkCompletion();
-      }
-    }
+  /**
+   * Xác nhận bỏ thay đổi chưa lưu. Trả về true nếu được phép tiếp tục (không dirty hoặc user đồng ý rời).
+   * Dùng chung cho guard CanDeactivate và chuyển tháng trong màn hình.
+   */
+  private confirmDiscardChanges(): Promise<boolean> {
+    if (!this.hasUnsavedChanges) return Promise.resolve(true);
+
+    return Swal.fire({
+      title: 'Thay đổi chưa được lưu',
+      text: 'Bạn có các đăng ký suất ăn chưa lưu. Bạn có chắc muốn rời đi mà không lưu?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Rời đi',
+      cancelButtonText: 'Ở lại',
+      confirmButtonColor: SWAL_COLORS.PRIMARY,
+      cancelButtonColor: SWAL_COLORS.NORMAL,
+      allowOutsideClick: false
+    }).then((result) => result.isConfirmed);
   }
 
   showToast(message: string, type: 'success' | 'danger'): void {

@@ -1,0 +1,45 @@
+<app-form-modal
+  [open]="open"
+  title="Thông tin cá nhân"
+  subtitle="Quản lý thông tin tài khoản của bạn"
+  [saving]="saving"
+  [saveDisabled]="form.invalid"
+  (save)="onSave()"
+  (cancel)="onCancel()">
+
+  @if (loading) {
+  <div class="form-field full-span">
+    <p class="loading-text">Đang tải thông tin...</p>
+  </div>
+  } @else {
+  <form [formGroup]="form" style="display: contents">
+    <div class="form-field">
+      <label>Tên đăng nhập</label>
+      <input type="text" [value]="user?.username || ''" disabled />
+    </div>
+
+    <div class="form-field">
+      <label class="required">Họ tên</label>
+      <input type="text" formControlName="fullName" placeholder="Nhập họ tên" />
+      @if (form.get('fullName')?.invalid && form.get('fullName')?.touched) {
+      <small class="error-text">Họ tên không được để trống.</small>
+      }
+    </div>
+
+    <div class="form-field">
+      <label>Phòng ban</label>
+      <input type="text" [value]="user?.department || 'Chưa cập nhật'" disabled />
+    </div>
+
+    <div class="form-field">
+      <label>Trạng thái</label>
+      <input type="text" [value]="statusLabel" disabled />
+    </div>
+
+    <div class="form-field full-span">
+      <label>Vai trò</label>
+      <input type="text" [value]="rolesLabel" disabled />
+    </div>
+  </form>
+  }
+</app-form-modal>

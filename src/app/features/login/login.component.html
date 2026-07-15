@@ -1,15 +1,5 @@
 <div class="login-page">
-  <!-- Header / Navigation -->
-  <nav class="navbar">
-    <div class="navbar-container">
-      <a class="navbar-brand" href="#">
-        <img class="logo-vnpost" src="assets/images/vnpost-logo1.png" alt="VNPost Logo" />
-      </a>
-      <div class="navbar-menu">
-        <a class="nav-link" href="#">Đăng nhập</a>
-      </div>
-    </div>
-  </nav>
+  <app-user-navbar [showUserMenu]="false"></app-user-navbar>
 
   <!-- Main Content -->
   <main class="login-main">
@@ -25,13 +15,6 @@
           <div class="card-header">Đăng nhập</div>
           <div class="card-body">
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-              <!-- Error message if any -->
-              @if (errorMessage) {
-                <div class="alert alert-danger">
-                  {{ errorMessage }}
-                </div>
-              }
-
               <!-- Username input row -->
               <div class="form-group row">
                 <label for="username" class="col-label">Tên đăng nhập</label>
@@ -41,9 +24,13 @@
                     type="text"
                     formControlName="username"
                     class="form-control"
-                    [class.is-invalid]="isFieldInvalid('username')"
+                    [class.is-invalid]="getFieldError('username')"
+                    (input)="clearServerErrors()"
                     autocomplete="username"
                   />
+                  <span class="field-error" [style.visibility]="getFieldError('username') ? 'visible' : 'hidden'">
+                    {{ getFieldError('username') }}
+                  </span>
                 </div>
               </div>
 
@@ -56,7 +43,8 @@
                     [type]="showPassword ? 'text' : 'password'"
                     formControlName="password"
                     class="form-control pr-5"
-                    [class.is-invalid]="isFieldInvalid('password')"
+                    [class.is-invalid]="getFieldError('password')"
+                    (input)="clearServerErrors()"
                     autocomplete="current-password"
                   />
                   @if (loginForm.get('password')?.value) {
@@ -75,6 +63,9 @@
                       }
                     </button>
                   }
+                  <span class="field-error" [style.visibility]="getFieldError('password') ? 'visible' : 'hidden'">
+                    {{ getFieldError('password') }}
+                  </span>
                 </div>
               </div>
 

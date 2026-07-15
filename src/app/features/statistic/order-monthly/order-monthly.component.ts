@@ -10,6 +10,9 @@ import { MonthlyMealDetailModalComponent } from './monthly-meal-detail-modal/mon
 import { UserService } from '../../system/user/user.service';
 import { forkJoin } from 'rxjs';
 import { FormatMoneyPipe } from '../../../shared/pipes/format-money.pipe';
+import { ToastService } from '@core/services/toast.service';
+import { FileDownloadService } from '@core/services/file-download.service';
+import { EXCEL_FILE_NAMES, DEFAULT_PAGE_SIZE } from '@shared/constants/business.constants';
 
 @Component({
   selector: 'app-order-monthly',
@@ -35,10 +38,11 @@ export class OrderMonthlyComponent implements OnInit {
   
   // List View Pagination
   currentPage: number = 1;
-  pageSize: number = 10;
+  pageSize: number = DEFAULT_PAGE_SIZE;
   totalItems: number = 0;
   items: any[] = [];
   allMergedItems: any[] = [];
+  sizeOptions = [10, 20, 50, 100];
   
   // Modal state
   isModalOpen: boolean = false;
@@ -57,7 +61,9 @@ export class OrderMonthlyComponent implements OnInit {
     private orderMonthlyService: OrderMonthlyService,
     private departmentService: DepartmentService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService,
+    private fileDownloadService: FileDownloadService
   ) {}
 
   ngOnInit(): void {
@@ -66,11 +72,9 @@ export class OrderMonthlyComponent implements OnInit {
   }
 
   loadDepartments(): void {
-    this.departmentService.getDepartments(1, 100).subscribe({
+    this.departmentService.getAllDepartments().subscribe({
       next: (res) => {
-        if (res.result) {
-          this.departments = res.result.data;
-        }
+        this.departments = res.result || [];
       }
     });
   }
@@ -85,11 +89,11 @@ export class OrderMonthlyComponent implements OnInit {
     const deptId = this.selectedDepartmentId !== null ? this.selectedDepartmentId : undefined;
     forkJoin({
       summaryRes: this.orderMonthlyService.getMonthlySummary(this.selectedMonth, this.selectedYear, deptId),
-      usersRes: this.userService.query({}, 0, 1000)
+      usersRes: this.userService.getAll()
     }).subscribe({
       next: (res) => {
         this.summary = res.summaryRes.result;
-        let allUsers = res.usersRes.result?.data || [];
+        let allUsers = res.usersRes.result || [];
         let fetchedItems = this.summary?.items || [];
         
         let mergedItems = allUsers.map(user => {
@@ -185,10 +189,29 @@ export class OrderMonthlyComponent implements OnInit {
     this.updateListView();
   }
 
-  get totalPages(): number[] {
-    return Array(Math.ceil(this.totalItems / this.pageSize)).fill(0).map((x, i) => i + 1);
+  onSizeChange(newSize: any): void {
+    const sizeNum = Number(newSize);
+    if (sizeNum !== this.pageSize) {
+      this.pageSize = sizeNum;
+      this.currentPage = 1;
+      this.updateListView();
+    }
   }
-  
+
+  get startItem(): number {
+    if (this.totalItems === 0) return 0;
+    return (this.currentPage - 1) * this.pageSize + 1;
+  }
+
+  get endItem(): number {
+    const end = this.currentPage * this.pageSize;
+    return end > this.totalItems ? this.totalItems : end;
+  }
+
+  get totalPagesCount(): number {
+    return Math.ceil(this.totalItems / this.pageSize);
+  }
+
   openUserDetail(item: OrderSummaryItemResponse): void {
     this.selectedUserId = item.userId;
     this.selectedUserName = item.fullName;
@@ -213,20 +236,13 @@ export class OrderMonthlyComponent implements OnInit {
     
     this.orderMonthlyService.exportMonthlyExcel(this.selectedMonth, this.selectedYear, deptId).subscribe({
       next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `theo_doi_dat_com_thang_${this.selectedMonth}_${this.selectedYear}.xlsx`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        alert('Tải file Excel thành công!');
+        this.fileDownloadService.save(blob, EXCEL_FILE_NAMES.MONTHLY_ORDER_TRACKING(this.selectedMonth, this.selectedYear));
+        this.toastService.showSuccess('Tải file Excel thành công!');
         this.isExporting = false;
       },
       error: (err) => {
         console.error('Export error', err);
-        alert('Có lỗi xảy ra khi xuất Excel.');
+        this.toastService.showError('Có lỗi xảy ra khi xuất Excel.');
         this.isExporting = false;
       }
     });

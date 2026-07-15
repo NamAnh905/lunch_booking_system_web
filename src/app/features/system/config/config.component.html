@@ -1,1 +1,40 @@
-<p>app-config works!</p>
+<div class="config-page">
+  <div class="config-card">
+    <div class="config-header">
+      <h2>Cấu hình hệ thống</h2>
+      <p class="config-subtitle">Điều chỉnh các mốc thời gian và thiết lập chung áp dụng cho toàn hệ thống.</p>
+    </div>
+
+    @if (loading) {
+      <div class="config-loading">Đang tải cấu hình...</div>
+    } @else {
+      <div class="config-list">
+        @for (config of configs; track config.configKey) {
+          <div class="config-row">
+            <div class="config-info">
+              <label [for]="config.configKey">{{ config.description || config.configKey }}</label>
+              <span class="config-key">{{ config.configKey }}</span>
+            </div>
+            <div class="config-input">
+              @if (config.isTimeInput) {
+                <input type="time" [id]="config.configKey" [(ngModel)]="config.configValue">
+              } @else {
+                <input type="text" [id]="config.configKey" [(ngModel)]="config.configValue">
+              }
+            </div>
+          </div>
+        }
+
+        @if (configs.length === 0) {
+          <div class="config-empty">Chưa có cấu hình nào.</div>
+        }
+      </div>
+
+      <div class="config-actions">
+        <button class="btn-save" [disabled]="saving" (click)="save()">
+          {{ saving ? 'Đang lưu...' : 'Lưu thay đổi' }}
+        </button>
+      </div>
+    }
+  </div>
+</div>

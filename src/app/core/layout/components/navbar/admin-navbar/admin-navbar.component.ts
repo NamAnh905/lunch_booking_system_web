@@ -2,13 +2,23 @@ import { Component, inject, Input, HostListener, ElementRef } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
-import { LucideUser, LucideLogOut } from '@lucide/angular';
+import { LucideUser, LucideLogOut, LucideKeyRound } from '@lucide/angular';
 import { AuthService } from '../../../../auth/auth.service';
+import { UserProfileModalComponent } from '@shared/components/account-modals/user-profile-modal/user-profile-modal.component';
+import { UserPasswordModalComponent } from '@shared/components/account-modals/user-password-modal/user-password-modal.component';
 
 @Component({
   selector: 'app-admin-navbar',
   standalone: true,
-  imports: [CommonModule, BreadcrumbComponent, LucideUser, LucideLogOut],
+  imports: [
+    CommonModule,
+    BreadcrumbComponent,
+    LucideUser,
+    LucideLogOut,
+    LucideKeyRound,
+    UserProfileModalComponent,
+    UserPasswordModalComponent
+  ],
   templateUrl: './admin-navbar.component.html',
   styleUrl: './admin-navbar.component.scss'
 })
@@ -22,6 +32,8 @@ export class AdminNavbarComponent {
   // Expose current user to the template
   currentUser$ = this.authService.currentUser$;
   isDropdownOpen = false;
+  profileModalOpen = false;
+  passwordModalOpen = false;
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
@@ -34,9 +46,14 @@ export class AdminNavbarComponent {
     this.isDropdownOpen = !this.isDropdownOpen;
   }
 
-  goToProfile(): void {
+  openProfile(): void {
     this.isDropdownOpen = false;
-    this.router.navigate(['/system/profile']);
+    this.profileModalOpen = true;
+  }
+
+  openPassword(): void {
+    this.isDropdownOpen = false;
+    this.passwordModalOpen = true;
   }
 
   logout(): void {

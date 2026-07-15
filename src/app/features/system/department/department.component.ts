@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
+import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { DepartmentService } from './department.service';
 import { DepartmentResponse, DepartmentCreateRequest, DepartmentUpdateRequest } from '@shared/models/department.model';
 import { AutoFocusDirective } from '../../../shared/directives/autofocus.directive';
@@ -10,7 +11,7 @@ import { AutoFocusDirective } from '../../../shared/directives/autofocus.directi
 @Component({
   selector: 'app-department',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent, AutoFocusDirective],
+  imports: [CommonModule, FormsModule, CrudComponent, FormModalComponent, AutoFocusDirective],
   templateUrl: './department.component.html',
   styleUrl: './department.component.scss'
 })

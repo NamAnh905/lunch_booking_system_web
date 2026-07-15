@@ -1,10 +1,12 @@
 import { Routes } from '@angular/router';
+import { pendingChangesGuard } from '@core/guards/pending-changes-guard';
 
 export const portalRoutes: Routes = [
   {
     path: 'meal-order',
     loadComponent: () => import('./meal-order/meal-order.component').then(m => m.MealOrderComponent),
-    title: 'Đăng ký cơm trưa - LunchOrder'
+    title: 'Đăng ký cơm trưa - LunchOrder',
+    canDeactivate: [pendingChangesGuard]
   },
   {
     path: 'ticket-exchange',

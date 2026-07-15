@@ -3,17 +3,19 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
+import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { UserService } from './user.service';
 import { UserResponse, UserCreateRequest, UserUpdateRequest } from '@shared/models/user.model';
 import { RoleService } from '../role/role.service';
 import { DepartmentService } from '../department/department.service';
 import { DepartmentResponse } from '@shared/models/department.model';
 import { AutoFocusDirective } from '../../../shared/directives/autofocus.directive';
+import { EXCEL_FILE_NAMES } from '@shared/constants/business.constants';
 
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent, AutoFocusDirective],
+  imports: [CommonModule, FormsModule, CrudComponent, FormModalComponent, AutoFocusDirective],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss'
 })
@@ -39,7 +41,7 @@ export class UserComponent extends BaseCrudComponent<UserResponse, { keyword?: s
       error: (err) => console.error('Failed to load roles', err)
     });
 
-    this.departmentService.getDepartments(1, 200).subscribe({
+    this.departmentService.getAllDepartments().subscribe({
       next: (res) => {
         const pageData = (res as any).result !== undefined ? (res as any).result : res;
         this.availableDepartments = pageData.data || pageData.content || pageData || [];
@@ -211,7 +213,7 @@ export class UserComponent extends BaseCrudComponent<UserResponse, { keyword?: s
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'danh_sach_nguoi_dung.xlsx';
+        a.download = EXCEL_FILE_NAMES.USER_LIST;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

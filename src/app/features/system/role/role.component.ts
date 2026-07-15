@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
+import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { RoleService } from './role.service';
 import { RoleResponse, RoleCreateRequest, RoleUpdateRequest } from '@shared/models/role.model';
 import { PermissionService } from '../permission/permission.service';
@@ -12,7 +13,7 @@ import { AutoFocusDirective } from '../../../shared/directives/autofocus.directi
 @Component({
   selector: 'app-role',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent, AutoFocusDirective],
+  imports: [CommonModule, FormsModule, CrudComponent, FormModalComponent, AutoFocusDirective],
   templateUrl: './role.component.html',
   styleUrl: './role.component.scss'
 })
@@ -25,7 +26,7 @@ export class RoleComponent extends BaseCrudComponent<RoleResponse, { keyword?: s
 
   override ngOnInit() {
     super.ngOnInit();
-    this.permissionService.getPermissions(1, 1000, '').subscribe({
+    this.permissionService.getAllPermissions().subscribe({
       next: (res: any) => {
         const pageData = res.result !== undefined ? res.result : res;
         this.availablePermissions = Array.isArray(pageData) ? pageData : (pageData.data || pageData.content || []);

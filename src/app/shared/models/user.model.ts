@@ -40,3 +40,12 @@ export interface UserResponse {
 export interface UserAssignRolesRequest {
   roleCodes: string[];
 }
+
+export interface ProfileUpdateRequest {
+  fullName: string;
+}
+
+export interface ChangePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+}

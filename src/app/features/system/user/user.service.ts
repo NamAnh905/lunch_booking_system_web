@@ -12,6 +12,10 @@ export class UserService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/admin/users`;
 
+  getAll(): Observable<ApiResponse<UserResponse[]>> {
+    return this.http.get<ApiResponse<UserResponse[]>>(`${this.apiUrl}/all`);
+  }
+
   query(query: any, page: number, size: number): Observable<ApiResponse<PageResponse<UserResponse>>> {
     let params = new HttpParams()
       .set('page', (page + 1).toString())

@@ -19,6 +19,7 @@
         <option value="OPEN">Mở bán (OPEN)</option>
         <option value="MATCHED">Đã ghép (MATCHED)</option>
         <option value="CANCELLED">Đã hủy (CANCELLED)</option>
+        <option value="EXPIRED">Hết hạn - tự thu hồi (EXPIRED)</option>
       </select>
     </div>
 
@@ -66,7 +67,8 @@
           <span [ngClass]="{
             'status-open': item.status === 'OPEN',
             'status-matched': item.status === 'MATCHED',
-            'status-cancelled': item.status === 'CANCELLED'
+            'status-cancelled': item.status === 'CANCELLED',
+            'status-expired': item.status === 'EXPIRED'
           }">
             {{ item.status }}
           </span>

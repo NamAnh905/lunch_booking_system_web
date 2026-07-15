@@ -1,6 +1,7 @@
 import { BaseEntity } from './base.model';
+import { DishType } from '@shared/enums/dish-type.enum';
 
-export type DishType = 'REGULAR' | 'SPECIAL' | 'DRINK' | 'VEGETABLE' | 'SOUP' | 'RICE';
+export { DishType };
 
 export interface Dish extends BaseEntity {
   id?: number;

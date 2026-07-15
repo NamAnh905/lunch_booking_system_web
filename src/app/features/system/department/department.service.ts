@@ -1,48 +1,36 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { shareReplay, catchError, tap, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { PageResponse, ApiResponse } from '@shared/models';
 import { DepartmentResponse, DepartmentCreateRequest, DepartmentUpdateRequest } from '@shared/models/department.model';
+import { BaseCachedCrudService } from '@shared/services/base-cached-crud.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class DepartmentService {
+export class DepartmentService extends BaseCachedCrudService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/admin/departments`;
 
-  private cache = new Map<string, Observable<ApiResponse<PageResponse<DepartmentResponse>>>>();
-  private refresh$ = new BehaviorSubject<void>(undefined);
-
-  clearCache(): void {
-    this.cache.clear();
-    this.refresh$.next();
+  getAllDepartments(): Observable<ApiResponse<DepartmentResponse[]>> {
+    return this.http.get<ApiResponse<DepartmentResponse[]>>(`${this.apiUrl}/all`);
   }
 
   getDepartments(page: number, size: number, keyword?: string): Observable<ApiResponse<PageResponse<DepartmentResponse>>> {
     const cacheKey = `${page}-${size}-${keyword || ''}`;
-    if (!this.cache.has(cacheKey)) {
-      let params = new HttpParams()
-        .set('page', page.toString())
-        .set('size', size.toString());
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
 
-      if (keyword) {
-        params = params.set('keyword', keyword);
-      }
-
-      const stream$ = this.refresh$.pipe(
-        switchMap(() => this.http.get<ApiResponse<PageResponse<DepartmentResponse>>>(this.apiUrl, { params })),
-        shareReplay(1),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return throwError(() => error);
-        })
-      );
-      this.cache.set(cacheKey, stream$);
+    if (keyword) {
+      params = params.set('keyword', keyword);
     }
-    return this.cache.get(cacheKey)!;
+
+    return this.cached(cacheKey, () =>
+      this.http.get<ApiResponse<PageResponse<DepartmentResponse>>>(this.apiUrl, { params })
+    );
   }
 
   createDepartment(data: DepartmentCreateRequest): Observable<ApiResponse<DepartmentResponse>> {

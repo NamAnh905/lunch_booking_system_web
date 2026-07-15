@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { shareReplay, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '@env/environment';
-import { ApiResponse, OrderResponse, OrderCreateRequest, MenuResponse, PriceResponse } from '@shared/models';
+import { ApiResponse, OrderResponse, OrderCreateRequest, MenuResponse, PriceResponse, PageResponse } from '@shared/models';
 
 @Injectable({
   providedIn: 'root'
@@ -29,15 +29,19 @@ export class MealOrderService {
   }
 
   cancelOrder(orderId: number): Observable<ApiResponse<OrderResponse>> {
-    return this.http.put<ApiResponse<OrderResponse>>(`${this.apiUrl}/orders/${orderId}/cancel`, {});
+    return this.http.patch<ApiResponse<OrderResponse>>(`${this.apiUrl}/orders/${orderId}/cancel`, {});
   }
 
-  getMenus(date?: string): Observable<ApiResponse<any>> {
-    const params: any = { size: 100 };
-    if (date) {
-      params.date = date;
-    }
-    return this.http.get<ApiResponse<any>>(`${this.apiUrl}/admin/menus`, { params });
+  getMenus(): Observable<ApiResponse<PageResponse<MenuResponse>>> {
+    return this.http.get<ApiResponse<PageResponse<MenuResponse>>>(`${this.apiUrl}/admin/menus`, {
+      params: { size: 100 }
+    });
+  }
+
+  getMenusByDate(date: string): Observable<ApiResponse<MenuResponse[]>> {
+    return this.http.get<ApiResponse<MenuResponse[]>>(`${this.apiUrl}/admin/menus/by-date`, {
+      params: { date }
+    });
   }
 
   getWeeklyMenus(startDate: string, endDate: string): Observable<ApiResponse<MenuResponse[]>> {

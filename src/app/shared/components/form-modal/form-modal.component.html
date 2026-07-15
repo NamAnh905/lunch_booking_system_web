@@ -1,0 +1,52 @@
+@if (open) {
+<div class="modal-overlay" (click)="onBackdrop()">
+  <div class="modal-panel" [style.max-width]="width" (click)="$event.stopPropagation()" role="dialog"
+    aria-modal="true">
+
+    <!-- Header -->
+    <header class="modal-header">
+      <div class="modal-heading">
+        <h3 class="modal-title">{{ title }}</h3>
+        @if (subtitle) {
+        <p class="modal-subtitle">{{ subtitle }}</p>
+        }
+      </div>
+      <button type="button" class="modal-close" (click)="cancel.emit()" [disabled]="saving" aria-label="Đóng">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Body: projected form content, laid out in a responsive 2-column grid -->
+    <div class="modal-body">
+      <div class="form-grid">
+        <ng-content></ng-content>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="modal-footer">
+      <!-- Optional extra controls (e.g. a delete button) on the left -->
+      <div class="footer-start">
+        <ng-content select="[modal-footer-start]"></ng-content>
+      </div>
+
+      <div class="footer-actions">
+        <button type="button" class="btn btn-ghost" (click)="cancel.emit()" [disabled]="saving">
+          {{ cancelLabel }}
+        </button>
+        <button type="button" class="btn btn-primary" (click)="save.emit()" [disabled]="saveDisabled || saving">
+          @if (saving) {
+          <span class="btn-spinner"></span> Đang lưu...
+          } @else {
+          {{ saveLabel }}
+          }
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>
+}

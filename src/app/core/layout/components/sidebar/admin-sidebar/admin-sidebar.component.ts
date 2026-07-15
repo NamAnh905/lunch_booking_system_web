@@ -6,7 +6,7 @@ import {
   LucideUsers, LucideShield, LucideKey, LucideBuilding,
   LucideUtensilsCrossed, LucideSoup, LucideCoins,
   LucideTicket, LucideMessageSquare, LucideBell,
-  LucideMenu
+  LucideMenu, LucideSettings
 } from '@lucide/angular';
 
 @Component({
@@ -18,7 +18,7 @@ import {
     LucideUsers, LucideShield, LucideKey, LucideBuilding,
     LucideUtensilsCrossed, LucideSoup, LucideCoins,
     LucideTicket, LucideMessageSquare, LucideBell,
-    LucideMenu
+    LucideMenu, LucideSettings
   ],
   templateUrl: './admin-sidebar.component.html',
   styleUrl: './admin-sidebar.component.scss'
@@ -64,6 +64,11 @@ export class AdminSidebarComponent {
           label: 'Phòng ban',
           icon: 'building',
           route: '/system/admin/department'
+        },
+        {
+          label: 'Cấu hình hệ thống',
+          icon: 'settings',
+          route: '/system/admin/config'
         }
       ]
     },

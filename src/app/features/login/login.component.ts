@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '@core/auth/auth.service';
+import { UserNavbarComponent } from '@core/layout/components/navbar/user-navbar/user-navbar.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, UserNavbarComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -19,30 +20,63 @@ export class LoginComponent {
   loginForm: FormGroup = this.fb.group({
     username: ['', [Validators.required]],
     password: ['', [Validators.required]],
-    rememberMe: [false]
+    rememberMe: [false],
   });
 
+  /** Thông báo "để trống" theo từng field (chỉ có ràng buộc required). */
+  private readonly requiredMessages: Record<string, string> = {
+    username: 'Không được để trống tài khoản',
+    password: 'Không được để trống mật khẩu',
+  };
+
+  /**
+   * Map mã lỗi xác thực từ Backend (ApiResponse.code) sang { field, message }
+   * để hiển thị NGAY DƯỚI ô tương ứng như một lỗi validate — không dùng banner/toast.
+   */
+  private readonly authErrors: Record<number, { field: string; message: string }> = {
+    2001: { field: 'username', message: 'Tài khoản không tồn tại' },        // USER_NOT_FOUND
+    2002: { field: 'username', message: 'Tài khoản đã bị khóa' },           // USER_LOCKED
+    1001: { field: 'password', message: 'Sai tên đăng nhập hoặc mật khẩu' }, // UNAUTHENTICATED
+  };
+
+  /** Lỗi trả về từ Backend, gắn theo tên field (được xoá ngay khi người dùng gõ lại). */
+  private serverErrors: Record<string, string> = {};
+
   loading = false;
-  errorMessage = '';
   showPassword = false;
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.loginForm.get(fieldName);
-    return !!(field && field.invalid && (field.dirty || field.touched));
+  /** Xoá lỗi Backend khi người dùng bắt đầu nhập lại (chuẩn bị lần thử mới). */
+  clearServerErrors(): void {
+    this.serverErrors = {};
+  }
+
+  /**
+   * Lỗi hiển thị dưới ô: ưu tiên lỗi Backend, sau đó tới lỗi required (on blur).
+   */
+  getFieldError(fieldName: string): string {
+    if (this.serverErrors[fieldName]) {
+      return this.serverErrors[fieldName];
+    }
+    const control = this.loginForm.get(fieldName);
+    if (control && control.invalid && control.touched) {
+      return this.requiredMessages[fieldName] ?? '';
+    }
+    return '';
   }
 
   onSubmit(): void {
+    // Nút Submit luôn bật; nếu form trống/không hợp lệ thì lộ lỗi required, không gọi API.
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
     }
 
     this.loading = true;
-    this.errorMessage = '';
+    this.clearServerErrors();
 
     const { username, password } = this.loginForm.value;
 
@@ -50,19 +84,22 @@ export class LoginComponent {
       next: (res) => {
         this.loading = false;
         if (res.authenticated) {
-          if (this.authService.hasRole('ADMIN') || this.authService.hasRole('SUPER_ADMIN') || this.authService.hasRole('ADMIN')) {
+          if (this.authService.hasRole('ADMIN') || this.authService.hasRole('SUPER_ADMIN')) {
             this.router.navigate(['statistic/order-monthly']);
           } else {
             this.router.navigate(['/portal/meal-order']);
           }
         } else {
-          this.errorMessage = 'Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.';
+          this.serverErrors = { password: 'Sai tên đăng nhập hoặc mật khẩu' };
         }
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = err.error?.message || 'Có lỗi xảy ra trong quá trình đăng nhập.';
-      }
+        const mapped = this.authErrors[err.error?.code];
+        this.serverErrors = mapped
+          ? { [mapped.field]: mapped.message }
+          : { password: 'Có lỗi xảy ra trong quá trình đăng nhập.' };
+      },
     });
   }
 }

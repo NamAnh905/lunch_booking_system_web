@@ -6,3 +6,8 @@ export interface SystemConfig {
   updatedBy?: number;
   updatedAt?: string; // ISO Date string
 }
+
+export interface SystemConfigUpdateRequest {
+  configKey: string;
+  configValue: string;
+}

@@ -10,6 +10,9 @@ import { DepartmentResponse } from '../../../shared/models/department.model';
 import { UserService } from '../../system/user/user.service';
 import { forkJoin } from 'rxjs';
 import { FormatMoneyPipe } from '../../../shared/pipes/format-money.pipe';
+import { ToastService } from '@core/services/toast.service';
+import { FileDownloadService } from '@core/services/file-download.service';
+import { EXCEL_FILE_NAMES, DEFAULT_PAGE_SIZE, APP_DATE_TIME_FORMAT } from '@shared/constants/business.constants';
 
 @Component({
   selector: 'app-order-daily',
@@ -19,10 +22,14 @@ import { FormatMoneyPipe } from '../../../shared/pipes/format-money.pipe';
   styleUrls: ['./order-daily.component.scss']
 })
 export class OrderDailyComponent implements OnInit {
+  readonly dateTimeFormat = APP_DATE_TIME_FORMAT;
   selectedDate: string = new Date().toISOString().split('T')[0];
   selectedDepartmentId: number | null = null;
   selectedStatus: string | null = null;
   isExporting: boolean = false;
+  isFriday: boolean = false;
+  totalNormalMeals: number = 0;
+  totalSpecialMeals: number = 0;
   
   departments: DepartmentResponse[] = [];
   summary?: DailyOrderSummaryResponse;
@@ -30,7 +37,7 @@ export class OrderDailyComponent implements OnInit {
   
   // Pagination
   currentPage: number = 1;
-  pageSize: number = 10;
+  pageSize: number = DEFAULT_PAGE_SIZE;
   totalOrders: number = 0;
   sizeOptions = [10, 20, 50, 100];
 
@@ -38,7 +45,9 @@ export class OrderDailyComponent implements OnInit {
     private orderDailyService: OrderDailyService,
     private departmentService: DepartmentService,
     private userService: UserService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private toastService: ToastService,
+    private fileDownloadService: FileDownloadService
   ) {}
 
   ngOnInit(): void {
@@ -53,11 +62,9 @@ export class OrderDailyComponent implements OnInit {
   }
 
   loadDepartments(): void {
-    this.departmentService.getDepartments(1, 100).subscribe({
+    this.departmentService.getAllDepartments().subscribe({
       next: (res) => {
-        if (res.result) {
-          this.departments = res.result.data;
-        }
+        this.departments = res.result || [];
       }
     });
   }
@@ -79,11 +86,11 @@ export class OrderDailyComponent implements OnInit {
   fetchData(): void {
     forkJoin({
       ordersRes: this.orderDailyService.getAdminOrders(this.selectedDate, undefined),
-      usersRes: this.userService.query({}, 0, 1000)
+      usersRes: this.userService.getAll()
     }).subscribe({
       next: (res) => {
         let fetchedOrders = res.ordersRes.result?.orders || [];
-        let allUsers = res.usersRes.result?.data || [];
+        let allUsers = res.usersRes.result || [];
         
         let mergedList = allUsers.map(user => {
           let userOrder = fetchedOrders.find(o => o.userId === user.id);
@@ -132,15 +139,26 @@ export class OrderDailyComponent implements OnInit {
     let totalSpecial = 0;
     let totalAmount = 0;
 
+    // Check if selected date is Friday
+    this.isFriday = new Date(this.selectedDate).getDay() === 5;
+
     registered.forEach(o => {
       const price = o.price || 25000;
-      if (price <= 25000) {
-        totalNormal++;
-      } else {
+      if (price === 40000) {
         totalSpecial++;
+      } else {
+        totalNormal++;
       }
       totalAmount += price;
     });
+
+    if (this.isFriday) {
+      this.totalNormalMeals = totalNormal;
+      this.totalSpecialMeals = totalSpecial;
+    } else {
+      this.totalNormalMeals = 0;
+      this.totalSpecialMeals = 0;
+    }
 
     this.summary = {
       date: this.selectedDate,
@@ -190,22 +208,15 @@ export class OrderDailyComponent implements OnInit {
     
     this.orderDailyService.exportDailyExcel(dateToExport, departmentToExport).subscribe({
       next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
         const dateParts = dateToExport.split('-');
         const formattedDate = dateParts.length === 3 ? `${dateParts[2]}_${dateParts[1]}_${dateParts[0]}` : dateToExport;
-        a.download = `tong_hop_suat_an_${formattedDate}.xlsx`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        alert('Tải file Excel thành công!');
+        this.fileDownloadService.save(blob, EXCEL_FILE_NAMES.DAILY_ORDER_SUMMARY(formattedDate));
+        this.toastService.showSuccess('Tải file Excel thành công!');
         this.isExporting = false;
       },
       error: (err) => {
         console.error('Export error', err);
-        alert('Có lỗi xảy ra khi xuất Excel.');
+        this.toastService.showError('Có lỗi xảy ra khi xuất Excel.');
         this.isExporting = false;
       }
     });

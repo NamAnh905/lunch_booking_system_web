@@ -1,0 +1,261 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+// ---------------------------------------------------------------------------
+// Overlay + panel chrome
+// ---------------------------------------------------------------------------
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  @include flex-center;
+  padding: 16px;
+  z-index: 1000;
+  animation: fm-fade-in 0.2s ease-out;
+}
+
+.modal-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: calc(100vh - 48px);
+  background: $card-bg;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+  overflow: hidden;
+  animation: fm-slide-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+// ---------------------------------------------------------------------------
+// Header
+// ---------------------------------------------------------------------------
+.modal-header {
+  @include flex-between;
+  gap: 16px;
+  padding: 18px 24px;
+  border-bottom: 1px solid $border-color;
+
+  .modal-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: $text-primary;
+    line-height: 1.4;
+  }
+
+  .modal-subtitle {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: $text-secondary;
+  }
+
+  .modal-close {
+    @include flex-center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: $radius-base;
+    background: transparent;
+    color: $text-secondary;
+    cursor: pointer;
+    transition: $transition-base;
+
+    &:hover:not(:disabled) {
+      background: rgba(0, 0, 0, 0.05);
+      color: $text-primary;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Body + 2-column responsive grid
+// ---------------------------------------------------------------------------
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  @include custom-scroll;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+
+  // Collapse to a single column on small screens
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Footer
+// ---------------------------------------------------------------------------
+.modal-footer {
+  @include flex-between;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid $border-color;
+  background: #fafafa;
+
+  .footer-start:empty {
+    display: none;
+  }
+
+  .footer-actions {
+    display: flex;
+    gap: 12px;
+    margin-left: auto;
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 88px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: $radius-base;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.btn-ghost {
+  background: $card-bg;
+  color: $text-primary;
+  border-color: #d9d9d9;
+
+  &:hover:not(:disabled) {
+    color: $primary-color;
+    border-color: $primary-color;
+  }
+}
+
+// Professional primary (theme blue) — deliberately NOT pink
+.btn-primary {
+  background-color: $primary-color;
+  color: #fff;
+  border-color: $primary-color;
+
+  &:hover:not(:disabled) {
+    background-color: $primary-hover;
+    border-color: $primary-hover;
+    box-shadow: $primary-shadow;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $primary-active;
+    border-color: $primary-active;
+  }
+}
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: fm-spin 0.7s linear infinite;
+}
+
+// ---------------------------------------------------------------------------
+// Shared form-field styling for PROJECTED content.
+// ::ng-deep is required because the fields live in the host component's view.
+// Consumers only need markup: <div class="form-field">, add `.full-span` to
+// make a field span both columns.
+// ---------------------------------------------------------------------------
+:host ::ng-deep {
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+
+    &.full-span {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: $text-primary;
+
+      &.required::after,
+      .required {
+        content: ' *';
+        color: $error-color;
+      }
+    }
+
+    input:not([type='checkbox']):not([type='radio']),
+    select,
+    textarea {
+      width: 100%;
+      padding: 9px 12px;
+      font-size: 14px;
+      color: $text-primary;
+      border: 1px solid #d9d9d9;
+      border-radius: $radius-base;
+      background: $card-bg;
+      transition: $transition-base;
+
+      &::placeholder {
+        color: $text-secondary;
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 3px $primary-shadow;
+      }
+
+      &:disabled {
+        background: #f5f5f5;
+        color: $text-secondary;
+        cursor: not-allowed;
+      }
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 84px;
+    }
+
+    .error-text {
+      font-size: 12px;
+      color: $error-color;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Animations
+// ---------------------------------------------------------------------------
+@keyframes fm-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fm-slide-in {
+  from { opacity: 0; transform: translateY(-16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fm-spin {
+  to { transform: rotate(360deg); }
+}

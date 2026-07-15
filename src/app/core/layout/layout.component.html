@@ -5,6 +5,8 @@
   <main class="main-content">
     @if (isAdminPage) {
       <app-admin-navbar [showBreadcrumb]="showBreadcrumb"></app-admin-navbar>
+    } @else {
+      <app-user-navbar></app-user-navbar>
     }
     <div [class.page-content]="isAdminPage" [class.portal-content]="!isAdminPage">
       <router-outlet></router-outlet>

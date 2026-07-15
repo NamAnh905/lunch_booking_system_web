@@ -15,8 +15,13 @@ export interface Order {
   updatedAt?: string; // ISO Date string
 }
 
+export interface OrderItemRequest {
+  orderDate: string;
+  isSpecial: boolean;
+}
+
 export interface OrderCreateRequest {
-  orderDates: string[];
+  orders: OrderItemRequest[];
 }
 
 export interface OrderStatusUpdateRequest {

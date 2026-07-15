@@ -69,35 +69,33 @@
 </app-crud>
 
 <!-- Form Modal -->
-@if (isFormOpen) {
-<div class="modal-overlay">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>{{ formMode === 'add' ? 'Thêm Quyền' : 'Cập nhật Quyền' }}</h3>
-      <button class="close-btn" (click)="closeForm()">&times;</button>
+<app-form-modal
+  [open]="isFormOpen"
+  [title]="formMode === 'add' ? 'Thêm Quyền' : 'Cập nhật Quyền'"
+  width="520px"
+  [saving]="loading"
+  [saveDisabled]="f.invalid"
+  (save)="onSave(f.value)"
+  (cancel)="closeForm()">
+  <form #f="ngForm" style="display: contents">
+    <div class="form-field full-span">
+      <label>Mã Quyền (Action) <span class="required">*</span></label>
+      <input type="text" name="action" #action="ngModel" [(ngModel)]="formModel.action" required [disabled]="formMode === 'edit'"
+        [pattern]="VALIDATION.CODE" [maxlength]="VALIDATION_LEN.PERMISSION_CODE.max">
+      @if (action.invalid && (action.dirty || action.touched)) {
+        <span class="error-text">
+          @if (action.errors?.['required']) { Mã quyền không được để trống. }
+          @else if (action.errors?.['pattern']) { Mã quyền chỉ được chứa chữ in hoa và dấu gạch dưới. }
+          @else if (action.errors?.['maxlength']) { Mã quyền không được vượt quá 100 ký tự. }
+        </span>
+      }
+      <span class="form-hint" *ngIf="formMode === 'edit'">Mã quyền không thể thay đổi sau khi tạo.</span>
     </div>
-    <div class="modal-body">
-      <form #f="ngForm" (ngSubmit)="onSave(f.value)">
 
-        <div class="form-group">
-          <label>Mã Quyền (Action) <span class="required">*</span></label>
-          <input type="text" name="action" [(ngModel)]="formModel.action" required [disabled]="formMode === 'edit'"
-            [class.disabled]="formMode === 'edit'">
-          <span class="form-hint" *ngIf="formMode === 'edit'">Mã quyền không thể thay đổi sau khi tạo.</span>
-        </div>
-
-        <div class="form-group">
-          <label>Mô tả</label>
-          <textarea name="description" [(ngModel)]="formModel.description" rows="3"
-            placeholder="Nhập mô tả cho quyền này..."></textarea>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeForm()">Hủy</button>
-          <button type="submit" class="btn btn-primary" [disabled]="!f.valid || loading">Lưu</button>
-        </div>
-      </form>
+    <div class="form-field full-span">
+      <label>Mô tả</label>
+      <textarea name="description" [(ngModel)]="formModel.description" rows="3"
+        placeholder="Nhập mô tả cho quyền này..."></textarea>
     </div>
-  </div>
-</div>
-}
+  </form>
+</app-form-modal>

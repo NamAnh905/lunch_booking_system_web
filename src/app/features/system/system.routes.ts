@@ -29,6 +29,12 @@ export const systemRoutes: Routes = [
                 data: { breadcrumb: 'Phòng ban' },
                 title: 'Phòng ban',
                 loadComponent: () => import('./department/department.component').then(m => m.DepartmentComponent)
+            },
+            {
+                path: 'config',
+                data: { breadcrumb: 'Cấu hình hệ thống' },
+                title: 'Cấu hình hệ thống',
+                loadComponent: () => import('./config/config.component').then(m => m.ConfigComponent)
             }
         ]
     },
@@ -79,11 +85,5 @@ export const systemRoutes: Routes = [
                 loadComponent: () => import('../../shared/components/placeholder/placeholder.component').then(m => m.PlaceholderComponent)
             }
         ]
-    },
-    {
-        path: 'profile',
-        data: { breadcrumb: 'Thông tin cá nhân' },
-        title: 'Thông tin cá nhân',
-        loadComponent: () => import('../../shared/components/placeholder/placeholder.component').then(m => m.PlaceholderComponent)
     }
 ];

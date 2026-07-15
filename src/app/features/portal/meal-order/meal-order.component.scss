@@ -1,15 +1,13 @@
-@import url('https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap');
 @import url('https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css');
 @import url('https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css');
-@import url('https://fonts.googleapis.com/css?family=Nunito');
 
 body {
-  font-family: "Nunito", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 16px;
   line-height: 1.8;
   font-weight: normal;
-  background: #f8f9fd;
+  background: #ffffff;
   color: gray;
 }
 
@@ -590,7 +588,7 @@ body {
 .elegant-calencar {
   max-width: 747.016px;
   width: 100%;
-  height: 396px;
+  min-height: 396px;
   text-align: center;
   position: relative;
   margin: 0 auto;
@@ -675,10 +673,19 @@ body {
 
 #calendar {
   width: 100%;
+  /* Cố định layout để độ rộng cột không phụ thuộc nội dung ô -> không giật khi đổi text/badge. */
+  table-layout: fixed;
 }
 
 #calendar tr {
   height: 3em;
+}
+
+/* 7 cột chia đều tuyệt đối, không co giãn theo nội dung. */
+#calendar thead th,
+#calendar tbody td {
+  width: calc(100% / 7);
+  box-sizing: border-box;
 }
 
 thead tr {
@@ -751,20 +758,39 @@ tbody td#disabled:active {
   background: #FCB71E;
 }
 
+.daySelectSpecial {
+  color: #fff;
+}
+
+.daySelectSpecial:after {
+  border: 1px solid black;
+  background: #ff5722 !important;
+}
+
+.dayselect-label.special {
+  height: 40px;
+  padding-top: 1%;
+  width: calc(365px/9);
+  border: 1px solid black;
+  border-radius: 50%;
+  text-align: center;
+  background-color: #ff5722;
+}
+
 #disabled,
-.past-day:not(.daySelect) {
+.past-day:not(.daySelect):not(.daySelectSpecial) {
   cursor: default;
   background: #FFFAD5;
 }
 
 #disabled:hover,
-.past-day:not(.daySelect):hover {
+.past-day:not(.daySelect):not(.daySelectSpecial):hover {
   background: #FFFAD5;
   color: #c9c9c9;
 }
 
 #disabled:hover:after,
-.past-day:not(.daySelect):hover:after {
+.past-day:not(.daySelect):not(.daySelectSpecial):hover:after {
   background: transparent;
 }
 
@@ -798,10 +824,65 @@ tbody td#disabled:active {
   transform: scale(0.8);
 }
 
-.lunch-label,
-.lunch-span {
-  p {
-    margin-bottom: 1rem;
+/* Nút "Chọn tất cả" / "Bỏ chọn tất cả": giữ text luôn trên một dòng
+   để nút không co giãn khi đổi trạng thái -> tránh giật layout (CLS). */
+.btn-select-all {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.summary-info label {
+  margin-bottom: 0; /* Xóa margin mặc định của label */
+  font-weight: inherit;
+}
+
+/* Phần thông tin: mỗi dòng là một hàng "nhãn — giá trị" với space-between.
+   Nhãn co theo nội dung ở trái, giá trị dồn sang phải và không ngắt dòng.
+   Cách này bám theo bề rộng panel (do khối Chú giải quyết định) nên không tràn. */
+.summary-info {
+  .summary-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+    font-weight: 600;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .summary-key {
+    flex: 0 0 auto;
+  }
+
+  .summary-val {
+    flex: 1 1 auto;
+    text-align: right;
+    white-space: nowrap;
+  }
+}
+
+/* Hàng nút hành động: gom cả 3 nút xuống một khối riêng, chia lưới cân đối.
+   "Chọn tất cả" trải hết bề ngang phía trên; "Pass vé" và "Xem thực đơn"
+   chia đôi hàng dưới -> bố cục gọn, các nút đồng đều kích thước. */
+.summary-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #f0e6c0;
+
+  .btn {
+    width: 100%;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .btn-select-all {
+    grid-column: 1 / -1;
   }
 }
 
@@ -844,7 +925,7 @@ tbody td#disabled:active {
   background: #ff4d4f;
   color: white;
   font-size: 8px;
-  font-family: "Nunito", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 800;
   padding: 1px 4px;
   border-radius: 4px;
@@ -853,8 +934,224 @@ tbody td#disabled:active {
   pointer-events: none;
 }
 
-.daySelect .claimed-badge {
+.daySelect .claimed-badge,
+.daySelectSpecial .claimed-badge {
   background: #ffffff;
   color: #ff4d4f;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+tbody td.draft {
+  font-weight: 700;
+}
+
+tbody td.draft:after {
+  border: 2px dashed #004b8c !important;
+}
+
+tbody td.draft:before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #004b8c;
+  box-shadow: 0 0 0 2px #FFFAD5;
+  z-index: 11;
+}
+
+@keyframes draftPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  tbody td.draft {
+    animation: none;
+  }
+}
+
+.dayselect-label.draft-legend {
+  height: 40px;
+  padding-top: 1%;
+  width: calc(365px/9);
+  border: 2px dashed #004b8c;
+  border-radius: 50%;
+  text-align: center;
+  background-color: #FFFAD5;
+}
+
+/* Hai cột (lịch + cột phải) cao bằng nhau; khối lịch giãn theo chiều cao của
+   cột phải để không bị "lùn". Trên mobile cột phải xuống dưới nên không ảnh hưởng. */
+.lunch-columns {
+  align-items: stretch;
+}
+
+/* Ép chuỗi phần tử bên trong cột lịch cùng cao 100% để .elegant-calencar
+   giãn khớp chiều cao cột (được kéo giãn bởi align-items: stretch ở trên). */
+#days {
+  display: flex;
+}
+
+#days .calendar,
+#days .ftco-section,
+#days .ftco-section .container,
+#days .ftco-section .row,
+#days .ftco-section .col-md-12,
+#days .elegant-calencar {
+  height: 100%;
+}
+
+/* ===== Cột phải: Chú giải + Tổng tiền ===== */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  /* Dùng gap cố định giữa legend-panel và summary-panel thay vì space-between
+     (space-between phụ thuộc chiều cao cột nên khoảng cách chập chờn) */
+  justify-content: flex-start;
+  gap: 1.5rem;
+  /* Padding trên/dưới bằng đúng inline padding của cột #days (31.969px) để mép trên khớp với lịch */
+  padding: 31.969px 0;
+}
+
+/* Trên mobile, cột phải xuống dưới lịch, giảm padding cho gọn (gap giữ nguyên) */
+@media only screen and (max-width: 767.98px) {
+  .right-panel {
+    width: 100%;
+    padding: 1.5rem 0;
+  }
+}
+
+/* Gộp chung class để khối summary-panel nhận được viền, nền và đổ bóng y hệt legend-panel */
+.legend-panel, .summary-panel {
+  background: #FFFAD5;
+  border: 1px solid #f0e6c0;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 3px 4px 7px #888888 !important;
+}
+
+.legend-title {
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #004b8c;
+  border-bottom: 1px solid #f0e6c0;
+}
+
+.legend-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 14px;
+  line-height: 1.3;
+  color: #333;
+}
+
+/* Chấm màu tròn, kích thước cân đối với chữ, căn giữa theo chiều dọc */
+.legend-dot {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #333;
+  box-sizing: border-box;
+}
+
+.legend-dot--active {
+  background-color: #FCB71E;
+}
+
+.legend-dot--special {
+  background-color: #ff5722;
+}
+
+.legend-dot--none {
+  background-color: #fff;
+}
+
+.legend-dot--draft {
+  background-color: #FFFAD5;
+  border: 2px dashed #004b8c;
+}
+
+.summary-panel {
+  font-size: 14px; /* Đồng bộ cỡ chữ với khối chú giải */
+  color: #333;     /* Đồng bộ màu chữ */
+  line-height: 1.3; /* Giảm chiều cao dòng để gọn gàng hơn */
+
+  label, p {
+    font-weight: 600;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+}
+
+
+// Giữ modal "Thực đơn" luôn nằm trong khung nhìn: header/footer cố định, chỉ thân cuộn.
+#exampleModalXl {
+  .modal-content {
+    max-height: calc(100vh - 3.5rem);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important; // ghi đè inline style="overflow:auto"
+  }
+
+  .modal-header,
+  .modal-footer {
+    flex: 0 0 auto;
+  }
+
+  .modal-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0; // MẤU CHỐT: cho phép flex item co lại để cuộn được, không tràn che header
+  }
+
+  // Chế độ xem ảnh: modal vừa với ảnh ngang, hiển thị ảnh đúng kích cỡ gốc (không phóng to → sắc nét).
+  .modal-dialog.image-mode {
+    max-width: min(96vw, 1150px);
+    margin: 0.75rem auto;
+
+    .menu-image {
+      width: auto;
+      height: auto;
+      max-width: 100%;   // không vượt quá bề ngang modal, nhưng KHÔNG phóng to quá cỡ gốc
+      max-height: none;
+    }
+  }
+}
+
+// Thực đơn dạng ảnh trong modal "Xem thực đơn"
+.menu-image-wrapper {
+  padding: 4px 0;
+
+  .menu-image-title {
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #004b8c;
+  }
+
+  .menu-image {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: contain;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
 }

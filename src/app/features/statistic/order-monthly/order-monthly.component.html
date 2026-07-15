@@ -101,54 +101,94 @@
   </div>
 
   <!-- LIST VIEW MODE -->
-  <div class="table-container" *ngIf="viewMode === 'list'">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th class="text-center" style="width: 60px;">STT</th>
-          <th>Họ và Tên</th>
-          <th>Phòng ban</th>
-          <th>Tổng suất ăn</th>
-          <th>Tổng tiền ăn</th>
-          <th class="action-column">Thao tác</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of items; let i = index">
-          <td class="text-center">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-          <td>{{ item.fullName }}</td>
-          <td>{{ item.departmentName }}</td>
-          <td>{{ item.normalMealCount + item.specialMealCount }}</td>
-          <td>{{ item.totalAmount | formatMoney }}</td>
-          <td class="action-column">
-            <div class="row-actions" *ngIf="item.hasData">
-              <button class="btn-icon view" (click)="openUserDetail(item)" title="Xem chi tiết">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-              </button>
-            </div>
-            <span *ngIf="!item.hasData" style="color: #94a3b8; font-style: italic; font-size: 13px;">
-              Chưa có dữ liệu
-            </span>
-          </td>
-        </tr>
-        <tr *ngIf="items.length === 0">
-          <td colspan="6" class="text-center empty-state">Không có dữ liệu</td>
-        </tr>
-      </tbody>
-    </table>
+  @if (viewMode === 'list') {
+  <div class="crud-container">
+    <div class="crud-body">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="text-center" style="width: 60px;">STT</th>
+            <th>Họ và Tên</th>
+            <th>Phòng ban</th>
+            <th>Tổng suất ăn</th>
+            <th>Tổng tiền ăn</th>
+            <th class="action-column">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items; track item.userId; let i = $index) {
+          <tr>
+            <td class="text-center">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+            <td>{{ item.fullName }}</td>
+            <td>{{ item.departmentName }}</td>
+            <td>{{ item.normalMealCount + item.specialMealCount }}</td>
+            <td>{{ item.totalAmount | formatMoney }}</td>
+            <td class="action-column">
+              @if (item.hasData) {
+              <div class="row-actions">
+                <button class="btn-icon view" (click)="openUserDetail(item)" title="Xem chi tiết">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+              } @else {
+              <span class="text-muted">Chưa có dữ liệu</span>
+              }
+            </td>
+          </tr>
+          }
+          @if (items.length === 0) {
+          <tr>
+            <td colspan="6" class="text-center empty-state">Không có dữ liệu</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
 
-    <div class="pagination" *ngIf="totalPages.length > 1">
-      <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">&laquo;</button>
-      <button *ngFor="let page of totalPages" [class.active]="page === currentPage" (click)="onPageChange(page)">
-        {{ page }}
-      </button>
-      <button [disabled]="currentPage === totalPages.length" (click)="onPageChange(currentPage + 1)">&raquo;</button>
+    <!-- Pagination Footer -->
+    <div class="crud-footer">
+      <div class="pagination-info">
+        Hiển thị từ <strong>{{ startItem }}</strong> đến <strong>{{ endItem }}</strong> trong tổng số <strong>{{
+          totalItems }}</strong> bản ghi
+      </div>
+
+      <!-- Navigation Arrows -->
+      <div class="pagination-buttons">
+        <button [disabled]="currentPage === 1" (click)="onPageChange(1)" title="Trang đầu">
+          &laquo;
+        </button>
+        <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)" title="Trang trước">
+          &lsaquo;
+        </button>
+
+        <span class="current-page-display">Trang {{ currentPage }} / {{ totalPagesCount || 1 }}</span>
+
+        <button [disabled]="currentPage === totalPagesCount || totalPagesCount === 0"
+          (click)="onPageChange(currentPage + 1)" title="Trang sau">
+          &rsaquo;
+        </button>
+        <button [disabled]="currentPage === totalPagesCount || totalPagesCount === 0"
+          (click)="onPageChange(totalPagesCount)" title="Trang cuối">
+          &raquo;
+        </button>
+      </div>
+
+      <!-- Items Per Page selector -->
+      <div class="page-size-selector">
+        <span>Số dòng / trang:</span>
+        <select [ngModel]="pageSize" (ngModelChange)="onSizeChange($event)">
+          @for (s of sizeOptions; track s) {
+          <option [value]="s">{{ s }}</option>
+          }
+        </select>
+      </div>
     </div>
   </div>
+  }
 </div>
 
 <app-monthly-meal-detail-modal *ngIf="isModalOpen" [userId]="selectedUserId!" [userName]="selectedUserName!"

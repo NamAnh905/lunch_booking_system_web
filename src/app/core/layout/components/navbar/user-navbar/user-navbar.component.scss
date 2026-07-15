@@ -1,0 +1,70 @@
+.logo-vnpost {
+  width: 68%;
+}
+
+/*
+ * Navbar tự chứa layout kiểu Bootstrap 4 để hiển thị GIỐNG NHAU ở mọi trang.
+ * Trước đây navbar chỉ nhìn đúng ở các trang portal vì meal-order.scss @import Bootstrap
+ * qua CDN (rò rỉ ra global khi component mounted). Ở trang login không có Bootstrap nên
+ * navbar vỡ layout (logo tràn full-width, container không căn giữa, mất nền trắng).
+ * Dưới đây tái lập đúng các quy tắc navbar/container của Bootstrap 4, đóng gói trong chính
+ * component (scoped) để không phụ thuộc Bootstrap và không đụng tới style của trang cha.
+ */
+.navbar {
+  /*
+   * position: relative (như Bootstrap) để nav là stacking context được vẽ SAU sibling
+   * kế tiếp -> box-shadow inline dưới đáy nav không bị nền của phần tử phía dưới
+   * (vd .login-main) vẽ đè lên. Thiếu dòng này thì shadow "mất" ở trang login.
+   */
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+
+  /* class bg-white trên <nav> (Bootstrap util) cho nền trắng navbar. */
+  &.bg-white {
+    background-color: #fff;
+  }
+}
+
+.navbar > .container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* .container căn giữa + max-width theo breakpoint như Bootstrap 4 -> logo thụt vào đúng vị trí. */
+.container {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 576px) {
+  .container { max-width: 540px; }
+}
+@media (min-width: 768px) {
+  .container { max-width: 720px; }
+}
+@media (min-width: 992px) {
+  .container { max-width: 960px; }
+}
+@media (min-width: 1200px) {
+  .container { max-width: 1140px; }
+}
+
+/* inline-block để logo width:68% tính trên kích thước ẢNH, không phải cả trang. */
+.navbar-brand {
+  display: inline-block;
+  padding-top: 0.3125rem;
+  padding-bottom: 0.3125rem;
+  margin-right: 1rem;
+  font-size: 1.25rem;
+  line-height: inherit;
+  white-space: nowrap;
+}

@@ -3,14 +3,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
+import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { DishService } from './dish.service';
 import { Dish, DishCreateRequest, DishUpdateRequest } from '@shared/models/dish.model';
+import { DishType, DISH_TYPE_LABELS } from '@shared/enums/dish-type.enum';
+import { EXCEL_FILE_NAMES } from '@shared/constants/business.constants';
 import { AutoFocusDirective } from '../../../shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-dish',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent, AutoFocusDirective],
+  imports: [CommonModule, FormsModule, CrudComponent, FormModalComponent, AutoFocusDirective],
   templateUrl: './dish.component.html',
   styleUrl: './dish.component.scss'
 })
@@ -26,21 +29,28 @@ export class DishComponent extends BaseCrudComponent<Dish, { keyword?: string, t
       name: '',
       description: '',
       isActive: true,
-      type: 'REGULAR'
+      type: DishType.REGULAR
     };
   }
 
   isFilterOpen = false;
-  
+
+  /** Thứ tự hiển thị loại món trong bộ lọc. */
+  private static readonly TYPE_FILTER_ORDER: DishType[] = [
+    DishType.REGULAR,
+    DishType.SPECIAL,
+    DishType.DRINK,
+    DishType.VEGETABLE,
+    DishType.SOUP,
+    DishType.RICE,
+  ];
+
   filterOptions = {
-    types: [
-      { value: 'REGULAR', label: 'Món thường', checked: false },
-      { value: 'SPECIAL', label: 'Món đặc biệt', checked: false },
-      { value: 'DRINK', label: 'Nước uống', checked: false },
-      { value: 'VEGETABLE', label: 'Rau', checked: false },
-      { value: 'SOUP', label: 'Canh', checked: false },
-      { value: 'RICE', label: 'Cơm', checked: false }
-    ],
+    types: DishComponent.TYPE_FILTER_ORDER.map((value) => ({
+      value,
+      label: DISH_TYPE_LABELS[value],
+      checked: false,
+    })),
     isActives: [
       { value: true, label: 'Hoạt động', checked: false },
       { value: false, label: 'Khóa', checked: false }
@@ -142,7 +152,7 @@ export class DishComponent extends BaseCrudComponent<Dish, { keyword?: string, t
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'danh_sach_mon_an.xlsx';
+        a.download = EXCEL_FILE_NAMES.DISH_LIST;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

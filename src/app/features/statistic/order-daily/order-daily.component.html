@@ -1,6 +1,6 @@
 <div class="daily-meal-container">
   <div class="header-section">
-    <h2>Danh sách ăn trưa ngày {{ selectedDate | date:'dd/MM/yyyy' }}</h2>
+    <h2>Danh sách ăn trưa ngày {{ selectedDate | date }}</h2>
   </div>
 
   <div class="summary-cards">
@@ -9,6 +9,12 @@
       <div class="card-content">
         <span class="label">Tổng suất ăn</span>
         <span class="value">{{ (summary?.totalNormalMeals || 0) + (summary?.totalSpecialMeals || 0) }}</span>
+        @if (isFriday) {
+        <div class="sub-stats">
+          <span class="sub-stat normal"><i class="fas fa-circle"></i> Thường: <strong>{{ totalNormalMeals }}</strong></span>
+          <span class="sub-stat special"><i class="fas fa-circle"></i> Tăng cường: <strong>{{ totalSpecialMeals }}</strong></span>
+        </div>
+        }
       </div>
     </div>
     <div class="card card-green">
@@ -30,7 +36,7 @@
           <select [(ngModel)]="selectedDepartmentId" (change)="onFilterChange()">
             <option [ngValue]="null">Tất cả phòng ban</option>
             @for (dept of departments; track dept.id) {
-              <option [ngValue]="dept.id">{{ dept.name }}</option>
+            <option [ngValue]="dept.id">{{ dept.name }}</option>
             }
           </select>
         </div>
@@ -44,7 +50,8 @@
       </div>
       <div class="spacer" style="flex: 1;"></div>
       <button class="btn btn-info" (click)="exportExcel()" [disabled]="isExporting">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" *ngIf="!isExporting">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" *ngIf="!isExporting">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
           <polyline points="7 10 12 15 17 10"></polyline>
           <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -65,29 +72,45 @@
             <th>Tên đăng nhập</th>
             <th>Phòng ban</th>
             <th>Trạng thái</th>
+            @if (isFriday) { <th>Loại suất ăn</th> }
             <th>Thời gian đặt</th>
           </tr>
         </thead>
         <tbody>
           @for (order of orders; track order.userId; let i = $index) {
-            <tr>
-              <td class="text-center">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-              <td>{{ order.fullName || 'N/A' }}</td>
-              <td>{{ order.userName || 'N/A' }}</td>
-              <td>{{ order.departmentName || 'N/A' }}</td>
-              <td>
-                <span class="status-clean" [class.active]="order.logicalStatus === 'REGISTERED'"
-                  [class.inactive]="order.logicalStatus === 'UNREGISTERED'">
-                  <span class="status-dot"></span> {{ order.logicalStatus === 'REGISTERED' ? 'Đã đăng ký' : 'Chưa đăng ký' }}
-                </span>
-              </td>
-              <td>{{ order.logicalStatus === 'REGISTERED' && order.createdAt ? (order.createdAt | date:'dd/MM/yyyy HH:mm') : '---' }}</td>
-            </tr>
+          <tr>
+            <td class="text-center">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+            <td>{{ order.fullName || 'N/A' }}</td>
+            <td>{{ order.userName || 'N/A' }}</td>
+            <td>{{ order.departmentName || 'N/A' }}</td>
+            <td>
+              <span class="status-clean" [class.active]="order.logicalStatus === 'REGISTERED'"
+                [class.inactive]="order.logicalStatus === 'UNREGISTERED'">
+                <span class="status-dot"></span> {{ order.logicalStatus === 'REGISTERED' ? 'Đã đăng ký' : 'Chưa đăng ký'
+                }}
+              </span>
+            </td>
+            @if (isFriday) {
+            <td>
+              @if (order.logicalStatus === 'REGISTERED') {
+              @if (order.price === 40000) {
+              <span class="meal-type-special">Tăng cường</span>
+              } @else {
+              <span class="meal-type-normal">Thường</span>
+              }
+              } @else {
+              <span class="text-muted">---</span>
+              }
+            </td>
+            }
+            <td>{{ order.logicalStatus === 'REGISTERED' && order.createdAt ? (order.createdAt | date:dateTimeFormat)
+              : '---' }}</td>
+          </tr>
           }
           @if (orders.length === 0) {
-            <tr>
-              <td colspan="6" class="text-center empty-state">Không có dữ liệu</td>
-            </tr>
+          <tr>
+            <td [attr.colspan]="isFriday ? 7 : 6" class="text-center empty-state">Không có dữ liệu</td>
+          </tr>
           }
         </tbody>
       </table>
@@ -96,9 +119,10 @@
     <!-- Pagination Footer -->
     <div class="crud-footer">
       <div class="pagination-info">
-        Hiển thị từ <strong>{{ startItem }}</strong> đến <strong>{{ endItem }}</strong> trong tổng số <strong>{{ totalOrders }}</strong> bản ghi
+        Hiển thị từ <strong>{{ startItem }}</strong> đến <strong>{{ endItem }}</strong> trong tổng số <strong>{{
+          totalOrders }}</strong> bản ghi
       </div>
-      
+
       <!-- Navigation Arrows -->
       <div class="pagination-buttons">
         <button [disabled]="currentPage === 1" (click)="onPageChange(1)" title="Trang đầu">
@@ -107,13 +131,15 @@
         <button [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)" title="Trang trước">
           &lsaquo;
         </button>
-        
+
         <span class="current-page-display">Trang {{ currentPage }} / {{ totalPagesCount || 1 }}</span>
 
-        <button [disabled]="currentPage === totalPagesCount || totalPagesCount === 0" (click)="onPageChange(currentPage + 1)" title="Trang sau">
+        <button [disabled]="currentPage === totalPagesCount || totalPagesCount === 0"
+          (click)="onPageChange(currentPage + 1)" title="Trang sau">
           &rsaquo;
         </button>
-        <button [disabled]="currentPage === totalPagesCount || totalPagesCount === 0" (click)="onPageChange(totalPagesCount)" title="Trang cuối">
+        <button [disabled]="currentPage === totalPagesCount || totalPagesCount === 0"
+          (click)="onPageChange(totalPagesCount)" title="Trang cuối">
           &raquo;
         </button>
       </div>
@@ -123,7 +149,7 @@
         <span>Số dòng / trang:</span>
         <select [ngModel]="pageSize" (ngModelChange)="onSizeChange($event)">
           @for (s of sizeOptions; track s) {
-            <option [value]="s">{{ s }}</option>
+          <option [value]="s">{{ s }}</option>
           }
         </select>
       </div>

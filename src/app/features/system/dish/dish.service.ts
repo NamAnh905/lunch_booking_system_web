@@ -1,53 +1,42 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { shareReplay, catchError, tap, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { PageResponse, ApiResponse } from '@shared/models';
 import { Dish, DishCreateRequest, DishUpdateRequest } from '@shared/models/dish.model';
+import { BaseCachedCrudService } from '@shared/services/base-cached-crud.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class DishService {
+export class DishService extends BaseCachedCrudService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/dishes`;
-  private cache = new Map<string, Observable<ApiResponse<PageResponse<Dish>>>>();
-  private refresh$ = new BehaviorSubject<void>(undefined);
+  private apiUrl = `${environment.apiUrl}/admin/dishes`;
 
-  clearCache(): void {
-    this.cache.clear();
-    this.refresh$.next();
+  getAll(): Observable<ApiResponse<Dish[]>> {
+    return this.http.get<ApiResponse<Dish[]>>(`${this.apiUrl}/all`);
   }
 
   query(query: any, page: number, size: number): Observable<ApiResponse<PageResponse<Dish>>> {
     const cacheKey = `${page}-${size}-${JSON.stringify(query)}`;
-    if (!this.cache.has(cacheKey)) {
-      let params = new HttpParams()
-        .set('page', (page + 1).toString())
-        .set('size', size.toString());
+    let params = new HttpParams()
+      .set('page', (page + 1).toString())
+      .set('size', size.toString());
 
-      if (query && query.keyword) {
-        params = params.set('keyword', query.keyword);
-      }
-      if (query && query.types && query.types.length > 0) {
-        params = params.set('types', query.types.join(','));
-      }
-      if (query && query.isActives && query.isActives.length > 0) {
-        params = params.set('isActives', query.isActives.join(','));
-      }
-
-      const stream$ = this.refresh$.pipe(
-        switchMap(() => this.http.get<ApiResponse<PageResponse<Dish>>>(this.apiUrl, { params })),
-        shareReplay(1),
-        catchError(error => {
-          this.cache.delete(cacheKey);
-          return throwError(() => error);
-        })
-      );
-      this.cache.set(cacheKey, stream$);
+    if (query && query.keyword) {
+      params = params.set('keyword', query.keyword);
     }
-    return this.cache.get(cacheKey)!;
+    if (query && query.types && query.types.length > 0) {
+      params = params.set('types', query.types.join(','));
+    }
+    if (query && query.isActives && query.isActives.length > 0) {
+      params = params.set('isActives', query.isActives.join(','));
+    }
+
+    return this.cached(cacheKey, () =>
+      this.http.get<ApiResponse<PageResponse<Dish>>>(this.apiUrl, { params })
+    );
   }
 
   add(form: DishCreateRequest): Observable<ApiResponse<Dish>> {

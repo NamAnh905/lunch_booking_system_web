@@ -1,56 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap');
+
 
 .login-page {
-  font-family: 'Nunito', sans-serif;
-  background-color: #f8fafc;
+  font-family: var(--font-sans-serif);
+  background-color: #ffffff;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-/* Navbar styles matching reference site */
-.navbar {
-  background-color: #ffffff;
-  box-shadow: 5px 3px 8px #888888 !important; /* Matches exactly the style from reference */
-  padding: 10px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-}
-
-.navbar-container {
-  width: 100%;
-  max-width: 1140px;
-  padding: 0 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-sizing: border-box;
-}
-
-.logo-vnpost {
-  height: auto;
-  max-width: 250px;
-  display: block;
-}
-
-.navbar-menu {
-  display: flex;
-  align-items: center;
-}
-
-.nav-link {
-  font-size: 0.9rem;
-  color: rgba(0, 0, 0, 0.5);
-  text-decoration: none;
-  font-weight: 400;
-  transition: color 0.15s ease-in-out;
-  
-  &:hover {
-    color: rgba(0, 0, 0, 0.7);
-  }
 }
 
 /* Main content container */
@@ -59,7 +14,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 4rem 0;
+  padding: 0;
   background-color: #f8fafc;
 }
 
@@ -78,12 +33,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 24px 0;
 }
 
 /* HT Logo and Dotted Background */
 .logo-section {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 10px;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -142,6 +98,7 @@
 .col-input {
   width: 50%; /* Equivalent to col-md-6 spacing */
   box-sizing: border-box;
+  position: relative; /* Mốc định vị cho .field-error nằm tuyệt đối bên dưới input */
 }
 
 /* Offsets for elements without labels */
@@ -173,14 +130,31 @@
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(52, 144, 220, 0.25);
   }
-  
+
   &.is-invalid {
     border-color: #e3342f;
-    
+
     &:focus {
       box-shadow: 0 0 0 0.2rem rgba(227, 52, 47, 0.25);
     }
   }
+}
+
+/*
+ * Text lỗi nằm TUYỆT ĐỐI ngay dưới input -> chiếm 0 không gian trong document flow,
+ * nên việc ẩn/hiện (qua [style.visibility]) KHÔNG làm xê dịch layout (chống CLS).
+ * Nằm gọn trong khoảng margin-bottom 1.25rem của .form-group.
+ */
+.field-error {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 3px;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  color: #e3342f;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 /* Checkbox alignment and spacing */
@@ -226,23 +200,23 @@
   border-radius: 0.25rem;
   border: 1px solid transparent;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  
+
   &:hover {
     color: #ffffff;
     background-color: #227dc7;
     border-color: #2176bd;
   }
-  
+
   &:focus {
     box-shadow: 0 0 0 0.2rem rgba(84, 158, 221, 0.5);
     outline: none;
   }
-  
+
   &:active {
     background-color: #2176bd;
     border-color: #1f6fb2;
   }
-  
+
   &:disabled {
     color: #ffffff;
     background-color: #6c757d;
@@ -250,21 +224,6 @@
     cursor: not-allowed;
     opacity: 0.65;
   }
-}
-
-/* Alert styles */
-.alert {
-  padding: 0.75rem 1.25rem;
-  margin-bottom: 1.5rem;
-  border: 1px solid transparent;
-  border-radius: 0.25rem;
-  font-size: 0.9rem;
-}
-
-.alert-danger {
-  color: #721c24;
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
 }
 
 /* Responsive breakpoint styling matching Bootstrap */
@@ -280,9 +239,6 @@
   }
   .offset-row {
     margin-left: 0;
-  }
-  .navbar-container {
-    padding: 0 10px;
   }
   .login-card {
     max-width: 100%;
@@ -313,11 +269,11 @@
   justify-content: center;
   z-index: 5;
   transition: color 0.15s ease-in-out;
-  
+
   &:hover {
     color: #495057;
   }
-  
+
   &:focus {
     outline: none;
   }

@@ -1,0 +1,7 @@
+@use '../../../../../styles/variables' as *;
+
+.loading-text {
+  margin: 8px 0;
+  color: $text-secondary;
+  font-size: 14px;
+}

@@ -1,0 +1,34 @@
+<div class="section-container">
+  <h3 class="section-title">Danh sách vé có thể Pass</h3>
+
+  @if (orders().length > 0) {
+    <div class="tickets-grid">
+      @for (order of orders(); track order.id) {
+        <mat-card class="ticket-card eligible-ticket">
+          <mat-card-header>
+            <mat-card-title>{{ order.menuDate | date }}</mat-card-title>
+            <mat-card-subtitle>Suất ăn thường</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-row">
+              <span>Trạng thái: <span class="status-badge pending">HỢP LỆ</span></span>
+            </div>
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button mat-flat-button color="primary" (click)="post.emit(order)" [disabled]="isLoading()">
+              Đăng lên chợ
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  } @else if (pendingOrderWarning()) {
+    <div class="cutoff-message">
+      <p>{{ pendingOrderWarning() }}<br>Ngoài khung giờ này, vui lòng tự hủy vé ở Tab Đăng ký cơm.</p>
+    </div>
+  } @else {
+    <div class="empty-state-small">
+      <p>Không có vé nào đủ điều kiện pass lúc này.</p>
+    </div>
+  }
+</div>

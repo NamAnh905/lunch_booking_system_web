@@ -169,52 +169,51 @@
 </app-crud>
 
 <!-- Form Modal -->
-@if (isFormOpen) {
-  <div class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>{{ formMode === 'add' ? 'Thêm món ăn' : 'Cập nhật món ăn' }}</h3>
-        <button class="close-btn" (click)="closeForm()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form #f="ngForm" (ngSubmit)="onSave(f.value)">
-          <div class="form-group">
-            <label class="required">Tên món ăn</label>
-            <input type="text" name="name" [(ngModel)]="formModel.name" required appAutoFocus>
-          </div>
-          
-          <div class="form-group">
-            <label class="required">Loại món ăn</label>
-            <select name="type" [(ngModel)]="formModel.type" required class="form-control">
-              <option value="REGULAR">Món thường</option>
-              <option value="SPECIAL">Món đặc biệt</option>
-              <option value="DRINK">Nước uống</option>
-              <option value="VEGETABLE">Rau</option>
-              <option value="SOUP">Canh</option>
-              <option value="RICE">Cơm</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label>Mô tả</label>
-            <textarea name="description" [(ngModel)]="formModel.description"></textarea>
-          </div>
-          
-          @if (formMode === 'edit') {
-            <div class="form-group checkbox-group">
-              <label>
-                <input type="checkbox" name="isActive" [(ngModel)]="formModel.isActive">
-                Hoạt động
-              </label>
-            </div>
-          }
-          
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="closeForm()">Hủy</button>
-            <button type="submit" class="btn btn-primary" [disabled]="!f.valid || loading">Lưu</button>
-          </div>
-        </form>
-      </div>
+<app-form-modal
+  [open]="isFormOpen"
+  [title]="formMode === 'add' ? 'Thêm món ăn' : 'Cập nhật món ăn'"
+  [saving]="loading"
+  [saveDisabled]="f.invalid"
+  (save)="onSave(f.value)"
+  (cancel)="closeForm()">
+  <form #f="ngForm" style="display: contents">
+    <div class="form-field">
+      <label class="required">Tên món ăn</label>
+      <input type="text" name="name" #name="ngModel" [(ngModel)]="formModel.name" required
+        [pattern]="VALIDATION.GENERAL_NAME" [maxlength]="VALIDATION_LEN.DISH_NAME.max" appAutoFocus>
+      @if (name.invalid && (name.dirty || name.touched)) {
+        <span class="error-text">
+          @if (name.errors?.['required']) { Tên món ăn không được để trống. }
+          @else if (name.errors?.['pattern']) { Tên món ăn không được chứa ký tự đặc biệt. }
+          @else if (name.errors?.['maxlength']) { Tên món ăn không được vượt quá 255 ký tự. }
+        </span>
+      }
     </div>
-  </div>
-}
+
+    <div class="form-field">
+      <label class="required">Loại món ăn</label>
+      <select name="type" [(ngModel)]="formModel.type" required class="form-control">
+        <option value="REGULAR">Món thường</option>
+        <option value="SPECIAL">Món đặc biệt</option>
+        <option value="DRINK">Nước uống</option>
+        <option value="VEGETABLE">Rau</option>
+        <option value="SOUP">Canh</option>
+        <option value="RICE">Cơm</option>
+      </select>
+    </div>
+
+    <div class="form-field full-span">
+      <label>Mô tả</label>
+      <textarea name="description" [(ngModel)]="formModel.description"></textarea>
+    </div>
+
+    @if (formMode === 'edit') {
+      <div class="form-field checkbox-group full-span">
+        <label>
+          <input type="checkbox" name="isActive" [(ngModel)]="formModel.isActive">
+          Hoạt động
+        </label>
+      </div>
+    }
+  </form>
+</app-form-modal>

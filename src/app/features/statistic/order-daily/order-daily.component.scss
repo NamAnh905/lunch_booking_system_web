@@ -9,7 +9,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans-serif);
 
   .header-section {
     margin-bottom: 24px;
@@ -23,6 +23,7 @@
 
   .summary-cards {
     display: flex;
+    flex-wrap: wrap;
     gap: 20px;
     margin-bottom: 24px;
 
@@ -60,6 +61,39 @@
           font-size: 24px;
           font-weight: 700;
           margin-top: 4px;
+        }
+
+        .sub-stats {
+          display: flex;
+          gap: 16px;
+          margin-top: 8px;
+          padding-top: 8px;
+          border-top: 1px solid rgba(255, 255, 255, 0.25);
+
+          .sub-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0.95;
+
+            i {
+              font-size: 6px;
+            }
+
+            strong {
+              font-weight: 700;
+            }
+
+            &.normal i {
+              color: #a5f3fc;
+            }
+
+            &.special i {
+              color: #fcd34d;
+            }
+          }
         }
       }
 
@@ -217,5 +251,20 @@
       border-color: lighten(#13c2c2, 6%);
       box-shadow: rgba(19, 194, 194, 0.15) 0px 4px 12px;
     }
+  }
+
+  // Meal type text colors
+  .meal-type-normal {
+    color: #0891b2;
+    font-weight: 600;
+  }
+
+  .meal-type-special {
+    color: #d97706;
+    font-weight: 600;
+  }
+
+  .text-muted {
+    color: #94a3b8;
   }
 }

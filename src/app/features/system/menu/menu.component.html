@@ -1,135 +1,149 @@
 <app-crud
   [loading]="loading"
-  [total]="0"
-  [page]="1"
-  [size]="100"
+  [total]="total"
+  [page]="page"
+  [size]="size"
   [selections]="[]"
-  [permissions]="{ add: 'MANAGE_MENUS', edit: 'MANAGE_MENUS', delete: 'MANAGE_MENUS', export: 'MANAGE_MENUS' }"
-  (refresh)="loadWeekMenus()"
+  [hideAdd]="true"
+  [permissions]="{ export: 'MANAGE_MENUS' }"
+  (pageChange)="onPageChange($event)"
+  (sizeChange)="onSizeChange($event)"
+  (refresh)="onReset()"
   (export)="onExport()">
-  
-  <div crud-filters class="filters week-selector">
-    <button class="btn btn-secondary" (click)="prevWeek()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="15 18 9 12 15 6"></polyline>
-      </svg>
-      Tuần trước
-    </button>
-    <button class="btn btn-secondary" (click)="thisWeek()">Tuần này</button>
-    <button class="btn btn-secondary" (click)="nextWeek()">
-      Tuần sau
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="9 18 15 12 9 6"></polyline>
-      </svg>
-    </button>
-    
-    <div class="date-picker-wrapper">
-      <span>Chọn ngày:</span>
-      <input type="date" [value]="currentDate | date:'yyyy-MM-dd'" (change)="onWeekDateChange($event)">
+
+  <div crud-filters class="filters">
+    <div class="toolbar-top">
+      <div class="search-wrapper">
+        <input type="text" placeholder="Tìm kiếm thực đơn..." [(ngModel)]="query.keyword" (keyup.enter)="onSearch()" class="search-input">
+        <button class="search-btn" (click)="onSearch()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 
-  <table crud-table class="grid-table">
+  <!-- Custom "Add" dropdown -->
+  <div crud-add class="add-menu-wrapper">
+    <button class="btn btn-primary" (click)="toggleAddMenu()" [disabled]="loading">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Thêm mới
+      <svg class="caret" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </button>
+
+    @if (isAddMenuOpen) {
+      <div class="add-menu-dropdown">
+        <button class="add-menu-item" (click)="openListEditor()">Thêm dạng Danh sách</button>
+        <button class="add-menu-item" (click)="openImageForm()">Thêm dạng Hình ảnh</button>
+      </div>
+    }
+  </div>
+
+  <table crud-table class="data-table">
     <thead>
       <tr>
-        <th class="content-header-col">Nội dung</th>
-        @for (day of weekDays; track day.dateStr) {
-          <th class="text-center weekday-col">{{ day.label }}</th>
-        }
+        <th class="text-center" style="width: 60px;">STT</th>
+        <th>Tên menu</th>
+        <th style="width: 140px;">Loại</th>
+        <th style="width: 180px;">Ngày tạo</th>
+        <th class="action-column">Thao tác</th>
       </tr>
     </thead>
     <tbody>
-      @for (price of availablePrices; track price.id) {
+      @for (item of data; track item.id; let i = $index) {
         <tr>
-          <!-- Price category details -->
-          <td class="price-category-cell">
-            <div class="category-name">{{ price.name }}</div>
-            <div class="category-amount">{{ price.amount | number }} VNĐ</div>
+          <td class="text-center">{{ (page - 1) * size + i + 1 }}</td>
+          <td>{{ item.name || ('Thực đơn ' + item.menuDate) }}</td>
+          <td>
+            <span class="type-badge" [class.image]="isImage(item)" [class.list]="!isImage(item)">
+              {{ typeLabel(item) }}
+            </span>
           </td>
-          
-          <!-- Cells for each day of the week -->
-          @for (day of weekDays; track day.dateStr) {
-            <td class="menu-grid-cell">
-              @let menu = getMenuAt(day.dateStr, price.id!);
-              @let slots = getMenuSlots(menu, day.name, price);
-              
-              <!-- Menu Header (Status & Delete menu) -->
-              @if (menu && slots.length > 0) {
-                <div class="menu-cell-header">
-                  <span class="status-clean" [class.active]="menu.status === 'ACTIVE'" [class.inactive]="menu.status !== 'ACTIVE'" (click)="onToggleCellStatus(menu)" title="Click để thay đổi trạng thái">
-                    <span class="status-dot"></span> {{ menu.status === 'ACTIVE' ? 'Hoạt động' : 'Khóa' }}
-                  </span>
-                  
-                  <button class="btn-delete-menu" (click)="onDeleteCell(menu)" title="Xóa thực đơn ngày này">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                    </svg>
-                  </button>
-                </div>
-              }
-              
-              <!-- 7 Rows of Menu Slots -->
-              @if (slots.length > 0) {
-                <div class="menu-slots-container" [class.inactive-menu]="menu && menu.status === 'INACTIVE'">
-                  @for (slot of slots; track $index; let idx = $index) {
-                    <div class="menu-slot-row" [class.empty-slot]="!slot.dish" [class.drink-slot]="slot.expectedType === 'DRINK'">
-                      
-                      <div class="slot-text-wrapper" (click)="openSlotDropdown(day.dateStr, price.id!, idx, slot.expectedType, $event)">
-                        @if (slot.dish) {
-                          <span class="dish-name">{{ slot.dish.name }}</span>
-                        } @else {
-                          <span class="placeholder-text">+ {{ slot.label }}</span>
-                        }
-                      </div>
-
-                      @if (slot.dish) {
-                        <button class="btn-remove-slot" (click)="removeDishFromSlot(day.dateStr, price.id!, idx, $event)" title="Xóa món này">
-                          &times;
-                        </button>
-                      }
-
-                      <!-- Dropdown search popup -->
-                      @if (activeEditSlot && activeEditSlot.dateStr === day.dateStr && activeEditSlot.priceId === price.id && activeEditSlot.slotIndex === idx) {
-                        <div class="slot-dropdown-popup" (click)="$event.stopPropagation()">
-                          <div class="dropdown-search-box">
-                            <input type="text" placeholder="Tìm nhanh..." [(ngModel)]="dishSearchKeyword" appAutoFocus>
-                          </div>
-                          <div class="dropdown-options-list">
-                            @for (availDish of getFilteredDishes(slot.expectedType); track availDish.id) {
-                              <div class="dropdown-option-item" (click)="selectDishForSlot(availDish)">
-                                {{ availDish.name }}
-                              </div>
-                            }
-                            @if (getFilteredDishes(slot.expectedType).length === 0) {
-                              <div class="no-options-item">Không tìm thấy món</div>
-                            }
-                          </div>
-                        </div>
-                      }
-
-                    </div>
-                  }
-                </div>
-              } @else {
-                <div class="blocked-cell-placeholder">
-                  &nbsp;
-                </div>
-              }
-            </td>
-          }
+          <td>{{ item.createdAt ? (item.createdAt | date:dateTimeFormat) : '' }}</td>
+          <td class="action-column">
+            <div class="row-actions">
+              <button class="btn-icon preview" (click)="onPreview(item)" title="Xem trước">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+              <button class="btn-icon edit" (click)="onEditRow(item)" title="Sửa">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </button>
+              <button class="btn-icon delete" (click)="onDeleteRow(item)" title="Xóa">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+          </td>
         </tr>
       }
-      @if (availablePrices.length === 0 && !loading) {
+      @if (data.length === 0 && !loading) {
         <tr>
-          <td colspan="6" class="text-center empty-state">Không có loại suất ăn nào</td>
+          <td colspan="5" class="text-center empty-state">Không có dữ liệu</td>
         </tr>
       }
     </tbody>
   </table>
 </app-crud>
 
-<!-- Backdrop to close active dropdowns -->
-@if (activeEditSlot) {
-  <div class="dropdown-backdrop" (click)="activeEditSlot = null"></div>
+<!-- List (Grid) editor overlay -->
+@if (showListEditor) {
+  <app-menu-list-editor [initialDate]="listEditorDate" (close)="onListEditorClose()"></app-menu-list-editor>
+}
+
+<!-- Image form modal -->
+@if (showImageForm) {
+  <app-menu-image-form
+    [menu]="imageFormMenu"
+    (close)="onImageFormClose()"
+    (saved)="onImageFormSaved()">
+  </app-menu-image-form>
+}
+
+<!-- Preview modal -->
+@if (previewMenu) {
+  <div class="modal-overlay" (click)="closePreview()">
+    <div class="modal-content preview-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ previewMenu.name || ('Thực đơn ' + previewMenu.menuDate) }}</h3>
+        <button class="close-btn" (click)="closePreview()">&times;</button>
+      </div>
+      <div class="modal-body">
+        @if (isImage(previewMenu)) {
+          @if (previewMenu.imageUrl) {
+            <img class="preview-image" [src]="previewMenu.imageUrl" alt="Thực đơn hình ảnh">
+          } @else {
+            <p class="empty-state">Chưa có ảnh cho thực đơn này.</p>
+          }
+        } @else {
+          @if (previewMenu.dishes && previewMenu.dishes.length > 0) {
+            <ul class="dish-list">
+              @for (dish of previewMenu.dishes; track dish.id) {
+                <li>{{ dish.name }}</li>
+              }
+            </ul>
+          } @else {
+            <p class="empty-state">Thực đơn chưa có món ăn.</p>
+          }
+        }
+      </div>
+    </div>
+  </div>
 }

@@ -71,40 +71,40 @@
 </app-crud>
 
 <!-- Form Modal -->
-@if (isFormOpen) {
-<div class="modal-overlay">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>{{ formMode === 'add' ? 'Thêm mới' : 'Cập nhật' }} phòng ban</h3>
-      <button class="close-btn" (click)="closeForm()">&times;</button>
+<app-form-modal
+  [open]="isFormOpen"
+  [title]="(formMode === 'add' ? 'Thêm mới' : 'Cập nhật') + ' phòng ban'"
+  [saving]="loading"
+  [saveDisabled]="f.invalid"
+  (save)="onSave(f.value)"
+  (cancel)="closeForm()">
+  <form #f="ngForm" style="display: contents">
+    <div class="form-field">
+      <label class="required">Mã phòng ban</label>
+      <input type="text" name="code" #code="ngModel" [(ngModel)]="formModel.code" required [disabled]="formMode === 'edit'"
+        [pattern]="VALIDATION.CODE" [maxlength]="VALIDATION_LEN.DEPARTMENT_CODE.max"
+        placeholder="VD: PB01" [appAutoFocus]="formMode === 'add'">
+      @if (code.invalid && (code.dirty || code.touched)) {
+        <span class="error-text">
+          @if (code.errors?.['required']) { Mã phòng ban không được để trống. }
+          @else if (code.errors?.['pattern']) { Mã phòng ban chỉ được chứa chữ in hoa và dấu gạch dưới. }
+          @else if (code.errors?.['maxlength']) { Mã phòng ban không được vượt quá 50 ký tự. }
+        </span>
+      }
     </div>
 
-    <div class="modal-body">
-      <form #f="ngForm" (ngSubmit)="onSave(f.value)">
-        <div class="form-group">
-          <label class="required">Mã phòng ban</label>
-          <input type="text" name="code" [(ngModel)]="formModel.code" required [disabled]="formMode === 'edit'"
-            placeholder="VD: PB01" [appAutoFocus]="formMode === 'add'">
-        </div>
-
-        <div class="form-group">
-          <label class="required">Tên phòng ban</label>
-          <input type="text" name="name" [(ngModel)]="formModel.name" required placeholder="VD: Phòng Hành chính"
-            [appAutoFocus]="formMode === 'edit'">
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeForm()">Hủy</button>
-          <button type="submit" class="btn btn-primary" [disabled]="!f.valid || loading">
-            @if (loading) {
-            <i class="fas fa-spinner fa-spin"></i> Đang lưu...
-            } @else {
-            Lưu
-            }
-          </button>
-        </div>
-      </form>
+    <div class="form-field">
+      <label class="required">Tên phòng ban</label>
+      <input type="text" name="name" #name="ngModel" [(ngModel)]="formModel.name" required
+        [pattern]="VALIDATION.GENERAL_NAME" [maxlength]="VALIDATION_LEN.DEPARTMENT_NAME.max"
+        placeholder="VD: Phòng Hành chính" [appAutoFocus]="formMode === 'edit'">
+      @if (name.invalid && (name.dirty || name.touched)) {
+        <span class="error-text">
+          @if (name.errors?.['required']) { Tên phòng ban không được để trống. }
+          @else if (name.errors?.['pattern']) { Tên phòng ban không được chứa ký tự đặc biệt. }
+          @else if (name.errors?.['maxlength']) { Tên phòng ban không được vượt quá 255 ký tự. }
+        </span>
+      }
     </div>
-  </div>
-</div>
-}
+  </form>
+</app-form-modal>

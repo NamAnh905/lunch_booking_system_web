@@ -85,43 +85,42 @@
 </app-crud>
 
 <!-- Form Modal -->
-@if (isFormOpen) {
-<div class="modal-overlay">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>{{ formMode === 'add' ? 'Thêm mới' : 'Cập nhật' }} giá</h3>
-      <button class="close-btn" (click)="closeForm()">&times;</button>
+<app-form-modal
+  [open]="isFormOpen"
+  [title]="(formMode === 'add' ? 'Thêm mới' : 'Cập nhật') + ' giá'"
+  [saving]="loading"
+  [saveDisabled]="f.invalid"
+  (save)="onSave(f.value)"
+  (cancel)="closeForm()">
+  <form #f="ngForm" style="display: contents">
+    <div class="form-field">
+      <label class="required">Tên giá</label>
+      <input type="text" name="name" #name="ngModel" [(ngModel)]="formModel.name" required
+        [pattern]="VALIDATION.GENERAL_NAME" [maxlength]="VALIDATION_LEN.PRICE_NAME.max"
+        placeholder="VD: Suất mặc định" appAutoFocus>
+      @if (name.invalid && (name.dirty || name.touched)) {
+        <span class="error-text">
+          @if (name.errors?.['required']) { Tên không được để trống. }
+          @else if (name.errors?.['pattern']) { Tên không được chứa ký tự đặc biệt. }
+          @else if (name.errors?.['maxlength']) { Tên không được vượt quá 100 ký tự. }
+        </span>
+      }
     </div>
 
-    <div class="modal-body">
-      <form #f="ngForm" (ngSubmit)="onSave(f.value)">
-        <div class="form-group">
-          <label class="required">Tên giá</label>
-          <input type="text" name="name" [(ngModel)]="formModel.name" required placeholder="VD: Suất mặc định" appAutoFocus>
-        </div>
-
-        <div class="form-group">
-          <label class="required">Mức giá (VNĐ)</label>
-          <input type="number" name="amount" [(ngModel)]="formModel.amount" required placeholder="VD: 30000">
-        </div>
-
-        <div class="form-group">
-          <label>Mô tả</label>
-          <textarea name="description" [(ngModel)]="formModel.description" rows="3"></textarea>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeForm()">Hủy</button>
-          <button type="submit" class="btn btn-primary" [disabled]="!f.valid || loading">
-            @if (loading) {
-            <i class="fas fa-spinner fa-spin"></i> Đang lưu...
-            } @else {
-            Lưu
-            }
-          </button>
-        </div>
-      </form>
+    <div class="form-field">
+      <label class="required">Mức giá (VNĐ)</label>
+      <input type="number" name="amount" #amount="ngModel" [(ngModel)]="formModel.amount" required [min]="0" placeholder="VD: 30000">
+      @if (amount.invalid && (amount.dirty || amount.touched)) {
+        <span class="error-text">
+          @if (amount.errors?.['required']) { Giá không được để trống. }
+          @else if (amount.errors?.['min']) { Giá không được nhỏ hơn 0. }
+        </span>
+      }
     </div>
-  </div>
-</div>
-}
+
+    <div class="form-field full-span">
+      <label>Mô tả</label>
+      <textarea name="description" [(ngModel)]="formModel.description" rows="3"></textarea>
+    </div>
+  </form>
+</app-form-modal>
