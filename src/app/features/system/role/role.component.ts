@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
+import { CrudActionsComponent } from '@shared/components/crud/crud-actions.component';
+import { CrudSearchComponent } from '@shared/components/crud/crud-search.component';
 import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { RoleService } from './role.service';
 import { RoleResponse, RoleCreateRequest, RoleUpdateRequest } from '@shared/models/role.model';
@@ -13,7 +15,7 @@ import { AutoFocusDirective } from '../../../shared/directives/autofocus.directi
 @Component({
   selector: 'app-role',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent, FormModalComponent, AutoFocusDirective],
+  imports: [CommonModule, FormsModule, CrudComponent, CrudActionsComponent, CrudSearchComponent, FormModalComponent, AutoFocusDirective],
   templateUrl: './role.component.html',
   styleUrl: './role.component.scss'
 })

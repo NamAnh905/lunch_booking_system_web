@@ -1,5 +1,8 @@
-@use '../../../../styles/variables' as *;
-@use '../../../../styles/mixins' as *;
+@use '../../../../styles/variables';
+@use '../../../../styles/mixins';
+@use '../../../../styles/buttons';
+
+@include buttons.crud-buttons;
 
 .config-page {
   display: flex;
@@ -10,7 +13,7 @@
   width: 100%;
   max-width: 800px;
   background-color: white;
-  border: 1px solid $border-color;
+  border: 1px solid variables.$border-color;
   border-radius: 8px;
   padding: 24px;
 }
@@ -22,13 +25,13 @@
     margin: 0 0 4px;
     font-size: 18px;
     font-weight: 600;
-    color: $text-primary;
+    color: variables.$text-primary;
   }
 
   .config-subtitle {
     margin: 0;
     font-size: 13px;
-    color: $text-secondary;
+    color: variables.$text-secondary;
   }
 }
 
@@ -36,7 +39,7 @@
 .config-empty {
   padding: 24px 0;
   text-align: center;
-  color: $text-secondary;
+  color: variables.$text-secondary;
   font-size: 14px;
 }
 
@@ -52,7 +55,7 @@
   justify-content: space-between;
   gap: 16px;
   padding-bottom: 16px;
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid variables.$border-color;
 
   &:last-child {
     border-bottom: none;
@@ -66,31 +69,32 @@
   gap: 2px;
 
   label {
+    margin: 0;
     font-size: 14px;
     font-weight: 500;
-    color: $text-primary;
+    color: variables.$text-primary;
   }
 
   .config-key {
     font-size: 12px;
-    color: $text-secondary;
+    color: variables.$text-secondary;
   }
 }
 
 .config-input {
   input {
     padding: 8px 12px;
-    border: 1px solid $border-color;
+    border: 1px solid variables.$border-color;
     border-radius: 6px;
     font-size: 14px;
     outline: none;
     min-width: 160px;
-    transition: $transition-base;
-    color: $text-primary;
+    transition: variables.$transition-base;
+    color: variables.$text-primary;
 
     &:focus {
-      border-color: $primary-color;
-      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+      border-color: variables.$primary-color;
+      box-shadow: 0 0 0 2px rgba(variables.$primary-color, 0.2);
     }
   }
 }
@@ -101,23 +105,6 @@
   justify-content: flex-end;
 }
 
-.btn-save {
+.config-actions .btn {
   padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  background-color: $primary-color;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: $transition-base;
-
-  &:hover:not(:disabled) {
-    opacity: 0.9;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
 }

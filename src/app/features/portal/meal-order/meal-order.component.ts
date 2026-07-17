@@ -4,7 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { CanComponentDeactivate } from '@core/guards/pending-changes-guard';
 import { MealOrderService } from './meal-order.service';
 import { AuthService } from '@core/auth/auth.service';
-import { OrderResponse } from '@shared/models';
+import { OrderResponse, OrderItemRequest } from '@shared/models';
 import Swal from 'sweetalert2';
 
 import { CalendarDay } from '@shared/models/meal-order.model';
@@ -43,7 +43,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
     return formatVnTime(this.businessConfig.cutOffTime);
   }
 
-  // Calendar State - khởi tạo theo ngày hiện tại của hệ thống.
   selectedDay = new Date().getDate();
   currentMonth = new Date().getMonth(); // 0-indexed
   currentYear = new Date().getFullYear();
@@ -58,7 +57,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
   calendarRows: CalendarDay[][] = [];
   registeredDates: Set<string> = new Set<string>(); // Set of date strings 'YYYY-MM-DD'
 
-  // Real backend maps
   menuMap: Record<string, any> = {};
   orderMap: Record<string, OrderResponse> = {};
   originalOrders: OrderResponse[] = [];
@@ -69,7 +67,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
    */
   private originalState = new Map<string, boolean>();
 
-  // UI State
   showMenuModal = false;
   menuGrid: { 
     priceName: string, 
@@ -159,7 +156,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
     this.totalPrice = summary.totalPrice;
   }
 
-  // Navigation arrows
   prevMonth(): void {
     this.confirmDiscardChanges().then((canLeave) => {
       if (!canLeave) return;
@@ -188,7 +184,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
     });
   }
 
-  // Handle day circle click
   onDayClick(day: CalendarDay): void {
     if (!day.dayNumber || day.isDisabled) return;
     
@@ -199,7 +194,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
 
     this.selectedDay = day.dayNumber;
 
-    // If user is toggling OFF (deselecting), handle immediately
     if (day.isRegistered) {
       day.isRegistered = false;
       day.isSpecial = false;
@@ -208,12 +202,10 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
       return;
     }
 
-    // Check if this day is a Friday (getDay() === 5)
     const dateObj = new Date(day.dateString + 'T00:00:00');
     const isFriday = dateObj.getDay() === 5;
 
     if (isFriday) {
-      // Show SweetAlert popup for Friday special meal choice
       Swal.fire({
         title: 'Chọn suất ăn ngày Thứ 6',
         text: 'Bạn muốn đăng ký suất thường hay suất đặc biệt?',
@@ -228,22 +220,18 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
         allowOutsideClick: false
       }).then((result) => {
         if (result.isConfirmed) {
-          // Special meal
           day.isRegistered = true;
           day.isSpecial = true;
           this.registeredDates.add(day.dateString);
           this.updateSummary();
         } else if (result.isDenied) {
-          // Normal meal
           day.isRegistered = true;
           day.isSpecial = false;
           this.registeredDates.add(day.dateString);
           this.updateSummary();
         }
-        // If cancelled, do nothing
       });
     } else {
-      // Non-Friday: register as normal meal
       day.isRegistered = true;
       day.isSpecial = false;
       this.registeredDates.add(day.dateString);
@@ -251,7 +239,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
     }
   }
 
-  // Action Buttons
 
   /** Các ô hợp lệ có thể chọn/bỏ chọn trong tháng (bỏ qua ô trống, ngày bị khoá, ngày đã qua giờ chốt). */
   private getSelectableDays(): CalendarDay[] {
@@ -284,7 +271,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
     this.updateSummary();
   }
 
-  // Show detailed menu list of the current week
   viewMenu(): void {
     const { monday, start: startStr, end: endStr } = getWeekRange(new Date());
 
@@ -299,7 +285,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
       next: (res) => {
         const menus = res.result || [];
         this.buildMenuGrid(menus, monday);
-
         this.isLoadingMenu = false;
       },
       error: () => {
@@ -337,20 +322,40 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
     return toIsoDate(new Date(this.currentYear, this.currentMonth, this.selectedDay));
   }
 
-  // Save Registration to Database
   saveRegistration(): void {
-    // Ngày mới đăng ký (chưa có đơn hợp lệ trên backend), kèm cờ suất đặc biệt.
-    const datesToRegister = Array.from(this.registeredDates)
-      .filter((date) => !this.originalOrders.find((o) => o.menuDate === date && o.status !== OrderStatus.CANCELLED))
-      .map((dateStr) => ({
-        orderDate: dateStr,
-        isSpecial: this.calendarDays.find((d) => d.dateString === dateStr)?.isSpecial ?? false
-      }));
+    // Chuẩn hoá menuDate về dạng 'YYYY-MM-DD' để khớp với key trong registeredDates.
+    const dateKey = (value: string): string => value.split('T')[0];
 
-    // Đơn cần huỷ (đang có trên backend nhưng người dùng đã bỏ chọn).
-    const ordersToCancel = this.originalOrders.filter(
-      (order) => order.menuDate && order.status !== OrderStatus.CANCELLED && !this.registeredDates.has(order.menuDate)
+    // Đơn gốc còn hiệu lực trên backend, tra cứu nhanh theo ngày.
+    const activeOriginalOrders = this.originalOrders.filter(
+      (o) => o.menuDate && o.status !== OrderStatus.CANCELLED
     );
+    const originalOrderByDate = new Map<string, OrderResponse>();
+    activeOriginalOrders.forEach((o) => originalOrderByDate.set(dateKey(o.menuDate), o));
+
+    const datesToRegister: OrderItemRequest[] = [];
+    const ordersToCancel: OrderResponse[] = [];
+
+    this.registeredDates.forEach((date) => {
+      const key = dateKey(date);
+      const isSpecial = this.calendarDays.find((d) => d.dateString === key)?.isSpecial ?? false;
+      const originalOrder = originalOrderByDate.get(key);
+
+      if (!originalOrder) {
+        datesToRegister.push({ orderDate: key, isSpecial });
+      } else if ((originalOrder.isSpecial ?? false) !== isSpecial) {
+        // Đã đăng ký nhưng đổi loại suất (thường <-> đặc biệt):
+        // huỷ đơn cũ rồi tạo lại đơn mới với cờ suất đặc biệt tương ứng.
+        ordersToCancel.push(originalOrder);
+        datesToRegister.push({ orderDate: key, isSpecial });
+      }
+    });
+
+    activeOriginalOrders.forEach((order) => {
+      if (!this.registeredDates.has(dateKey(order.menuDate))) {
+        ordersToCancel.push(order);
+      }
+    });
 
     if (datesToRegister.length === 0 && ordersToCancel.length === 0) {
       this.showToast('Không có thay đổi đăng ký nào cần lưu.', 'success');
@@ -379,7 +384,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
     });
   }
 
-  // ---- Bảo vệ thay đổi chưa lưu (unsaved changes) ----
 
   /** Một ô đang ở trạng thái nháp nếu trạng thái hiện tại khác với trạng thái gốc từ backend. */
   isDayDirty(day: CalendarDay): boolean {
@@ -388,9 +392,7 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
     const wasRegistered = this.originalState.has(day.dateString);
     const originalSpecial = this.originalState.get(day.dateString) ?? false;
 
-    // Đổi giữa đăng ký / huỷ.
     if (day.isRegistered !== wasRegistered) return true;
-    // Vẫn đăng ký nhưng đổi loại suất (thường <-> đặc biệt).
     if (day.isRegistered && (day.isSpecial ?? false) !== originalSpecial) return true;
 
     return false;

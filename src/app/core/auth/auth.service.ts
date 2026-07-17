@@ -18,7 +18,6 @@ export class AuthService {
 
   constructor() {}
 
-  // Helper to decode JWT token in-memory
   private decodeToken(token: string): UserClaims | null {
     try {
       const parts = token.split('.');
@@ -37,7 +36,6 @@ export class AuthService {
     }
   }
 
-  // Map JWT claims to UserInfo structure
   private mapClaimsToUserInfo(claims: UserClaims): UserInfo {
     const scope = claims.scope || '';
     const roles: string[] = [];
@@ -54,12 +52,12 @@ export class AuthService {
     return {
       username: claims.sub,
       userId: claims.userId,
+      fullName: claims.fullName,
       roles,
       permissions,
     };
   }
 
-  // Handle successful token response
   private handleAuthResponse(response: ApiResponse<TokenResponse>): TokenResponse {
     const tokenResult = response.result;
     if (tokenResult?.authenticated && tokenResult.token) {
@@ -80,7 +78,6 @@ export class AuthService {
     this.tokenStorage.setLoggedIn(false);
   }
 
-  // Login method
   public login(request: any): Observable<TokenResponse> {
     return this.http.post<ApiResponse<TokenResponse>>(`${this.apiUrl}/login`, request).pipe(
       map((res) => this.handleAuthResponse(res)),
@@ -91,7 +88,6 @@ export class AuthService {
     );
   }
 
-  // Refresh token session (usually on application start or token rotation)
   public refresh(): Observable<TokenResponse> {
     return this.http.post<ApiResponse<TokenResponse>>(`${this.apiUrl}/refresh`, {}).pipe(
       map((res) => this.handleAuthResponse(res)),
@@ -102,7 +98,6 @@ export class AuthService {
     );
   }
 
-  // Logout method
   public logout(): Observable<void> {
     return this.http.post<ApiResponse<void>>(`${this.apiUrl}/logout`, {}).pipe(
       tap(() => this.clearSession()),
@@ -118,14 +113,12 @@ export class AuthService {
     return this.currentUserSubject.value !== null;
   }
 
-  // Check if user has specific authority/permission
   public hasPermission(permission: string): boolean {
     const user = this.currentUserSubject.value;
     if (!user) return false;
     return user.permissions.includes(permission) || user.roles.includes('ADMIN');
   }
 
-  // Check if user has any of the specified roles
   public hasRole(roleName: string): boolean {
     const user = this.currentUserSubject.value;
     if (!user) return false;

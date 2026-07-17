@@ -21,7 +21,6 @@ export class UserService {
       .set('page', (page + 1).toString())
       .set('size', size.toString()); // Pass size parameter to backend
     
-    // Add other query params if any
     if (query && query.keyword) {
       params = params.set('keyword', query.keyword);
     }

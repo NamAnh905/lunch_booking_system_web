@@ -13,6 +13,7 @@ import { FormatMoneyPipe } from '../../../shared/pipes/format-money.pipe';
 import { ToastService } from '@core/services/toast.service';
 import { FileDownloadService } from '@core/services/file-download.service';
 import { EXCEL_FILE_NAMES, DEFAULT_PAGE_SIZE, APP_DATE_TIME_FORMAT } from '@shared/constants/business.constants';
+import { toIsoDate } from '@shared/utils/date.util';
 
 @Component({
   selector: 'app-order-daily',
@@ -23,7 +24,7 @@ import { EXCEL_FILE_NAMES, DEFAULT_PAGE_SIZE, APP_DATE_TIME_FORMAT } from '@shar
 })
 export class OrderDailyComponent implements OnInit {
   readonly dateTimeFormat = APP_DATE_TIME_FORMAT;
-  selectedDate: string = new Date().toISOString().split('T')[0];
+  selectedDate: string = toIsoDate(new Date());
   selectedDepartmentId: number | null = null;
   selectedStatus: string | null = null;
   isExporting: boolean = false;
@@ -35,7 +36,6 @@ export class OrderDailyComponent implements OnInit {
   summary?: DailyOrderSummaryResponse;
   orders: any[] = [];
   
-  // Pagination
   currentPage: number = 1;
   pageSize: number = DEFAULT_PAGE_SIZE;
   totalOrders: number = 0;
@@ -139,7 +139,6 @@ export class OrderDailyComponent implements OnInit {
     let totalSpecial = 0;
     let totalAmount = 0;
 
-    // Check if selected date is Friday
     this.isFriday = new Date(this.selectedDate).getDay() === 5;
 
     registered.forEach(o => {

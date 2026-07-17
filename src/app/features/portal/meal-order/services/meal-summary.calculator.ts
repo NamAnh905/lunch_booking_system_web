@@ -12,10 +12,6 @@ export interface MealSummary {
   totalPrice: number;
 }
 
-/**
- * Tính tổng số suất ăn và số tiền từ danh sách ngày trên lịch.
- * Trích từ `MealOrderComponent.updateSummary` (logic thuần, không phụ thuộc state component).
- */
 @Injectable({ providedIn: 'root' })
 export class MealSummaryCalculator {
   calculate(days: CalendarDay[], prices: MealPrices): MealSummary {

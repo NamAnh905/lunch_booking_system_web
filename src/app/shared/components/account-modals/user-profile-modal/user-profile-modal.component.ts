@@ -6,11 +6,6 @@ import { FormModalComponent } from '@shared/components/form-modal/form-modal.com
 import { ProfileService } from '@core/services/profile.service';
 import { UserResponse } from '@shared/models/user.model';
 
-/**
- * "Thông tin cá nhân" modal — edits the current user's full name.
- * Wraps the shared FormModalComponent; owns its own reactive form + validation.
- * Loads fresh profile data each time it is opened.
- */
 @Component({
   selector: 'app-user-profile-modal',
   standalone: true,

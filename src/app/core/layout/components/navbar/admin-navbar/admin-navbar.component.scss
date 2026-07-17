@@ -1,13 +1,13 @@
-@import '../../../../../../styles/variables';
+@use '../../../../../../styles/variables';
 
 .admin-navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: $navbar-height;
+  height: variables.$navbar-height;
   padding: 0 32px;
   background-color: #ffffff;
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid variables.$border-color;
   flex-shrink: 0;
   box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
@@ -23,7 +23,7 @@
     gap: 12px;
     cursor: pointer;
     padding: 6px 12px;
-    border-radius: $radius-md;
+    border-radius: variables.$radius-md;
     transition: background-color 0.2s;
 
     &:hover {
@@ -38,12 +38,12 @@
       .user-name {
         font-size: 13px;
         font-weight: 600;
-        color: $text-primary;
+        color: variables.$text-primary;
       }
 
       .user-role {
         font-size: 11px;
-        color: $text-secondary;
+        color: variables.$text-secondary;
         margin-top: 2px;
       }
     }
@@ -52,7 +52,7 @@
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background-color: $primary-color;
+      background-color: variables.$primary-color;
       color: white;
       display: flex;
       align-items: center;
@@ -65,12 +65,15 @@
   .dropdown-menu {
     position: absolute;
     top: calc(100% + 4px);
+    left: auto;
     right: 0;
+    display: block;
     width: 200px;
+    margin: 0;
     background: #ffffff;
-    border: 1px solid $border-color;
-    border-radius: $radius-md;
-    box-shadow: $shadow-base;
+    border: 1px solid variables.$border-color;
+    border-radius: variables.$radius-md;
+    box-shadow: variables.$shadow-base;
     opacity: 0;
     visibility: hidden;
     transform: translateY(10px);
@@ -82,7 +85,7 @@
       display: flex;
       align-items: center;
       padding: 10px 16px;
-      color: $text-primary;
+      color: variables.$text-primary;
       text-decoration: none;
       cursor: pointer;
       font-size: 0.9rem;
@@ -90,7 +93,7 @@
       gap: 12px;
 
       svg {
-        color: $text-secondary;
+        color: variables.$text-secondary;
       }
 
       &:hover {
@@ -107,12 +110,11 @@
 
     .dropdown-divider {
       height: 1px;
-      background-color: $border-color;
+      background-color: variables.$border-color;
       margin: 4px 0;
     }
   }
 
-  /* Show dropdown only when class .show is applied */
   .dropdown-menu.show {
     opacity: 1;
     visibility: visible;

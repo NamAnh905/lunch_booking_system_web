@@ -37,19 +37,16 @@ export class MenuService {
     return this.http.post<ApiResponse<Menu>>(this.apiUrl, form);
   }
 
-  /** Tải ảnh lên Cloudinary, trả về URL an toàn. */
   uploadImage(file: File): Observable<ApiResponse<UploadResponse>> {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<ApiResponse<UploadResponse>>(`${this.uploadUrl}/image`, formData);
   }
 
-  /** Tạo thực đơn dạng hình ảnh (theo tuần). */
   addImageMenu(form: MenuImageCreateRequest): Observable<ApiResponse<Menu>> {
     return this.http.post<ApiResponse<Menu>>(`${this.apiUrl}/image`, form);
   }
 
-  /** Cập nhật thực đơn dạng hình ảnh. */
   updateImageMenu(id: number | string, form: MenuImageCreateRequest): Observable<ApiResponse<Menu>> {
     return this.http.put<ApiResponse<Menu>>(`${this.apiUrl}/image/${id}`, form);
   }

@@ -8,7 +8,6 @@
   flex-direction: column;
 }
 
-/* Main content container */
 .login-main {
   flex: 1;
   display: flex;
@@ -36,7 +35,6 @@
   padding: 24px 0;
 }
 
-/* HT Logo and Dotted Background */
 .logo-section {
   text-align: center;
   margin-bottom: 10px;
@@ -51,7 +49,6 @@
   display: block;
 }
 
-/* Login Card Container */
 .login-card {
   width: 100%;
   max-width: 580px; /* Aligns with col-md-7 column spacing */
@@ -76,7 +73,6 @@
   padding: 2.25rem 2.5rem;
 }
 
-/* Bootstrap form-group row implementation */
 .form-group {
   display: flex;
   margin-bottom: 1.25rem;
@@ -101,12 +97,10 @@
   position: relative; /* Mốc định vị cho .field-error nằm tuyệt đối bên dưới input */
 }
 
-/* Offsets for elements without labels */
 .offset-row {
   margin-left: 33.333333%; /* Equivalent to offset-md-4 */
 }
 
-/* Bootstrap form-control matching styles */
 .form-control {
   display: block;
   width: 100%;
@@ -157,7 +151,6 @@
   pointer-events: none;
 }
 
-/* Checkbox alignment and spacing */
 .form-check {
   display: flex;
   align-items: center;
@@ -178,12 +171,10 @@
   user-select: none;
 }
 
-/* Submit Button row */
 .button-row {
   margin-top: 0.5rem;
 }
 
-/* Primary Button style */
 .btn-primary {
   color: #ffffff;
   background-color: #3490dc; /* Standard Bootstrap 4 Primary Blue */
@@ -226,7 +217,6 @@
   }
 }
 
-/* Responsive breakpoint styling matching Bootstrap */
 @media (max-width: 768px) {
   .col-label {
     width: 100%;
@@ -245,7 +235,6 @@
   }
 }
 
-/* Password toggle visibility */
 .position-relative {
   position: relative;
 }

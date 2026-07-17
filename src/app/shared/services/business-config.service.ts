@@ -39,7 +39,6 @@ export class BusinessConfigService {
 
   /** Giờ chốt đặt/hủy suất ăn và giờ mở cửa sổ pass vé (cùng key CUT_OFF_TIME). */
   cutOffTime: TimeOfDay = { ...CUTOFF_TIME.ORDER };
-  /** Giờ khóa chợ pass vé — vé chưa ai nhận sẽ tự động thu hồi. */
   exchangeLockTime: TimeOfDay = { ...CUTOFF_TIME.EXCHANGE_END };
 
   constructor() {

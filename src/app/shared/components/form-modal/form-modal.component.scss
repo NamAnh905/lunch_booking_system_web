@@ -1,9 +1,6 @@
 @use '../../../../styles/variables' as *;
 @use '../../../../styles/mixins' as *;
 
-// ---------------------------------------------------------------------------
-// Overlay + panel chrome
-// ---------------------------------------------------------------------------
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -27,9 +24,6 @@
   animation: fm-slide-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-// ---------------------------------------------------------------------------
-// Header
-// ---------------------------------------------------------------------------
 .modal-header {
   @include flex-between;
   gap: 16px;
@@ -74,9 +68,6 @@
   }
 }
 
-// ---------------------------------------------------------------------------
-// Body + 2-column responsive grid
-// ---------------------------------------------------------------------------
 .modal-body {
   padding: 24px;
   overflow-y: auto;
@@ -88,15 +79,11 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px 20px;
 
-  // Collapse to a single column on small screens
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
   }
 }
 
-// ---------------------------------------------------------------------------
-// Footer
-// ---------------------------------------------------------------------------
 .modal-footer {
   @include flex-between;
   gap: 12px;
@@ -191,6 +178,7 @@
     }
 
     label {
+      margin: 0;
       font-size: 13px;
       font-weight: 500;
       color: $text-primary;
@@ -243,9 +231,6 @@
   }
 }
 
-// ---------------------------------------------------------------------------
-// Animations
-// ---------------------------------------------------------------------------
 @keyframes fm-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }

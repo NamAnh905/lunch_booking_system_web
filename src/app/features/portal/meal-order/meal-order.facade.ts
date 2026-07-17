@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, forkJoin, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, concatMap } from 'rxjs/operators';
 import { MealOrderService } from './meal-order.service';
 import { OrderResponse, OrderItemRequest } from '@shared/models';
 import { MealPrices } from './services/meal-summary.calculator';
@@ -8,7 +8,6 @@ import { MEAL_PRICE } from '@shared/constants/business.constants';
 import { OrderStatus } from '@shared/enums';
 import { toIsoDate } from '@shared/utils/date.util';
 
-/** Dữ liệu một tháng đã được chuẩn hoá thành các map tiện tra cứu. */
 export interface MonthData {
   orders: OrderResponse[];
   menus: any[];
@@ -17,13 +16,11 @@ export interface MonthData {
   registeredDates: Set<string>;
 }
 
-/** Các thay đổi cần lưu: ngày mới đăng ký + đơn cần huỷ. */
 export interface SaveChanges {
   datesToRegister: OrderItemRequest[];
   ordersToCancel: OrderResponse[];
 }
 
-/** Kết quả lưu: có thay đổi hay không, và có lỗi hay không. */
 export interface SaveResult {
   changed: boolean;
   hasError: boolean;
@@ -44,7 +41,6 @@ export class MealOrderFacade {
   /** Cache dữ liệu thô theo tháng: key = `${year}-${month}`. */
   private monthCache: Record<string, { orders: OrderResponse[]; menus: any[] }> = {};
 
-  /** Giá suất ăn hiện hành (mặc định là hằng số nghiệp vụ). */
   prices: MealPrices = { normal: MEAL_PRICE.NORMAL, special: MEAL_PRICE.SPECIAL };
 
   clearCache(): void {
@@ -55,7 +51,6 @@ export class MealOrderFacade {
     delete this.monthCache[`${year}-${month}`];
   }
 
-  /** Nạp giá suất ăn thường/đặc biệt từ danh sách giá đang active. */
   loadPrices(): Observable<MealPrices> {
     return this.mealOrderService.getActivePrices().pipe(
       map((res) => {
@@ -106,8 +101,10 @@ export class MealOrderFacade {
   }
 
   /**
-   * Lưu thay đổi đăng ký. Chạy song song mọi lời gọi huỷ + 1 lời gọi tạo,
-   * dùng forkJoin để biết chính xác khi tất cả hoàn tất.
+   * Lưu thay đổi đăng ký. Huỷ đơn TRƯỚC (song song với nhau), chờ tất cả hoàn tất
+   * rồi mới tạo đơn — bảo đảm khi đổi loại suất (thường <-> đặc biệt) thì đơn cũ đã
+   * ở trạng thái CANCELLED để BE upsert lại, tránh lỗi ORDER_ALREADY_EXISTS do race
+   * khi cancel + create chạy đồng thời.
    */
   save(changes: SaveChanges): Observable<SaveResult> {
     const { datesToRegister, ordersToCancel } = changes;
@@ -124,6 +121,10 @@ export class MealOrderFacade {
       )
     );
 
+    // forkJoin([]) không phát giá trị nào — dùng of([]) khi không có đơn cần huỷ.
+    const cancels$: Observable<boolean[]> =
+      cancelStreams.length > 0 ? forkJoin(cancelStreams) : of([]);
+
     const create$: Observable<boolean> =
       datesToRegister.length > 0
         ? this.mealOrderService.createOrders({ orders: datesToRegister }).pipe(
@@ -133,12 +134,18 @@ export class MealOrderFacade {
           )
         : of(false);
 
-    return forkJoin([...cancelStreams, create$]).pipe(
-      map((errorFlags) => ({ changed: true, hasError: errorFlags.some(Boolean) }))
+    return cancels$.pipe(
+      concatMap((cancelFlags) =>
+        create$.pipe(
+          map((createFlag) => ({
+            changed: true,
+            hasError: cancelFlags.some(Boolean) || createFlag,
+          }))
+        )
+      )
     );
   }
 
-  /** Chuẩn hoá orders/menus thô thành map + tập ngày đã đăng ký. */
   private buildMonthData(orders: OrderResponse[], menus: any[]): MonthData {
     const orderMap: Record<string, OrderResponse> = {};
     const registeredDates = new Set<string>();

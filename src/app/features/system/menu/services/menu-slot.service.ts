@@ -12,10 +12,6 @@ export interface MenuSlot {
   label: string;
 }
 
-/**
- * Logic bố trí món ăn vào các "slot" của một ô thực đơn và kiểm tra hợp lệ.
- * Trích từ `MenuComponent.getMenuSlots` / `validateDishForSlot` / `isSpecialPrice`.
- */
 @Injectable({ providedIn: 'root' })
 export class MenuSlotService {
   private classifier = inject(DishClassifierService);

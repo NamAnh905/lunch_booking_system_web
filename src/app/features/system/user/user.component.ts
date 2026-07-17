@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
+import { CrudActionsComponent } from '@shared/components/crud/crud-actions.component';
+import { CrudSearchComponent } from '@shared/components/crud/crud-search.component';
 import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { UserService } from './user.service';
 import { UserResponse, UserCreateRequest, UserUpdateRequest } from '@shared/models/user.model';
@@ -15,7 +17,7 @@ import { EXCEL_FILE_NAMES } from '@shared/constants/business.constants';
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent, FormModalComponent, AutoFocusDirective],
+  imports: [CommonModule, FormsModule, CrudComponent, CrudActionsComponent, CrudSearchComponent, FormModalComponent, AutoFocusDirective],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss'
 })
@@ -45,13 +47,6 @@ export class UserComponent extends BaseCrudComponent<UserResponse, { keyword?: s
       next: (res) => {
         const pageData = (res as any).result !== undefined ? (res as any).result : res;
         this.availableDepartments = pageData.data || pageData.content || pageData || [];
-        
-        // Populate filter options
-        this.filterOptions.departments = this.availableDepartments.map(dept => ({
-          value: dept.id,
-          label: dept.name,
-          checked: false
-        }));
       },
       error: (err) => console.error('Failed to load departments', err)
     });
@@ -72,66 +67,19 @@ export class UserComponent extends BaseCrudComponent<UserResponse, { keyword?: s
     };
   }
 
-  isFilterOpen = false;
-  
-  filterOptions = {
-    departments: [] as { value: number, label: string, checked: boolean }[],
-    isActives: [
-      { value: true, label: 'Hoạt động', checked: false },
-      { value: false, label: 'Khóa', checked: false }
-    ]
-  };
+  selectedDepartmentId: number | null = null;
+  selectedIsActive: boolean | null = null;
 
-  activeFilters: { key: string, value: any, label: string }[] = [];
-
-  toggleFilter() {
-    this.isFilterOpen = !this.isFilterOpen;
-  }
-
-  applyFilter() {
-    this.isFilterOpen = false;
-    this.updateActiveFilters();
+  onFilterChange() {
+    this.query.departmentIds = this.selectedDepartmentId === null ? [] : [this.selectedDepartmentId];
+    this.query.isActives = this.selectedIsActive === null ? [] : [this.selectedIsActive];
     this.onSearch();
   }
 
-  clearFilter() {
-    this.filterOptions.departments.forEach(d => d.checked = false);
-    this.filterOptions.isActives.forEach(a => a.checked = false);
-    this.applyFilter();
-  }
-
-  updateActiveFilters() {
-    this.activeFilters = [];
-    const selectedDepts = this.filterOptions.departments.filter(d => d.checked);
-    if (selectedDepts.length > 0) {
-      this.query.departmentIds = selectedDepts.map(d => d.value);
-      selectedDepts.forEach(d => {
-        this.activeFilters.push({ key: 'departments', value: d.value, label: `Phòng: ${d.label}` });
-      });
-    } else {
-      this.query.departmentIds = [];
-    }
-
-    const selectedActives = this.filterOptions.isActives.filter(a => a.checked);
-    if (selectedActives.length > 0) {
-      this.query.isActives = selectedActives.map(a => a.value);
-      selectedActives.forEach(a => {
-        this.activeFilters.push({ key: 'isActives', value: a.value, label: `Trạng thái: ${a.label}` });
-      });
-    } else {
-      this.query.isActives = [];
-    }
-  }
-
-  removeFilter(filter: any) {
-    if (filter.key === 'departments') {
-      const option = this.filterOptions.departments.find(d => d.value === filter.value);
-      if (option) option.checked = false;
-    } else if (filter.key === 'isActives') {
-      const option = this.filterOptions.isActives.find(a => a.value === filter.value);
-      if (option) option.checked = false;
-    }
-    this.applyFilter();
+  override onReset() {
+    this.selectedDepartmentId = null;
+    this.selectedIsActive = null;
+    super.onReset();
   }
 
   onEditRow(item: any) {

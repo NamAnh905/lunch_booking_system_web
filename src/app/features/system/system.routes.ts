@@ -73,12 +73,6 @@ export const systemRoutes: Routes = [
                 loadComponent: () => import('./market/market.component').then(m => m.MarketComponent)
             },
             {
-                path: 'feedback',
-                data: { breadcrumb: 'Phản hồi' },
-                title: 'Phản hồi',
-                loadComponent: () => import('../../shared/components/placeholder/placeholder.component').then(m => m.PlaceholderComponent)
-            },
-            {
                 path: 'notification',
                 data: { breadcrumb: 'Thông báo' },
                 title: 'Thông báo',

@@ -1,5 +1,9 @@
 .logo-vnpost {
   width: 68%;
+  /* Khử "baseline gap" của ảnh inline (~5px thừa bên dưới). Bootstrap reboot
+     đặt img{vertical-align:middle}; thiếu nó thì navbar cao lệch giữa trang có
+     Bootstrap (meal-order, 84px) và trang không có (ticket-exchange, 89px). */
+  vertical-align: middle;
 }
 
 /*
@@ -67,4 +71,148 @@
   font-size: 1.25rem;
   line-height: inherit;
   white-space: nowrap;
+}
+
+/*
+ * Menu người dùng bên phải + dropdown.
+ * Tái lập các class Bootstrap 4 mà template đang dùng (navbar-nav, ml-auto,
+ * nav-item, dropdown, dropdown-toggle, dropdown-menu, dropdown-item...) ngay
+ * trong component để dropdown hiển thị đúng ở MỌI trang, không còn phụ thuộc
+ * việc trang feature (meal-order/ticket-exchange) @import Bootstrap qua CDN.
+ * Trước đây thiếu phần này nên khi vào trang không có Bootstrap, các mục menu
+ * đổ ra dạng link text thô, không thành hộp dropdown.
+ */
+.navbar-collapse {
+  display: flex;
+  flex-basis: 100%;
+  flex-grow: 1;
+  align-items: center;
+}
+
+.navbar-toggler {
+  padding: 0.25rem 0.75rem;
+  font-size: 1.25rem;
+  line-height: 1;
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+/* Từ md trở lên: menu luôn bung ngang, ẩn nút toggler (giống navbar-expand-md). */
+@media (min-width: 768px) {
+  .navbar-expand-md .navbar-collapse {
+    display: flex !important;
+    flex-basis: auto;
+  }
+  .navbar-expand-md .navbar-toggler {
+    display: none;
+  }
+}
+
+.navbar-nav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navbar-nav.ml-auto { margin-left: auto !important; }
+.navbar-nav.mr-auto { margin-right: auto !important; }
+
+.nav-item {
+  position: relative;
+}
+
+.nav-link {
+  display: block;
+  padding: 0.5rem 1rem;
+  /* Ghim cứng metric chữ để navbar cao BẰNG NHAU ở mọi trang, không lệ thuộc
+     line-height/font-size kế thừa từ CSS toàn cục (Bootstrap có ở meal-order
+     nhưng không có ở ticket-exchange -> trước đây cao lệch 84px vs 89px). */
+  font-size: 1rem;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.7);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    color: #004b8c;
+  }
+}
+
+/* Caret của dropdown-toggle (giống Bootstrap 4). */
+.dropdown-toggle::after {
+  display: inline-block;
+  margin-left: 0.4em;
+  vertical-align: 0.15em;
+  content: '';
+  border-top: 0.3em solid;
+  border-right: 0.3em solid transparent;
+  border-bottom: 0;
+  border-left: 0.3em solid transparent;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  min-width: 12rem;
+  margin: 0.35rem 0 0;
+  padding: 0.5rem 0;
+  /* Ghim typography để dropdown hiển thị GIỐNG NHAU ở mọi trang, không phụ
+     thuộc việc Bootstrap có được nạp toàn cục hay không (meal-order có,
+     ticket-exchange không). Thiếu các dòng này thì font-size/màu/canh lề bị
+     Bootstrap điền vào ở meal-order nhưng kế thừa mặc định ở ticket-exchange. */
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #212529;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0.6rem;
+  box-shadow: 0 8px 20px rgba(16, 24, 40, 0.14);
+
+  &.dropdown-menu-right {
+    right: 0;
+    left: auto;
+  }
+
+  &.show {
+    display: block;
+  }
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 1.25rem;
+  clear: both;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  text-align: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    color: #004b8c;
+    background-color: #f4f6fb;
+  }
 }

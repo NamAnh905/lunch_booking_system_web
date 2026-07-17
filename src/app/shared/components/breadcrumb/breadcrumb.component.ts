@@ -29,7 +29,6 @@ export class BreadcrumbComponent implements OnInit {
     ).subscribe(() => {
       const built = this.createBreadcrumbs(this.activatedRoute.root);
       
-      // If the breadcrumb list is not empty, set isLast on the final item
       if (built.length > 0) {
         built[built.length - 1].isLast = true;
       }
@@ -50,7 +49,6 @@ export class BreadcrumbComponent implements OnInit {
     }
 
     for (const child of children) {
-      // Only process the primary outlet
       if (child.outlet !== 'primary') {
         continue;
       }
@@ -61,7 +59,6 @@ export class BreadcrumbComponent implements OnInit {
         nextUrl += `/${routeURL}`;
       }
 
-      // Read breadcrumb label from route data or title
       let label = child.snapshot.data['breadcrumb'];
       
       if (label === 'SKIP') {
@@ -72,13 +69,11 @@ export class BreadcrumbComponent implements OnInit {
         label = child.snapshot.title;
       }
 
-      // Fallback: If no label is defined, capitalize the route URL path segment
       if (!label && routeURL) {
         label = routeURL.charAt(0).toUpperCase() + routeURL.slice(1);
       }
 
       if (label) {
-        // Strip common browser tab title suffixes (e.g. " - LunchOrder")
         const suffixIndex = label.indexOf(' - ');
         if (suffixIndex !== -1) {
           label = label.substring(0, suffixIndex);

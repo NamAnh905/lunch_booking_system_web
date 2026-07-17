@@ -6,6 +6,7 @@ import { catchError, of } from 'rxjs';
 
 import { routes } from './app.routes';
 import { jwtInterceptor } from './core/interceptors/jwt-interceptor';
+import { csrfInterceptor } from './core/interceptors/csrf.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { AuthService } from './core/auth/auth.service';
 import { TokenStorageService } from './core/auth/token.storage.service';
@@ -27,7 +28,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([jwtInterceptor, errorInterceptor])
+      withInterceptors([jwtInterceptor, csrfInterceptor, errorInterceptor])
     ),
     {
       provide: APP_INITIALIZER,

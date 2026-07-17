@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
+import { CrudActionsComponent } from '@shared/components/crud/crud-actions.component';
+import { CrudSearchComponent } from '@shared/components/crud/crud-search.component';
 import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { PermissionService } from './permission.service';
 import { Permission, PermissionCreateRequest, PermissionUpdateRequest } from '@shared/models/permission.model';
@@ -10,7 +12,7 @@ import { Permission, PermissionCreateRequest, PermissionUpdateRequest } from '@s
 @Component({
   selector: 'app-permission',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent, FormModalComponent],
+  imports: [CommonModule, FormsModule, CrudComponent, CrudActionsComponent, CrudSearchComponent, FormModalComponent],
   templateUrl: './permission.component.html',
   styleUrl: './permission.component.scss'
 })

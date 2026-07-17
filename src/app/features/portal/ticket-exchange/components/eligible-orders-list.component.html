@@ -1,33 +1,63 @@
 <div class="section-container">
-  <h3 class="section-title">Danh sách vé có thể Pass</h3>
+  <h3 class="section-title"><i class="fas fa-ticket"></i> Danh sách vé có thể Pass</h3>
 
-  @if (orders().length > 0) {
+  @if (isLoading() && orders().length === 0) {
+    <div class="tickets-grid">
+      @for (i of [1, 2]; track i) {
+        <div class="skeleton-card">
+          <div class="skeleton-top">
+            <div class="skeleton skeleton--tile"></div>
+            <div class="skeleton-lines">
+              <div class="skeleton skeleton--line skeleton--w60"></div>
+              <div class="skeleton skeleton--line skeleton--w40"></div>
+            </div>
+          </div>
+          <div class="skeleton skeleton--btn"></div>
+        </div>
+      }
+    </div>
+  } @else if (orders().length > 0) {
     <div class="tickets-grid">
       @for (order of orders(); track order.id) {
         <mat-card class="ticket-card eligible-ticket">
-          <mat-card-header>
-            <mat-card-title>{{ order.menuDate | date }}</mat-card-title>
-            <mat-card-subtitle>Suất ăn thường</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="info-row">
-              <span>Trạng thái: <span class="status-badge pending">HỢP LỆ</span></span>
+          <div class="card-top">
+            <div class="date-tile" [class.special]="order.isSpecial">
+              <span class="date-tile__day">{{ order.menuDate | date: 'dd' }}</span>
+              <span class="date-tile__month">Th{{ order.menuDate | date: 'MM' }}</span>
             </div>
-          </mat-card-content>
-          <mat-card-actions align="end">
+            <div class="card-heading">
+              <span class="card-heading__date">{{ order.menuDate | date: 'dd/MM/yyyy' }}</span>
+              <span class="meal-chip" [class.special]="order.isSpecial">
+                <i class="fas" [ngClass]="order.isSpecial ? 'fa-star' : 'fa-utensils'"></i>
+                {{ order.isSpecial ? 'Suất đặc biệt' : 'Suất thường' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="info-row">
+              <i class="fas fa-circle-check"></i>
+              <span class="info-row__label">Trạng thái</span>
+              <span class="status-badge pending">Hợp lệ</span>
+            </div>
+          </div>
+
+          <div class="card-actions">
             <button mat-flat-button color="primary" (click)="post.emit(order)" [disabled]="isLoading()">
-              Đăng lên chợ
+              <i class="fas fa-cloud-arrow-up"></i> Đăng lên chợ
             </button>
-          </mat-card-actions>
+          </div>
         </mat-card>
       }
     </div>
   } @else if (pendingOrderWarning()) {
     <div class="cutoff-message">
+      <i class="fas fa-clock"></i>
       <p>{{ pendingOrderWarning() }}<br>Ngoài khung giờ này, vui lòng tự hủy vé ở Tab Đăng ký cơm.</p>
     </div>
   } @else {
     <div class="empty-state-small">
+      <i class="fas fa-inbox empty-state__icon"></i>
       <p>Không có vé nào đủ điều kiện pass lúc này.</p>
     </div>
   }

@@ -1,33 +1,62 @@
-@if (tickets().length > 0) {
+@if (isLoading() && tickets().length === 0) {
+  <div class="tickets-grid">
+    @for (i of [1, 2, 3]; track i) {
+      <div class="skeleton-card">
+        <div class="skeleton-top">
+          <div class="skeleton skeleton--tile"></div>
+          <div class="skeleton-lines">
+            <div class="skeleton skeleton--line skeleton--w60"></div>
+            <div class="skeleton skeleton--line skeleton--w40"></div>
+          </div>
+        </div>
+        <div class="skeleton skeleton--btn"></div>
+      </div>
+    }
+  </div>
+} @else if (tickets().length > 0) {
   <div class="tickets-grid">
     @for (ticket of tickets(); track ticket.exchangeId) {
       <mat-card class="ticket-card">
-        <mat-card-header>
-          <mat-card-title>{{ ticket.menuDate | date }}</mat-card-title>
-          <mat-card-subtitle>Suất ăn {{ ticket.isSpecial ? 'đặc biệt' : 'thường' }}</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="info-row">
-            <span>Người pass: <strong>{{ ticket.sellerName }}</strong></span>
+        <div class="card-top">
+          <div class="date-tile" [class.special]="ticket.isSpecial">
+            <span class="date-tile__day">{{ ticket.menuDate | date: 'dd' }}</span>
+            <span class="date-tile__month">Th{{ ticket.menuDate | date: 'MM' }}</span>
           </div>
-          <div class="info-row">
-            <span>Trạng thái:
-              <span class="status-badge" [ngClass]="ticket.status.toLowerCase()">{{ ticket.status }}</span>
+          <div class="card-heading">
+            <span class="card-heading__date">{{ ticket.menuDate | date: 'dd/MM/yyyy' }}</span>
+            <span class="meal-chip" [class.special]="ticket.isSpecial">
+              <i class="fas" [ngClass]="ticket.isSpecial ? 'fa-star' : 'fa-utensils'"></i>
+              {{ ticket.isSpecial ? 'Suất đặc biệt' : 'Suất thường' }}
             </span>
           </div>
-        </mat-card-content>
-        <mat-card-actions align="end">
-          @if (ticket.sellerId !== currentUserId()) {
+        </div>
+
+        <div class="card-body">
+          <div class="info-row">
+            <i class="fas fa-user"></i>
+            <span class="info-row__label">Người pass</span>
+            <strong>{{ ticket.sellerName }}</strong>
+          </div>
+          <div class="info-row">
+            <i class="fas fa-circle-info"></i>
+            <span class="info-row__label">Trạng thái</span>
+            <span class="status-badge" [ngClass]="ticket.status.toLowerCase()">{{ statusLabel(ticket.status) }}</span>
+          </div>
+        </div>
+
+        @if (ticket.sellerId !== currentUserId()) {
+          <div class="card-actions">
             <button mat-flat-button color="primary" (click)="claim.emit(ticket)" [disabled]="isLoading()">
-              Nhận vé
+              <i class="fas fa-hand-holding-heart"></i> Nhận vé
             </button>
-          }
-        </mat-card-actions>
+          </div>
+        }
       </mat-card>
     }
   </div>
-} @else if (!isLoading()) {
+} @else {
   <div class="empty-state">
+    <i class="fas fa-store-slash empty-state__icon"></i>
     <p>Hiện tại chưa có vé nào trên chợ.</p>
   </div>
 }

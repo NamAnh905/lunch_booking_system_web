@@ -33,21 +33,15 @@ import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, 
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormModalComponent {
-  /** Whether the modal is visible. Host owns this flag. */
   @Input() open = false;
-  /** Header title (e.g. "Thêm mới phòng ban"). */
   @Input({ required: true }) title = '';
-  /** Optional muted line under the title. */
   @Input() subtitle = '';
-  /** In-flight state: shows a spinner on Lưu and locks close/cancel. */
   @Input() saving = false;
   /** Disables the Lưu button (typically form.invalid). Accepts null so `ngForm.invalid` can bind directly. */
   @Input() saveDisabled: boolean | null = false;
   @Input() saveLabel = 'Lưu';
   @Input() cancelLabel = 'Hủy';
-  /** Allow closing by clicking the dark backdrop. */
   @Input() closeOnBackdrop = true;
-  /** Max width of the panel. Use a wider value for dense 2-column forms. */
   @Input() width = '640px';
 
   @Output() save = new EventEmitter<void>();

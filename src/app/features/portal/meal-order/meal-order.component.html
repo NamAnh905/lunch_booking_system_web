@@ -32,7 +32,7 @@
                                                                 <form id="monthYear">
                                                                     <div class="pre-button d-flex align-items-center justify-content-center"
                                                                         (click)="prevMonth()"><i
-                                                                            class="fa fa-chevron-left"></i></div>
+                                                                            class="fas fa-chevron-left"></i></div>
                                                                     <div class="head-info">
                                                                         <div class="head-day">{{ selectedDay }}</div>
                                                                         <div class="head-month">{{
@@ -41,7 +41,7 @@
                                                                     </div>
                                                                     <div class="next-button d-flex align-items-center justify-content-center"
                                                                         (click)="nextMonth()"><i
-                                                                            class="fa fa-chevron-right"></i></div>
+                                                                            class="fas fa-chevron-right"></i></div>
                                                                 </form>
                                                             </div>
                                                         </div>
@@ -116,8 +116,12 @@
                                 <div class="summary-panel d-flex flex-column">
                                     <div class="summary-info" id="lunch-infor">
                                         <div class="summary-row">
-                                            <span class="summary-key">Giá tiền:</span>
+                                            <span class="summary-key">Suất thường:</span>
                                             <span class="summary-val"><label id="price" for="price" [attr.value]="pricePerMeal">{{ pricePerMeal | formatMoney }} / vé</label></span>
+                                        </div>
+                                        <div class="summary-row">
+                                            <span class="summary-key">Suất đặc biệt:</span>
+                                            <span class="summary-val"><label id="special-price" for="special-price" [attr.value]="specialPricePerMeal">{{ specialPricePerMeal | formatMoney }} / vé</label></span>
                                         </div>
                                         <div class="summary-row">
                                             <span class="summary-key">Tổng ngày ăn:</span>

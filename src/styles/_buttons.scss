@@ -1,0 +1,106 @@
+@use "sass:color";
+
+@use 'variables';
+
+@mixin crud-buttons {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-weight: 500;
+    font-size: 13.5px;
+    padding: 8px 14px;
+    border-radius: variables.$radius-base;
+    border: 1px solid transparent;
+    cursor: pointer;
+    background: transparent;
+    color: variables.$text-primary;
+    transition: variables.$transition-base;
+    outline: none;
+    user-select: none;
+
+    svg {
+      transition: transform 0.2s ease;
+    }
+
+    &:hover:not(:disabled) {
+      svg {
+        transform: scale(1.1);
+      }
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-primary {
+    background-color: variables.$primary-color;
+    color: #fff;
+    border-color: variables.$primary-color;
+
+    &:hover:not(:disabled) {
+      background-color: variables.$primary-hover;
+      border-color: variables.$primary-hover;
+      box-shadow: variables.$primary-shadow;
+    }
+
+    &:active:not(:disabled) {
+      background-color: variables.$primary-active;
+      border-color: variables.$primary-active;
+    }
+  }
+
+  .btn-warning {
+    background-color: variables.$warning-color;
+    color: #fff;
+    border-color: variables.$warning-color;
+
+    &:hover:not(:disabled) {
+      background-color: color.adjust(variables.$warning-color, $lightness: 6%, $space: hsl);
+      border-color: color.adjust(variables.$warning-color, $lightness: 6%, $space: hsl);
+      box-shadow: rgba(250, 173, 20, 0.15) 0px 4px 12px;
+    }
+  }
+
+  .btn-danger {
+    background-color: variables.$error-color;
+    color: #fff;
+    border-color: variables.$error-color;
+
+    &:hover:not(:disabled) {
+      background-color: color.adjust(variables.$error-color, $lightness: 6%, $space: hsl);
+      border-color: color.adjust(variables.$error-color, $lightness: 6%, $space: hsl);
+      box-shadow: rgba(245, 34, 45, 0.15) 0px 4px 12px;
+    }
+  }
+
+  .btn-info {
+    background-color: #13c2c2;
+    color: #fff;
+    border-color: #13c2c2;
+
+    &:hover:not(:disabled) {
+      background-color: color.adjust(#13c2c2, $lightness: 6%, $space: hsl);
+      border-color: color.adjust(#13c2c2, $lightness: 6%, $space: hsl);
+      box-shadow: rgba(19, 194, 194, 0.15) 0px 4px 12px;
+    }
+  }
+
+  .btn-secondary {
+    background-color: #fff;
+    color: variables.$text-primary;
+    border-color: #d9d9d9;
+
+    &:hover:not(:disabled) {
+      color: variables.$primary-color;
+      border-color: variables.$primary-color;
+    }
+  }
+
+  .btn-icon {
+    padding: 8px 10px;
+  }
+}

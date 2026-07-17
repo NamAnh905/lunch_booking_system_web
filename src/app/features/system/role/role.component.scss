@@ -5,72 +5,6 @@
   display: flex;
   gap: 12px;
   align-items: center;
-
-  .search-wrapper {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-
-    .search-input {
-      padding: 8px 40px 8px 12px;
-      border: 1px solid $border-color;
-      border-radius: 6px;
-      font-size: 14px;
-      outline: none;
-      width: 250px;
-      transition: $transition-base;
-
-      &:focus {
-        border-color: $primary-color;
-        box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
-      }
-    }
-
-    .search-btn {
-      position: absolute;
-      right: 5px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4px;
-      color: $text-secondary;
-      transition: color $transition-base;
-
-      &:hover {
-        color: $primary-color;
-      }
-
-      svg {
-        width: 16px;
-        height: 16px;
-      }
-    }
-  }
-
-  .btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: $transition-base;
-
-    &.btn-secondary {
-      background-color: #f1f5f9;
-      color: $text-primary;
-      border: 1px solid $border-color;
-
-      &:hover {
-        background-color: #e2e8f0;
-      }
-    }
-  }
 }
 
 @keyframes dropdownFadeIn {
@@ -85,7 +19,6 @@
   }
 }
 
-// Permissions multi-select inside the form modal
 .multi-select-dropdown {
   position: relative;
   width: 100%;

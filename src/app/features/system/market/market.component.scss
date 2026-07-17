@@ -1,12 +1,21 @@
 @use '../../../../styles/variables' as *;
 @use '../../../../styles/mixins' as *;
 
-// FILTERS
 .filters {
   display: flex;
   gap: 16px;
   align-items: flex-end;
   flex-wrap: wrap;
+
+  .filter-label {
+    margin: 0;
+    line-height: 38px;
+    font-size: 14px;
+    font-weight: 500;
+    color: $text-secondary;
+    white-space: nowrap;
+    user-select: none;
+  }
 
   .filter-group {
     display: flex;
@@ -14,14 +23,15 @@
     gap: 4px;
 
     label {
+      margin: 0;
       font-size: 13px;
       font-weight: 500;
       color: $text-secondary;
     }
 
-    input[type="text"],
-    input[type="date"],
-    select {
+    > input[type="text"],
+    > input[type="date"],
+    > select {
       padding: 8px 12px;
       border: 1px solid $border-color;
       border-radius: 6px;
@@ -38,46 +48,6 @@
       }
     }
 
-    .search-wrapper {
-      position: relative;
-      display: inline-block;
-      width: 100%;
-
-      .search-input {
-        width: 100%;
-        min-width: 250px;
-        border-radius: 6px;
-        padding: 8px 40px 8px 12px;
-        &::placeholder {
-          color: #94a3b8;
-        }
-      }
-
-      .search-btn {
-        position: absolute;
-        right: 5px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 4px;
-        color: $text-secondary;
-        transition: color $transition-base;
-
-        &:hover {
-          color: $primary-color;
-        }
-
-        svg {
-          width: 16px;
-          height: 16px;
-        }
-      }
-    }
   }
 
   .btn {
@@ -102,9 +72,94 @@
   }
 }
 
-// Table styling overrides if needed
+:host ::ng-deep .filters .filter-group .mat-mdc-form-field {
+  min-width: 260px;
+  font-size: 14px;
+  color: $text-primary;
+  line-height: normal;
+
+  .mat-mdc-text-field-wrapper {
+    height: 38px;
+    padding: 0;
+    background-color: white;
+    border-radius: $radius-base;
+    transition: $transition-base;
+  }
+
+  .mat-mdc-form-field-flex {
+    height: 38px;
+    align-items: center;
+    padding: 0 4px 0 12px;
+  }
+
+  .mat-mdc-form-field-infix {
+    min-height: 38px;
+    width: auto;
+    flex: 1 1 auto;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: $border-color;
+    border-width: 1px;
+  }
+
+  .mdc-notched-outline__leading {
+    border-radius: $radius-base 0 0 $radius-base;
+  }
+
+  .mdc-notched-outline__trailing {
+    border-radius: 0 $radius-base $radius-base 0;
+  }
+
+  &.mat-focused {
+    .mat-mdc-text-field-wrapper {
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+    }
+
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: $primary-color;
+      border-width: 1px;
+    }
+  }
+
+  .mat-date-range-input-container {
+    align-items: center;
+  }
+
+  .mat-date-range-input-inner {
+    font-size: 14px;
+    color: $text-primary;
+  }
+
+  .mat-mdc-form-field-icon-suffix {
+    padding: 0;
+
+    .mat-mdc-icon-button.mat-mdc-button-base {
+      --mdc-icon-button-state-layer-size: 30px;
+      width: 30px;
+      height: 30px;
+      padding: 3px;
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
 .data-table {
-  width: 100%;
   border-collapse: collapse;
 
   th, td {
@@ -128,45 +183,9 @@
   }
 }
 
-// Actions
-.row-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
 
-  .btn-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: transparent;
-
-    svg {
-      width: 16px;
-      height: 16px;
-    }
-
-    &.delete {
-      color: #ef4444;
-      background-color: rgba(239, 68, 68, 0.1);
-      
-      &:hover {
-        background-color: #ef4444;
-        color: white;
-      }
-    }
-  }
-}
-
-// Badges
 .badge {
   padding: 4px 8px;
-  border-radius: 4px;
   font-size: 12px;
   font-weight: 500;
   display: inline-block;

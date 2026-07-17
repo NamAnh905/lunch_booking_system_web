@@ -13,7 +13,6 @@ export abstract class BaseCachedCrudService {
   private readonly cache = new Map<string, Observable<unknown>>();
   protected readonly refresh$ = new BehaviorSubject<void>(undefined);
 
-  /** Xoá toàn bộ cache và ép các luồng đang theo dõi nạp lại từ server. */
   clearCache(): void {
     this.cache.clear();
     this.refresh$.next();

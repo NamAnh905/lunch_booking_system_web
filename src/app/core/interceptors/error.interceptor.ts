@@ -54,7 +54,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
-      // Global error toast for everything else.
+      if (req.url.includes('/auth/login')) {
+        return throwError(() => error);
+      }
+
       let errorMsg = 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
       if (error.error && error.error.message) {
         errorMsg = error.error.message;

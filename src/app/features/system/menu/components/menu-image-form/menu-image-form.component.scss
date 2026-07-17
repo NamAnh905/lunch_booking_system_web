@@ -1,4 +1,7 @@
-@use '../../../../../../styles/variables' as *;
+@use '../../../../../../styles/variables';
+@use '../../../../../../styles/buttons';
+
+@include buttons.crud-buttons;
 
 .modal-overlay {
   position: fixed;
@@ -13,6 +16,7 @@
 
 .modal-content {
   background: white;
+  border: none;
   border-radius: 8px;
   width: 100%;
   max-width: 520px;
@@ -26,13 +30,13 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px 24px;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid variables.$border-color;
 
     h3 {
       margin: 0;
       font-size: 18px;
       font-weight: 600;
-      color: $text-primary;
+      color: variables.$text-primary;
     }
 
     .close-btn {
@@ -40,11 +44,11 @@
       border: none;
       font-size: 24px;
       line-height: 1;
-      color: $text-secondary;
+      color: variables.$text-secondary;
       cursor: pointer;
       padding: 0;
 
-      &:hover { color: $text-primary; }
+      &:hover { color: variables.$text-primary; }
     }
   }
 
@@ -58,7 +62,7 @@
         display: block;
         margin-bottom: 8px;
         font-weight: 500;
-        color: $text-primary;
+        color: variables.$text-primary;
         font-size: 14px;
 
         .required { color: #ef4444; }
@@ -68,15 +72,15 @@
       input[type="date"] {
         width: 100%;
         padding: 10px 12px;
-        border: 1px solid $border-color;
+        border: 1px solid variables.$border-color;
         border-radius: 6px;
         font-size: 14px;
         outline: none;
-        transition: $transition-base;
+        transition: variables.$transition-base;
 
         &:focus {
-          border-color: $primary-color;
-          box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+          border-color: variables.$primary-color;
+          box-shadow: 0 0 0 2px rgba(variables.$primary-color, 0.2);
         }
       }
 
@@ -89,14 +93,14 @@
       .week-hint {
         margin-top: 6px;
         font-size: 13px;
-        color: $primary-color;
+        color: variables.$primary-color;
         font-weight: 500;
       }
     }
 
     .image-preview {
       margin-bottom: 16px;
-      border: 1px dashed $border-color;
+      border: 1px dashed variables.$border-color;
       border-radius: 8px;
       padding: 8px;
       background: #f8fafc;
@@ -117,34 +121,6 @@
     gap: 12px;
     padding-top: 8px;
 
-    .btn {
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-weight: 500;
-      cursor: pointer;
-      border: none;
-      font-size: 14px;
-
-      &.btn-secondary {
-        background-color: white;
-        border: 1px solid $border-color;
-        color: $text-primary;
-
-        &:hover { background-color: #f1f5f9; }
-      }
-
-      &.btn-primary {
-        background-color: $primary-color;
-        color: white;
-
-        &:hover { background-color: $primary-hover; }
-
-        &:disabled {
-          background-color: #94a3b8;
-          cursor: not-allowed;
-        }
-      }
-    }
   }
 }
 

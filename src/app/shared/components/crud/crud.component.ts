@@ -1,6 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+
+export interface CrudAddOption {
+  label: string;
+  value: string;
+}
 
 @Component({
   selector: 'app-crud',
@@ -16,8 +21,8 @@ export class CrudComponent {
   @Input() size = 10;
   @Input() selections: any[] = [];
   @Input() hideAdd = false;
-  
-  
+  @Input() addOptions: CrudAddOption[] = [];
+
   @Input() permissions: { add?: string; edit?: string; delete?: string; export?: string } = {
     add: '',
     edit: '',
@@ -28,12 +33,17 @@ export class CrudComponent {
   @Output() pageChange = new EventEmitter<number>();
   @Output() sizeChange = new EventEmitter<number>();
   @Output() add = new EventEmitter<void>();
+  @Output() addOption = new EventEmitter<string>();
   @Output() edit = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any[]>();
   @Output() export = new EventEmitter<void>();
   @Output() refresh = new EventEmitter<void>();
 
   sizeOptions = [10, 20, 50, 100];
+
+  isAddMenuOpen = false;
+
+  private elementRef = inject(ElementRef);
 
   get totalPages(): number {
     return Math.ceil(this.total / this.size);
@@ -63,7 +73,24 @@ export class CrudComponent {
   }
 
   onAdd(): void {
+    if (this.addOptions.length > 0) {
+      this.isAddMenuOpen = !this.isAddMenuOpen;
+      return;
+    }
     this.add.emit();
+  }
+
+  onAddOption(value: string): void {
+    this.isAddMenuOpen = false;
+    this.addOption.emit(value);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.isAddMenuOpen) return;
+    if (!this.elementRef.nativeElement.contains(event.target as Node)) {
+      this.isAddMenuOpen = false;
+    }
   }
 
   onEdit(): void {
@@ -89,7 +116,6 @@ export class CrudComponent {
   hasPermission(permission?: string): boolean {
     if (permission === undefined) return false;
     if (!permission) return true;
-    // Connect auth verification logic here if needed
     return true;
   }
 }

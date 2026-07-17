@@ -13,12 +13,21 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  background: transparent;
 }
 
 .breadcrumb-item {
   display: flex;
   align-items: center;
+  padding-left: 0;
   color: var(--text-secondary, #64748b);
+
+  &::before {
+    // Cancels Bootstrap's `.breadcrumb-item + .breadcrumb-item::before { content: "/" }`,
+    // which ties this rule in specificity — !important guarantees it wins regardless of
+    // stylesheet order. This component renders its own `.separator` span instead.
+    content: none !important;
+  }
 
   .separator {
     margin: 0 10px;
@@ -43,10 +52,6 @@
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 4px;
 
-  // &:hover {
-  //   color: var(--color-primary, #3b82f6);
-  //   transform: translateY(-0.5px);
-  // }
 
   &.home-link {
     display: inline-flex;
@@ -63,15 +68,6 @@
       transition: stroke 0.25s ease, transform 0.25s ease;
     }
 
-    // &:hover {
-    //   color: var(--color-primary, #3b82f6);
-    //   background: var(--bg-hover, rgba(59, 130, 246, 0.08));
-
-    //   .home-icon {
-    //     stroke: var(--color-primary, #3b82f6);
-    //     transform: scale(1.08);
-    //   }
-    // }
   }
 }
 

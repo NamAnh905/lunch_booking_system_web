@@ -4,93 +4,44 @@
   [page]="page"
   [size]="size"
   [selections]="[]"
-  [hideAdd]="true"
-  [permissions]="{ export: 'MANAGE_MENUS' }"
+  [addOptions]="addOptions"
+  [permissions]="{ add: 'MANAGE_MENUS', export: 'MANAGE_MENUS' }"
   (pageChange)="onPageChange($event)"
   (sizeChange)="onSizeChange($event)"
   (refresh)="onReset()"
+  (addOption)="onAddOption($event)"
   (export)="onExport()">
 
   <div crud-filters class="filters">
     <div class="toolbar-top">
-      <div class="search-wrapper">
-        <input type="text" placeholder="Tìm kiếm thực đơn..." [(ngModel)]="query.keyword" (keyup.enter)="onSearch()" class="search-input">
-        <button class="search-btn" (click)="onSearch()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-        </button>
-      </div>
+      <app-crud-search placeholder="Tìm kiếm thực đơn..." [(value)]="query.keyword" (search)="onSearch()" />
     </div>
-  </div>
-
-  <!-- Custom "Add" dropdown -->
-  <div crud-add class="add-menu-wrapper">
-    <button class="btn btn-primary" (click)="toggleAddMenu()" [disabled]="loading">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="5" x2="12" y2="19"></line>
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-      </svg>
-      Thêm mới
-      <svg class="caret" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="6 9 12 15 18 9"></polyline>
-      </svg>
-    </button>
-
-    @if (isAddMenuOpen) {
-      <div class="add-menu-dropdown">
-        <button class="add-menu-item" (click)="openListEditor()">Thêm dạng Danh sách</button>
-        <button class="add-menu-item" (click)="openImageForm()">Thêm dạng Hình ảnh</button>
-      </div>
-    }
   </div>
 
   <table crud-table class="data-table">
     <thead>
       <tr>
-        <th class="text-center" style="width: 60px;">STT</th>
-        <th>Tên menu</th>
-        <th style="width: 140px;">Loại</th>
-        <th style="width: 180px;">Ngày tạo</th>
+        <th class="stt-col">STT</th>
+        <th class="name-col">Tên menu</th>
+        <th class="status-col">Loại</th>
+        <th class="datetime-col">Ngày tạo</th>
         <th class="action-column">Thao tác</th>
       </tr>
     </thead>
     <tbody>
       @for (item of data; track item.id; let i = $index) {
         <tr>
-          <td class="text-center">{{ (page - 1) * size + i + 1 }}</td>
-          <td>{{ item.name || ('Thực đơn ' + item.menuDate) }}</td>
-          <td>
-            <span class="type-badge" [class.image]="isImage(item)" [class.list]="!isImage(item)">
+          <td class="stt-col">{{ (page - 1) * size + i + 1 }}</td>
+          <td [title]="item.name || ('Thực đơn ' + item.menuDate)">{{ item.name || ('Thực đơn ' + item.menuDate) }}</td>
+          <td class="status-col">
+            <span class="type-text" [class.image]="isImage(item)" [class.list]="!isImage(item)">
               {{ typeLabel(item) }}
             </span>
           </td>
-          <td>{{ item.createdAt ? (item.createdAt | date:dateTimeFormat) : '' }}</td>
+          <td class="datetime-col">{{ item.createdAt ? (item.createdAt | date:dateTimeFormat) : '' }}</td>
           <td class="action-column">
-            <div class="row-actions">
-              <button class="btn-icon preview" (click)="onPreview(item)" title="Xem trước">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-              </button>
-              <button class="btn-icon edit" (click)="onEditRow(item)" title="Sửa">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-              </button>
-              <button class="btn-icon delete" (click)="onDeleteRow(item)" title="Xóa">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="3 6 5 6 21 6"></polyline>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                </svg>
-              </button>
-            </div>
+            <app-crud-actions [showPreview]="true" (preview)="onPreview(item)" (edit)="onEditRow(item)"
+              (delete)="onDeleteRow(item)" />
           </td>
         </tr>
       }
@@ -103,12 +54,10 @@
   </table>
 </app-crud>
 
-<!-- List (Grid) editor overlay -->
 @if (showListEditor) {
   <app-menu-list-editor [initialDate]="listEditorDate" (close)="onListEditorClose()"></app-menu-list-editor>
 }
 
-<!-- Image form modal -->
 @if (showImageForm) {
   <app-menu-image-form
     [menu]="imageFormMenu"
@@ -117,7 +66,6 @@
   </app-menu-image-form>
 }
 
-<!-- Preview modal -->
 @if (previewMenu) {
   <div class="modal-overlay" (click)="closePreview()">
     <div class="modal-content preview-content" (click)="$event.stopPropagation()">

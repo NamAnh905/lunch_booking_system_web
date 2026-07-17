@@ -67,23 +67,23 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th class="text-center" style="width: 60px;">STT</th>
+            <th class="stt-col">STT</th>
             <th>Họ và Tên</th>
-            <th>Tên đăng nhập</th>
-            <th>Phòng ban</th>
-            <th>Trạng thái</th>
-            @if (isFriday) { <th>Loại suất ăn</th> }
-            <th>Thời gian đặt</th>
+            <th class="code-col">Tên đăng nhập</th>
+            <th class="dept-col">Phòng ban</th>
+            <th class="status-col">Trạng thái</th>
+            @if (isFriday) { <th class="status-col">Loại suất ăn</th> }
+            <th class="datetime-col">Thời gian đặt</th>
           </tr>
         </thead>
         <tbody>
           @for (order of orders; track order.userId; let i = $index) {
           <tr>
-            <td class="text-center">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-            <td>{{ order.fullName || 'N/A' }}</td>
-            <td>{{ order.userName || 'N/A' }}</td>
-            <td>{{ order.departmentName || 'N/A' }}</td>
-            <td>
+            <td class="stt-col">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+            <td [title]="order.fullName || 'N/A'">{{ order.fullName || 'N/A' }}</td>
+            <td class="code-col" [title]="order.userName || 'N/A'">{{ order.userName || 'N/A' }}</td>
+            <td class="dept-col" [title]="order.departmentName || 'N/A'">{{ order.departmentName || 'N/A' }}</td>
+            <td class="status-col">
               <span class="status-clean" [class.active]="order.logicalStatus === 'REGISTERED'"
                 [class.inactive]="order.logicalStatus === 'UNREGISTERED'">
                 <span class="status-dot"></span> {{ order.logicalStatus === 'REGISTERED' ? 'Đã đăng ký' : 'Chưa đăng ký'
@@ -91,7 +91,7 @@
               </span>
             </td>
             @if (isFriday) {
-            <td>
+            <td class="status-col">
               @if (order.logicalStatus === 'REGISTERED') {
               @if (order.price === 40000) {
               <span class="meal-type-special">Tăng cường</span>
@@ -103,7 +103,7 @@
               }
             </td>
             }
-            <td>{{ order.logicalStatus === 'REGISTERED' && order.createdAt ? (order.createdAt | date:dateTimeFormat)
+            <td class="datetime-col">{{ order.logicalStatus === 'REGISTERED' && order.createdAt ? (order.createdAt | date:dateTimeFormat)
               : '---' }}</td>
           </tr>
           }
@@ -116,14 +116,12 @@
       </table>
     </div>
 
-    <!-- Pagination Footer -->
     <div class="crud-footer">
       <div class="pagination-info">
         Hiển thị từ <strong>{{ startItem }}</strong> đến <strong>{{ endItem }}</strong> trong tổng số <strong>{{
           totalOrders }}</strong> bản ghi
       </div>
 
-      <!-- Navigation Arrows -->
       <div class="pagination-buttons">
         <button [disabled]="currentPage === 1" (click)="onPageChange(1)" title="Trang đầu">
           &laquo;
@@ -144,7 +142,6 @@
         </button>
       </div>
 
-      <!-- Items Per Page selector -->
       <div class="page-size-selector">
         <span>Số dòng / trang:</span>
         <select [ngModel]="pageSize" (ngModelChange)="onSizeChange($event)">

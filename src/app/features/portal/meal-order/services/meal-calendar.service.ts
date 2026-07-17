@@ -6,24 +6,14 @@ import { BusinessConfigService } from '@shared/services/business-config.service'
 import { toIsoDate, isWeekend } from '@shared/utils/date.util';
 
 export interface BuildCalendarParams {
-  /** Năm hiển thị. */
   year: number;
-  /** Tháng hiển thị (0-indexed, giống Date.getMonth()). */
   month: number;
-  /** Tập ngày đã đăng ký (ISO 'YYYY-MM-DD'). */
   registeredDates: Set<string>;
-  /** Map đơn theo ngày (ISO). */
   orderMap: Record<string, OrderResponse>;
-  /** Map thực đơn theo ngày (ISO). */
   menuMap: Record<string, any>;
-  /** Id người dùng hiện tại (để xác định vé nhận từ chợ). */
   currentUserId?: number;
 }
 
-/**
- * Dựng danh sách ô ngày cho lịch đặt suất ăn.
- * Trích từ `MealOrderComponent.setupCalendar` — logic thuần, có thể unit-test độc lập.
- */
 @Injectable({ providedIn: 'root' })
 export class MealCalendarService {
   private businessConfig = inject(BusinessConfigService);
@@ -37,7 +27,6 @@ export class MealCalendarService {
     const today = new Date();
     const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-    // Kiểm tra giờ chốt đơn.
     const { hour: cutHour, minute: cutMinute } = this.businessConfig.cutOffTime;
     const isPastCutoff =
       today.getHours() > cutHour ||
@@ -49,7 +38,6 @@ export class MealCalendarService {
 
     const days: CalendarDay[] = [];
 
-    // Ô trống trước ngày 1.
     for (let i = 0; i < firstDay; i++) {
       days.push({ dayNumber: null, dateString: '', isRegistered: false });
     }
@@ -84,7 +72,6 @@ export class MealCalendarService {
     return days;
   }
 
-  /** Chia mảng ngày thành các hàng 7 cột (một tuần). */
   toRows(days: CalendarDay[]): CalendarDay[][] {
     const rows: CalendarDay[][] = [];
     for (let i = 0; i < days.length; i += 7) {

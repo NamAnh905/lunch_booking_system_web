@@ -1,8 +1,10 @@
-import { Component, HostListener, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
-import { CrudComponent } from '@shared/components/crud/crud.component';
+import { CrudAddOption, CrudComponent } from '@shared/components/crud/crud.component';
+import { CrudActionsComponent } from '@shared/components/crud/crud-actions.component';
+import { CrudSearchComponent } from '@shared/components/crud/crud-search.component';
 import { MenuService } from './menu.service';
 import { Menu } from '@shared/models/menu.model';
 import { MenuType } from '@shared/enums/menu-type.enum';
@@ -14,7 +16,7 @@ import { MenuImageFormComponent } from './components/menu-image-form/menu-image-
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent, MenuListEditorComponent, MenuImageFormComponent],
+  imports: [CommonModule, FormsModule, CrudComponent, CrudActionsComponent, CrudSearchComponent, MenuListEditorComponent, MenuImageFormComponent],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
 })
@@ -25,14 +27,16 @@ export class MenuComponent extends BaseCrudComponent<Menu, { keyword?: string },
   readonly MenuType = MenuType;
   readonly dateTimeFormat = APP_DATE_TIME_FORMAT;
 
-  // View state
-  isAddMenuOpen = false;
+  readonly addOptions: CrudAddOption[] = [
+    { label: 'Thêm dạng Danh sách', value: 'list' },
+    { label: 'Thêm dạng Hình ảnh', value: 'image' },
+  ];
+
   showListEditor = false;
   listEditorDate: string | undefined;
   showImageForm = false;
   imageFormMenu: Menu | null = null;
 
-  // Preview state
   previewMenu: Menu | null = null;
 
   getService() {
@@ -43,33 +47,19 @@ export class MenuComponent extends BaseCrudComponent<Menu, { keyword?: string },
     return {};
   }
 
-  // ---- Add dropdown ----
-  toggleAddMenu() {
-    this.isAddMenuOpen = !this.isAddMenuOpen;
-  }
-
-  closeAddMenu() {
-    this.isAddMenuOpen = false;
-  }
-
-  /** Đóng dropdown khi click ra ngoài. */
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    if (!this.isAddMenuOpen) return;
-    const target = event.target as HTMLElement;
-    if (!target.closest('.add-menu-wrapper')) {
-      this.isAddMenuOpen = false;
+  onAddOption(value: string) {
+    if (value === 'list') {
+    } else {
+      this.openImageForm();
     }
   }
 
   openListEditor(date?: string) {
-    this.closeAddMenu();
     this.listEditorDate = date;
     this.showListEditor = true;
   }
 
   openImageForm(menu: Menu | null = null) {
-    this.closeAddMenu();
     this.imageFormMenu = menu;
     this.showImageForm = true;
   }
@@ -90,11 +80,9 @@ export class MenuComponent extends BaseCrudComponent<Menu, { keyword?: string },
     this.loadData();
   }
 
-  // ---- Row actions ----
   isImage(item: Menu): boolean {
     return item.type === MenuType.IMAGE;
   }
-
   typeLabel(item: Menu): string {
     return this.isImage(item) ? 'Hình ảnh' : 'Danh sách';
   }

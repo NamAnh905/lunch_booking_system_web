@@ -9,6 +9,7 @@ export interface TokenResponse {
 export interface UserClaims {
   sub: string;      // username
   userId: number;
+  fullName?: string;
   scope: string;    // space-separated roles and permissions (e.g. "ROLE_USER VIEW_REPORTS")
   exp: number;      // expiration timestamp (in seconds)
   refreshExpiry?: number;
@@ -17,6 +18,7 @@ export interface UserClaims {
 export interface UserInfo {
   username: string;
   userId: number;
+  fullName?: string;
   roles: string[];
   permissions: string[];
 }

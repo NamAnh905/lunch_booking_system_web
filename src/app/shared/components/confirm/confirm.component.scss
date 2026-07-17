@@ -1,3 +1,5 @@
+@use "sass:color";
+
 @use '../../../../styles/variables' as *;
 
 .modal-overlay {
@@ -96,7 +98,7 @@
         color: white;
 
         &:hover {
-          background-color: darken($error-color, 10%);
+          background-color: color.adjust($error-color, $lightness: -10%, $space: hsl);
         }
       }
     }

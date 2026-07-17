@@ -4,10 +4,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { OrderResponse } from '@shared/models';
 
-/**
- * Presentation component (dumb): hiển thị các đơn đủ điều kiện pass vé
- * và thông báo cảnh báo khi ngoài khung giờ. Phát sự kiện "post".
- */
 @Component({
   selector: 'app-eligible-orders-list',
   standalone: true,

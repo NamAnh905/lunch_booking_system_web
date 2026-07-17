@@ -2,7 +2,6 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { TicketExchangeService } from './ticket-exchange.service';
 import { AuthService } from '@core/auth/auth.service';
@@ -26,7 +25,6 @@ import { MyTicketsListComponent } from './components/my-tickets-list.component';
     CommonModule,
     RouterModule,
     MatTabsModule,
-    MatProgressSpinnerModule,
     MatDividerModule,
     FormsModule,
     MarketTicketsListComponent,
@@ -72,8 +70,6 @@ export class TicketExchangeComponent implements OnInit {
     this.ticketExchangeService.getMarketTickets(this.currentPage, this.pageSize, TicketExchangeStatus.OPEN, null).subscribe({
       next: (res) => {
         const data = res.result?.data || [];
-        // Loại trừ vé của chính mình khỏi chợ chung.
-        this.marketTickets = data.filter(t => t.sellerId !== this.currentUserId);
         this.isLoading = false;
       },
       error: (err) => {
@@ -111,20 +107,23 @@ export class TicketExchangeComponent implements OnInit {
         const allOrders = res.result || [];
         const pendingOrders = allOrders.filter(o =>
           o.status === OrderStatus.PENDING &&
+          !this.isClaimedTicket(o) &&
           !this.myTickets.some(t => t.orderId === o.id)
         );
         
         this.eligibleOrders = pendingOrders.filter(o => this.isValidExchangeTime(o.menuDate));
 
         if (this.eligibleOrders.length === 0 && pendingOrders.length > 0) {
-          // Tìm đơn PENDING gần nhất để xác định thông báo cảnh báo.
           const closestOrder = pendingOrders.sort((a, b) => new Date(a.menuDate).getTime() - new Date(b.menuDate).getTime())[0];
-          this.pendingOrderWarning = this.exchangeWindow.getWarning(closestOrder.menuDate);
         } else {
           this.pendingOrderWarning = null;
         }
       }
     });
+  }
+
+  private isClaimedTicket(order: OrderResponse): boolean {
+    return order.originalUserId != null && order.originalUserId !== this.currentUserId;
   }
 
   claimTicket(ticket: TicketExchangeResponse): void {

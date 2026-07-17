@@ -10,7 +10,6 @@ export * from './order.model';
 export * from './ticket-exchange.model';
 export * from './payment.model';
 export * from './system-config.model';
-export * from './feedback.model';
 export * from './notification.model';
 export * from './order-summary.model';
 export * from './auth.model';

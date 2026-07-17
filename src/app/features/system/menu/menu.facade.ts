@@ -10,14 +10,6 @@ import { Dish } from '@shared/models/dish.model';
 import { ApiResponse } from '@shared/models';
 import { unwrapPage } from '@shared/utils/api.util';
 
-/**
- * Facade điều phối dữ liệu cho màn quản lý thực đơn:
- *  - Nạp giá/món đang active, nạp thực đơn tuần (đã map theo `date_priceId`).
- *  - Lưu món vào ô, xoá ô, đổi trạng thái (khoá/mở), xuất Excel.
- *
- * Component chỉ giữ tương tác UI (chọn/xoá món trong ô, điều hướng tuần)
- * và phản hồi (toast/loading), còn phần gọi API nằm ở đây.
- */
 @Injectable()
 export class MenuFacade {
   private menuService = inject(MenuService);
@@ -33,7 +25,6 @@ export class MenuFacade {
     );
   }
 
-  /** Danh sách món đang active. */
   loadActiveDishes(): Observable<Dish[]> {
     return this.dishService.getAll().pipe(map((res) => unwrapPage<Dish>(res).data.filter((d) => d.isActive)));
   }

@@ -33,10 +33,8 @@ export class OrderMonthlyComponent implements OnInit {
   
   viewMode: 'overview' | 'list' = 'overview';
   
-  // Daily overview data
   daysInMonth: { day: number | null, date: Date | null, totalMeals: number, isPadding: boolean, isWeekend: boolean }[] = [];
   
-  // List View Pagination
   currentPage: number = 1;
   pageSize: number = DEFAULT_PAGE_SIZE;
   totalItems: number = 0;
@@ -44,7 +42,6 @@ export class OrderMonthlyComponent implements OnInit {
   allMergedItems: any[] = [];
   sizeOptions = [10, 20, 50, 100];
   
-  // Modal state
   isModalOpen: boolean = false;
   selectedUserId?: number;
   selectedUserName?: string;
@@ -140,7 +137,6 @@ export class OrderMonthlyComponent implements OnInit {
     // Khởi tạo mảng mới hoàn toàn để ép Change Detection cập nhật đúng dữ liệu
     const newCalendarGrid: { day: number | null, date: Date | null, totalMeals: number, isPadding: boolean, isWeekend: boolean }[] = [];
     
-    // Thêm các ô trống đầu tháng (padding)
     for (let i = 0; i < offset; i++) {
       newCalendarGrid.push({ day: null, date: null, totalMeals: 0, isPadding: true, isWeekend: false });
     }

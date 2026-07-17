@@ -1,6 +1,9 @@
-@import '../../../../styles/variables';
-@import '../../../../styles/mixins';
-@import '../../../../styles/table';
+@use "sass:color";
+
+@use '../../../../styles/variables';
+@use '../../../../styles/mixins';
+@use '../../../../styles/table';
+@use '../../../../styles/filters';
 
 .monthly-meal-container {
   padding: 24px;
@@ -29,8 +32,10 @@
 
     .card {
       display: flex;
+      flex-direction: row;
       align-items: center;
       padding: 20px;
+      border: none;
       border-radius: 12px;
       flex: 1;
       max-width: 300px;
@@ -94,35 +99,7 @@
       align-items: center;
       justify-content: space-between;
 
-      .filters-inline {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-
-        .filter-item {
-          select {
-            padding: 8px 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            background-color: #ffffff;
-            color: #475569;
-            min-width: 120px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-
-            &:hover {
-              border-color: #cbd5e1;
-            }
-
-            &:focus {
-              border-color: #0ea5e9;
-              box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
-            }
-          }
-        }
-      }
+      @include filters.filters-inline(120px);
 
       .spacer {
         flex-grow: 1;
@@ -287,7 +264,7 @@
           display: block;
           flex: 1;
           overflow-y: scroll;
-          @include custom-scroll;
+          @include mixins.custom-scroll;
           width: 100%;
 
           tr {
@@ -327,12 +304,12 @@
     font-weight: 500;
     font-size: 13.5px;
     padding: 8px 14px;
-    border-radius: $radius-base;
+    border-radius: variables.$radius-base;
     border: 1px solid transparent;
     cursor: pointer;
     background: transparent;
-    color: $text-primary;
-    transition: $transition-base;
+    color: variables.$text-primary;
+    transition: variables.$transition-base;
     outline: none;
     user-select: none;
 
@@ -358,8 +335,8 @@
     border-color: #13c2c2;
 
     &:hover:not(:disabled) {
-      background-color: lighten(#13c2c2, 6%);
-      border-color: lighten(#13c2c2, 6%);
+      background-color: color.adjust(#13c2c2, $lightness: 6%, $space: hsl);
+      border-color: color.adjust(#13c2c2, $lightness: 6%, $space: hsl);
       box-shadow: rgba(19, 194, 194, 0.15) 0px 4px 12px;
     }
   }

@@ -1,13 +1,16 @@
-@import '../../../../styles/variables';
-@import '../../../../styles/mixins';
-@import '../../../../styles/table';
+@use '../../../../styles/variables';
+@use '../../../../styles/mixins';
+@use '../../../../styles/table';
+@use '../../../../styles/buttons';
+
+@include buttons.crud-buttons;
 
 .crud-header {
   position: relative;
   z-index: 20;
-  @include flex-between;
+  @include mixins.flex-between;
   padding: 16px 20px;
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid variables.$border-color;
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(10px);
   gap: 16px;
@@ -29,103 +32,47 @@
   }
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-weight: 500;
-  font-size: 13.5px;
-  padding: 8px 14px;
-  border-radius: $radius-base;
-  border: 1px solid transparent;
-  cursor: pointer;
-  background: transparent;
-  color: $text-primary;
-  transition: $transition-base;
-  outline: none;
-  user-select: none;
+.add-menu-wrapper {
+  position: relative;
 
-  svg {
-    transition: transform 0.2s ease;
-  }
+  .add-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 220px;
+    background: white;
+    border: 1px solid variables.$border-color;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 200;
+    overflow: hidden;
+    animation: dropdownFadeIn 0.15s ease-out;
 
-  &:hover:not(:disabled) {
-    svg {
-      transform: scale(1.1);
+    .add-menu-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 12px 16px;
+      background: white;
+      border: none;
+      font-size: 14px;
+      color: variables.$text-primary;
+      cursor: pointer;
+      transition: background-color 0.15s;
+
+      &:hover {
+        background-color: #f1f5f9;
+        color: variables.$primary-color;
+      }
+
+      & + .add-menu-item {
+        border-top: 1px solid variables.$border-color;
+      }
     }
   }
-
-  &:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
 }
 
-.btn-primary {
-  background-color: $primary-color;
-  color: #fff;
-  border-color: $primary-color;
-
-  &:hover:not(:disabled) {
-    background-color: $primary-hover;
-    border-color: $primary-hover;
-    box-shadow: $primary-shadow;
-  }
-
-  &:active:not(:disabled) {
-    background-color: $primary-active;
-    border-color: $primary-active;
-  }
-}
-
-.btn-warning {
-  background-color: $warning-color;
-  color: #fff;
-  border-color: $warning-color;
-
-  &:hover:not(:disabled) {
-    background-color: lighten($warning-color, 6%);
-    border-color: lighten($warning-color, 6%);
-    box-shadow: rgba(250, 173, 20, 0.15) 0px 4px 12px;
-  }
-}
-
-.btn-danger {
-  background-color: $error-color;
-  color: #fff;
-  border-color: $error-color;
-
-  &:hover:not(:disabled) {
-    background-color: lighten($error-color, 6%);
-    border-color: lighten($error-color, 6%);
-    box-shadow: rgba(245, 34, 45, 0.15) 0px 4px 12px;
-  }
-}
-
-.btn-info {
-  background-color: #13c2c2;
-  color: #fff;
-  border-color: #13c2c2;
-
-  &:hover:not(:disabled) {
-    background-color: lighten(#13c2c2, 6%);
-    border-color: lighten(#13c2c2, 6%);
-    box-shadow: rgba(19, 194, 194, 0.15) 0px 4px 12px;
-  }
-}
-
-.btn-secondary {
-  background-color: #fff;
-  color: $text-primary;
-  border-color: #d9d9d9;
-
-  &:hover:not(:disabled) {
-    color: $primary-color;
-    border-color: $primary-color;
-  }
-}
-
-.btn-icon {
-  padding: 8px 10px;
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }

@@ -1,12 +1,3 @@
-/**
- * Các hàm tiện ích xử lý ngày tháng dùng chung.
- *
- * Thay thế các đoạn `padStart` / dựng ngày lặp lại rải rác trong:
- *  - meal-order.component (loadData, setupCalendar, viewMenu, buildMenuGrid, getSelectedDateString)
- *  - menu.component (generateWeekDays, getMonday, formatDateLabel)
- *  - ticket-exchange.component (fetchEligibleOrders)
- *  - order-monthly / order-daily (goToDailyDetail, parse ngày backend)
- */
 
 /** Kiểu ngày trả về từ backend: chuỗi ISO hoặc mảng [y, m, d, hh?, mm?, ss?] (Jackson LocalDate/LocalDateTime). */
 export type BackendDate = string | number[] | null | undefined;
@@ -22,7 +13,6 @@ export function toIsoDate(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-/** Định dạng `Date` -> `'DD/MM/YYYY'` để hiển thị cho người dùng. */
 export function toDisplayDate(date: Date): string {
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -55,19 +45,14 @@ export function getMonday(date: Date): Date {
   return result;
 }
 
-/** Kiểm tra ngày cuối tuần (Thứ Bảy / Chủ Nhật). */
 export function isWeekend(date: Date): boolean {
   const day = date.getDay();
   return day === 0 || day === 6;
 }
 
-/** Kết quả khoảng ngày làm việc trong tuần. */
 export interface WeekRange {
-  /** Đối tượng Date của Thứ Hai. */
   monday: Date;
-  /** ISO 'YYYY-MM-DD' của Thứ Hai. */
   start: string;
-  /** ISO 'YYYY-MM-DD' của ngày cuối (mặc định Thứ Sáu). */
   end: string;
 }
 

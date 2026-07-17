@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
+import { CrudActionsComponent } from '@shared/components/crud/crud-actions.component';
+import { CrudSearchComponent } from '@shared/components/crud/crud-search.component';
 import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { DishService } from './dish.service';
 import { Dish, DishCreateRequest, DishUpdateRequest } from '@shared/models/dish.model';
@@ -13,7 +15,7 @@ import { AutoFocusDirective } from '../../../shared/directives/autofocus.directi
 @Component({
   selector: 'app-dish',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent, FormModalComponent, AutoFocusDirective],
+  imports: [CommonModule, FormsModule, CrudComponent, CrudActionsComponent, CrudSearchComponent, FormModalComponent, AutoFocusDirective],
   templateUrl: './dish.component.html',
   styleUrl: './dish.component.scss'
 })
@@ -33,9 +35,6 @@ export class DishComponent extends BaseCrudComponent<Dish, { keyword?: string, t
     };
   }
 
-  isFilterOpen = false;
-
-  /** Thứ tự hiển thị loại món trong bộ lọc. */
   private static readonly TYPE_FILTER_ORDER: DishType[] = [
     DishType.REGULAR,
     DishType.SPECIAL,
@@ -45,68 +44,24 @@ export class DishComponent extends BaseCrudComponent<Dish, { keyword?: string, t
     DishType.RICE,
   ];
 
-  filterOptions = {
-    types: DishComponent.TYPE_FILTER_ORDER.map((value) => ({
-      value,
-      label: DISH_TYPE_LABELS[value],
-      checked: false,
-    })),
-    isActives: [
-      { value: true, label: 'Hoạt động', checked: false },
-      { value: false, label: 'Khóa', checked: false }
-    ]
-  };
+  readonly typeOptions = DishComponent.TYPE_FILTER_ORDER.map((value) => ({
+    value,
+    label: DISH_TYPE_LABELS[value]
+  }));
 
-  activeFilters: { key: string, value: any, label: string }[] = [];
+  selectedType: DishType | null = null;
+  selectedIsActive: boolean | null = null;
 
-  toggleFilter() {
-    this.isFilterOpen = !this.isFilterOpen;
-  }
-
-  applyFilter() {
-    this.isFilterOpen = false;
-    this.updateActiveFilters();
+  onFilterChange() {
+    this.query.types = this.selectedType ? [this.selectedType] : [];
+    this.query.isActives = this.selectedIsActive === null ? [] : [this.selectedIsActive];
     this.onSearch();
   }
 
-  clearFilter() {
-    this.filterOptions.types.forEach(t => t.checked = false);
-    this.filterOptions.isActives.forEach(a => a.checked = false);
-    this.applyFilter();
-  }
-
-  updateActiveFilters() {
-    this.activeFilters = [];
-    const selectedTypes = this.filterOptions.types.filter(t => t.checked);
-    if (selectedTypes.length > 0) {
-      this.query.types = selectedTypes.map(t => t.value);
-      selectedTypes.forEach(t => {
-        this.activeFilters.push({ key: 'types', value: t.value, label: `Loại: ${t.label}` });
-      });
-    } else {
-      this.query.types = [];
-    }
-
-    const selectedActives = this.filterOptions.isActives.filter(a => a.checked);
-    if (selectedActives.length > 0) {
-      this.query.isActives = selectedActives.map(a => a.value);
-      selectedActives.forEach(a => {
-        this.activeFilters.push({ key: 'isActives', value: a.value, label: `Trạng thái: ${a.label}` });
-      });
-    } else {
-      this.query.isActives = [];
-    }
-  }
-
-  removeFilter(filter: any) {
-    if (filter.key === 'types') {
-      const option = this.filterOptions.types.find(t => t.value === filter.value);
-      if (option) option.checked = false;
-    } else if (filter.key === 'isActives') {
-      const option = this.filterOptions.isActives.find(a => a.value === filter.value);
-      if (option) option.checked = false;
-    }
-    this.applyFilter();
+  override onReset() {
+    this.selectedType = null;
+    this.selectedIsActive = null;
+    super.onReset();
   }
 
   onEditRow(item: Dish) {

@@ -1,7 +1,6 @@
 @use '../../../../styles/variables' as *;
 @use '../../../../styles/mixins' as *;
 
-// 1. FILTERS (Search Bar)
 .filters {
   display: flex;
   flex-direction: column;
@@ -13,143 +12,23 @@
     gap: 12px;
     align-items: center;
   }
-
-  .search-wrapper {
-    position: relative;
-    display: inline-block;
-    width: 250px;
-
-    .search-input {
-      padding: 8px 40px 8px 12px;
-      border: 1px solid $border-color;
-      border-radius: 6px;
-      font-size: 14px;
-      outline: none;
-      width: 100%;
-      transition: $transition-base;
-
-      &:focus {
-        border-color: $primary-color;
-        box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
-      }
-    }
-
-    .search-btn {
-      position: absolute;
-      right: 5px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4px;
-      color: $text-secondary;
-      transition: color $transition-base;
-
-      &:hover { color: $primary-color; }
-
-      svg { width: 16px; height: 16px; }
-    }
-  }
 }
 
-// 2. ADD DROPDOWN
-.add-menu-wrapper {
-  position: relative;
-
-  .btn.btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    background-color: $primary-color;
-    color: white;
-    transition: $transition-base;
-
-    &:hover { background-color: $primary-hover; }
-
-    .caret { margin-left: 2px; }
-  }
-
-  .add-menu-dropdown {
-    position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
-    min-width: 220px;
-    background: white;
-    border: 1px solid $border-color;
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    z-index: 200;
-    overflow: hidden;
-    animation: dropdownFadeIn 0.15s ease-out;
-
-    .add-menu-item {
-      display: block;
-      width: 100%;
-      text-align: left;
-      padding: 12px 16px;
-      background: white;
-      border: none;
-      font-size: 14px;
-      color: $text-primary;
-      cursor: pointer;
-      transition: background-color 0.15s;
-
-      &:hover {
-        background-color: #f1f5f9;
-        color: $primary-color;
-      }
-
-      & + .add-menu-item {
-        border-top: 1px solid $border-color;
-      }
-    }
-  }
-}
-
-// 3. TYPE BADGE
-.type-badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
+.type-text {
+  text-transform: uppercase;
+  font-weight: 700;
 
   &.list {
-    background-color: rgba($primary-color, 0.1);
     color: $primary-color;
   }
 
   &.image {
-    background-color: rgba(22, 163, 74, 0.12);
     color: #16a34a;
   }
 }
 
-// 4. PREVIEW ICON (extend global btn-icon)
-::ng-deep .btn-icon.preview {
-  color: #0891b2;
-
-  &:hover {
-    background: white;
-    border-color: rgba(8, 145, 178, 0.3);
-    box-shadow: 0 4px 6px rgba(8, 145, 178, 0.1);
-  }
-}
-
-// 5. PREVIEW MODAL
 .modal-overlay {
   position: fixed;
-  inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -236,10 +115,5 @@
 
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes dropdownFadeIn {
-  from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
 }

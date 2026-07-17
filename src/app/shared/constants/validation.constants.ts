@@ -13,7 +13,7 @@ export const VALIDATION_PATTERNS = {
   /** Không chứa khoảng trắng (mật khẩu). */
   PASSWORD: /^\S+$/,
   /** Chữ cái (kể cả tiếng Việt) và khoảng trắng; không số, không ký tự đặc biệt (họ tên). */
-  PERSON_NAME: /^[a-zA-ZÀ-ỹ\s]+$/,
+  PERSON_NAME: /^[a-zA-ZÀ-ỹ\s()]+$/,
   /** Chữ cái (kể cả tiếng Việt), số và khoảng trắng; không ký tự đặc biệt (tên chung). */
   GENERAL_NAME: /^[a-zA-ZÀ-ỹ0-9\s]+$/,
   /** Chỉ chữ in hoa và dấu gạch dưới (mã code hệ thống). */

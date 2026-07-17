@@ -1,181 +1,302 @@
+@use "sass:color";
+
 /* Style dùng chung cho các danh sách thẻ vé (market / eligible / my-tickets).
-   Trích từ ticket-exchange.component.scss để các presentation component
-   dùng lại mà vẫn giữ nguyên giao diện dưới View Encapsulation. */
+   Dùng lại ở các presentation component; giữ nhất quán dưới View Encapsulation. */
+
+$brand: #004b8c;
+$brand-soft: #e8f1fb;
+$text-strong: #111827;
+$text-muted: #6b7280;
+$card-border: #eef0f4;
 
 .tickets-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
   margin-bottom: 20px;
 }
 
 .ticket-card {
-  border-radius: 12px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border: 1px solid #f3f4f6;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+  padding: 20px !important;
+  border-radius: 14px;
+  border: 1px solid $card-border;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: $brand;
+  }
+
+  &.eligible-ticket::before { background: #16a34a; }
+  &.my-ticket::before { background: #f59e0b; }
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  }
-
-  .ticket-avatar {
-    background-color: #e0e7ff;
-    color: #4f46e5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-
-    &.my-avatar {
-      background-color: #fef3c7;
-      color: #d97706;
-    }
-  }
-
-  mat-card-header {
-    justify-content: center;
-    text-align: center;
-  }
-
-  mat-card-title {
-    font-size: 18px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #111827;
-    margin-bottom: 4px;
-  }
-
-  mat-card-subtitle {
-    color: #000000;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  mat-card-content {
-    margin-top: 16px;
-
-    .info-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 12px;
-      color: #4b5563;
-      font-size: 14px;
-
-      mat-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-        margin-right: 8px;
-        color: #9ca3af;
-      }
-
-      strong {
-        color: #111827;
-        font-weight: 500;
-      }
-    }
-  }
-
-  mat-card-actions {
-    padding: 8px 16px 16px;
-
-    button {
-      border-radius: 8px;
-      font-weight: 500;
-      width: 100%;
-
-      mat-icon {
-        margin-right: 4px;
-      }
-    }
+    border-color: color.adjust($card-border, $lightness: -6%, $space: hsl);
+    box-shadow: 0 12px 22px -8px rgba(16, 24, 40, 0.18);
   }
 }
 
-.status-badge {
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-
-  &.open, &.pending {
-    color: #16a34a;
-  }
-
-  &.matched, &.claimed {
-    color: #2563eb;
-  }
-
-  &.cancelled, &.withdrawn {
-    color: #dc2626;
-  }
+.card-top {
+  display: flex;
+  gap: 14px;
 }
 
-.empty-state {
+.date-tile {
+  flex: 0 0 auto;
+  width: 54px;
+  height: 58px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 100px 20px;
-  color: #6b7280;
-  text-align: center;
-  gap: 1rem;
+  border-radius: 12px;
+  background: $brand-soft;
+  color: $brand;
+  line-height: 1;
 
-  p {
-    font-size: 16px;
-    margin: 0;
+  &.special {
+    background: #fff4e5;
+    color: #d97706;
   }
+
+  &__day {
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  &__month {
+    margin-top: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+}
+
+.card-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+
+  &__date {
+    font-size: 16px;
+    font-weight: 700;
+    color: $text-strong;
+  }
+}
+
+.meal-chip {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #eef2f7;
+  color: #475569;
+
+  i { font-size: 11px; }
+
+  &.special {
+    background: #fef3c7;
+    color: #b45309;
+  }
+}
+
+.card-body {
+  margin-top: 16px;
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: $text-muted;
+  font-size: 14px;
+
+  > i {
+    width: 16px;
+    text-align: center;
+    color: #9aa4b2;
+    font-size: 14px;
+  }
+
+  strong {
+    color: $text-strong;
+    font-weight: 600;
+  }
+
+  .info-row__label { margin-right: auto; }
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+
+  &.open,
+  &.pending {
+    color: #15803d;
+    background: #dcfce7;
+  }
+
+  &.matched,
+  &.claimed {
+    color: #1d4ed8;
+    background: #dbeafe;
+  }
+
+  &.cancelled,
+  &.withdrawn,
+  &.expired {
+    color: #b91c1c;
+    background: #fee2e2;
+  }
+}
+
+.card-actions {
+  margin-top: 18px;
+
+  button {
+    height: 42px;
+    border-radius: 10px;
+    font-weight: 600;
+
+    i { margin-right: 6px; }
+  }
+}
+
+.skeleton-card {
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid $card-border;
+  background: #fff;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #edf0f4;
+  border-radius: 8px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+    animation: skeleton-shimmer 1.3s infinite;
+  }
+
+  &--tile { width: 54px; height: 58px; border-radius: 12px; }
+  &--line { height: 12px; margin-bottom: 8px; }
+  &--w60 { width: 60%; }
+  &--w40 { width: 40%; }
+  &--btn { height: 42px; border-radius: 10px; margin-top: 18px; }
+}
+
+.skeleton-top {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.skeleton-lines {
+  flex: 1;
+}
+
+@keyframes skeleton-shimmer {
+  100% { transform: translateX(100%); }
 }
 
 .section-container {
   margin-bottom: 8px;
 
   .section-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #374151;
+    display: flex;
+    align-items: center;
+    font-size: 17px;
+    font-weight: 700;
+    color: #1f2937;
     margin-bottom: 16px;
-    font-family: var(--font-sans-serif);
+
+    i { color: $brand; }
   }
 }
 
+.empty-state,
 .empty-state-small {
-  padding: 60px 20px;
-  color: #6b7280;
-  text-align: center;
-  background-color: transparent;
-  border-radius: 8px;
-  border: 1px dashed #d1d5db;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 12px;
+  text-align: center;
+  color: $text-muted;
+
+  .empty-state__icon {
+    font-size: 40px;
+    color: #cbd5e1;
+  }
 
   p {
     margin: 0;
-    font-size: 14px;
+    font-size: 15px;
   }
+}
+
+.empty-state {
+  padding: 80px 20px;
+}
+
+.empty-state-small {
+  padding: 48px 20px;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+
+  .empty-state__icon { font-size: 32px; }
+  p { font-size: 14px; }
 }
 
 .cutoff-message {
   display: flex;
   align-items: flex-start;
-  padding: 16px;
-  background-color: #fffbeb;
-  border-left: 4px solid #fbbf24;
-  border-radius: 4px;
+  gap: 12px;
+  padding: 16px 18px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-left: 4px solid #f59e0b;
+  border-radius: 10px;
   color: #92400e;
+
+  > i {
+    margin-top: 2px;
+    font-size: 18px;
+    color: #f59e0b;
+  }
 
   p {
     margin: 0;
     font-size: 14px;
     line-height: 1.5;
   }
-}
-
-.eligible-avatar {
-  background-color: #dcfce7 !important;
-  color: #16a34a !important;
 }

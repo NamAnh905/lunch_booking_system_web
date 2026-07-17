@@ -1,6 +1,7 @@
-@import url('https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css');
-@import url('https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css');
+/*
+ * Font Awesome và Bootstrap đã được nạp toàn cục qua npm trong styles.scss
+ * (@fortawesome/fontawesome-free, bootstrap) nên KHÔNG import lại ở đây.
+ */
 
 body {
   font-family: "Poppins", sans-serif;
@@ -26,7 +27,6 @@ a:focus {
   box-shadow: none;
 }
 
-/* Base custom styles from datcom.html and style.css */
 #app {
   overflow: auto;
 }
@@ -557,7 +557,6 @@ body {
 }
 
 
-/* Custom Calendar CSS from calendar.css */
 .bg-primary {
   background: #39cb75 !important;
 }
@@ -1004,7 +1003,6 @@ tbody td.draft:before {
   height: 100%;
 }
 
-/* ===== Cột phải: Chú giải + Tổng tiền ===== */
 .right-panel {
   display: flex;
   flex-direction: column;
@@ -1135,7 +1133,6 @@ tbody td.draft:before {
   }
 }
 
-// Thực đơn dạng ảnh trong modal "Xem thực đơn"
 .menu-image-wrapper {
   padding: 4px 0;
 

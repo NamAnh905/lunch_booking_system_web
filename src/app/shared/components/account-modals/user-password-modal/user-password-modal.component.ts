@@ -14,11 +14,6 @@ function passwordsMatchValidator(group: AbstractControl): ValidationErrors | nul
   return newPassword === confirmPassword ? null : { passwordsMismatch: true };
 }
 
-/**
- * "Đổi mật khẩu" modal — changes the current user's password.
- * Wraps the shared FormModalComponent; owns its own reactive form + validation.
- * Resets its form each time it is opened.
- */
 @Component({
   selector: 'app-user-password-modal',
   standalone: true,

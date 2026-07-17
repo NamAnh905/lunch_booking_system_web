@@ -1,11 +1,11 @@
-@import '../../../styles/variables';
+@use '../../../styles/variables';
 
 .app-layout {
   display: flex;
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background-color: $bg-color;
+  background-color: variables.$bg-color;
 }
 
 .main-content {

@@ -23,7 +23,6 @@ export class LoginComponent {
     rememberMe: [false],
   });
 
-  /** Thông báo "để trống" theo từng field (chỉ có ràng buộc required). */
   private readonly requiredMessages: Record<string, string> = {
     username: 'Không được để trống tài khoản',
     password: 'Không được để trống mật khẩu',
@@ -39,6 +38,8 @@ export class LoginComponent {
     1001: { field: 'password', message: 'Sai tên đăng nhập hoặc mật khẩu' }, // UNAUTHENTICATED
   };
 
+  private readonly TOO_MANY_LOGIN_ATTEMPTS = 1004;
+
   /** Lỗi trả về từ Backend, gắn theo tên field (được xoá ngay khi người dùng gõ lại). */
   private serverErrors: Record<string, string> = {};
 
@@ -49,7 +50,6 @@ export class LoginComponent {
     this.showPassword = !this.showPassword;
   }
 
-  /** Xoá lỗi Backend khi người dùng bắt đầu nhập lại (chuẩn bị lần thử mới). */
   clearServerErrors(): void {
     this.serverErrors = {};
   }
@@ -66,6 +66,15 @@ export class LoginComponent {
       return this.requiredMessages[fieldName] ?? '';
     }
     return '';
+  }
+
+  private tooManyAttemptsMessage(retryAfterSeconds: unknown): string {
+    const seconds = typeof retryAfterSeconds === 'number' ? Math.ceil(retryAfterSeconds) : 0;
+    if (seconds <= 0) {
+      return 'Bạn đã nhập sai quá nhiều lần. Vui lòng thử lại sau.';
+    }
+    const wait = seconds < 60 ? `${seconds} giây` : `${Math.ceil(seconds / 60)} phút`;
+    return `Bạn đã nhập sai quá nhiều lần. Vui lòng thử lại sau ${wait}.`;
   }
 
   onSubmit(): void {
@@ -95,6 +104,14 @@ export class LoginComponent {
       },
       error: (err) => {
         this.loading = false;
+
+        if (err.error?.code === this.TOO_MANY_LOGIN_ATTEMPTS) {
+          this.serverErrors = {
+            password: this.tooManyAttemptsMessage(err.error?.result?.retryAfterSeconds),
+          };
+          return;
+        }
+
         const mapped = this.authErrors[err.error?.code];
         this.serverErrors = mapped
           ? { [mapped.field]: mapped.message }

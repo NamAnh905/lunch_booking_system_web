@@ -101,11 +101,6 @@ export class AdminSidebarComponent {
           route: '/system/interaction/ticket-exchange'
         },
         {
-          label: 'Phản hồi',
-          icon: 'message-square',
-          route: '/system/interaction/feedback'
-        },
-        {
           label: 'Thông báo',
           icon: 'bell',
           route: '/system/interaction/notification'

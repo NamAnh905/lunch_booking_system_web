@@ -3,11 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { TicketExchangeResponse } from '@shared/models';
+import { ticketStatusLabel } from './ticket-status.util';
 
-/**
- * Presentation component (dumb): hiển thị các vé người dùng đang đăng trên chợ.
- * Phát sự kiện "withdraw" khi muốn thu hồi.
- */
 @Component({
   selector: 'app-my-tickets-list',
   standalone: true,
@@ -21,4 +18,6 @@ export class MyTicketsListComponent {
   isLoading = input(false);
 
   withdraw = output<TicketExchangeResponse>();
+
+  statusLabel = ticketStatusLabel;
 }

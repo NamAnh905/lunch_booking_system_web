@@ -3,7 +3,6 @@
   <div class="modal-panel" [style.max-width]="width" (click)="$event.stopPropagation()" role="dialog"
     aria-modal="true">
 
-    <!-- Header -->
     <header class="modal-header">
       <div class="modal-heading">
         <h3 class="modal-title">{{ title }}</h3>
@@ -20,16 +19,13 @@
       </button>
     </header>
 
-    <!-- Body: projected form content, laid out in a responsive 2-column grid -->
     <div class="modal-body">
       <div class="form-grid">
         <ng-content></ng-content>
       </div>
     </div>
 
-    <!-- Footer -->
     <footer class="modal-footer">
-      <!-- Optional extra controls (e.g. a delete button) on the left -->
       <div class="footer-start">
         <ng-content select="[modal-footer-start]"></ng-content>
       </div>

@@ -1,0 +1,32 @@
+@mixin filters-inline($min-width: 150px) {
+  .filters-inline {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+
+    .filter-item {
+      input[type="date"],
+      select {
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        background-color: #ffffff;
+        color: #475569;
+        min-width: $min-width;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          border-color: #cbd5e1;
+        }
+
+        &:focus {
+          border-color: #0ea5e9;
+          box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+        }
+      }
+    }
+  }
+}

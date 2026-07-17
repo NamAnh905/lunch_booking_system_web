@@ -11,7 +11,6 @@ export const permissionGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  // Redirect to dashboard/home if access is denied
   router.navigate(['/']);
   return false;
 };

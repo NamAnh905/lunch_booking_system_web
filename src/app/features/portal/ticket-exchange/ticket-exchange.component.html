@@ -1,25 +1,22 @@
-
-<main class="py-4 bg-white">
-  <div class="container-fluid tickets" style="max-width: 1200px; margin: 0 auto; width: 100%;">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 style="color: #004b8c; margin: 0; font-weight: 600;">Chợ Pass Vé - Giao dịch suất ăn</h2>
-      <button class="btn btn-outline-secondary btn-sm d-flex align-items-center" routerLink="/portal/meal-order"
-        style="border-radius: 8px; font-weight: 500; gap: 8px; padding: 8px 16px;"> Quay lại
+<main class="exchange-page">
+  <div class="exchange-shell">
+    <header class="exchange-header">
+      <div class="exchange-header__title">
+        <span class="exchange-header__icon"><i class="fas fa-right-left"></i></span>
+        <div>
+          <h2>Chợ Pass Vé</h2>
+          <p>Giao dịch, trao đổi suất ăn với đồng nghiệp</p>
+        </div>
+      </div>
+      <button class="btn-back" routerLink="/portal/meal-order">
+        <i class="fas fa-arrow-left"></i> Quay lại
       </button>
-    </div>
+    </header>
 
-    <div class="container-cover"
-      style="box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border-radius: 12px; background-color: #fff; padding: 24px; width: 100%;">
+    <div class="exchange-body">
       <mat-tab-group animationDuration="0ms" class="flat-tabs">
-        <!-- Tab 1: Chợ vé chung -->
         <mat-tab label="Chợ vé chung">
           <div class="tab-content">
-            @if (isLoading) {
-              <div class="loading-shade">
-                <mat-spinner diameter="40"></mat-spinner>
-              </div>
-            }
-
             <app-market-tickets-list
               [tickets]="marketTickets"
               [currentUserId]="currentUserId"
@@ -29,15 +26,8 @@
           </div>
         </mat-tab>
 
-        <!-- Tab 2: Vé tôi đang Pass -->
         <mat-tab label="Vé tôi đang Pass">
           <div class="tab-content">
-            @if (isLoading) {
-              <div class="loading-shade">
-                <mat-spinner diameter="40"></mat-spinner>
-              </div>
-            }
-
             <app-eligible-orders-list
               [orders]="eligibleOrders"
               [pendingOrderWarning]="pendingOrderWarning"
@@ -45,7 +35,7 @@
               (post)="postTicket($event)">
             </app-eligible-orders-list>
 
-            <mat-divider style="margin: 24px 0;"></mat-divider>
+            <mat-divider class="section-divider"></mat-divider>
 
             <app-my-tickets-list
               [tickets]="myTickets"

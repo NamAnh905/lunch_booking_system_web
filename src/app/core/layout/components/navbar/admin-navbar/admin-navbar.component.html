@@ -5,7 +5,6 @@
     }
   </div>
 
-  <!-- User Profile Dropdown -->
   <div class="user-profile-dropdown" tabindex="0">
     <div class="user-trigger" *ngIf="currentUser$ | async as user" (click)="toggleDropdown()">
       <div class="user-info">
@@ -23,6 +22,10 @@
       <a class="dropdown-item" (click)="openPassword()">
         <svg lucideKeyRound width="16" height="16"></svg>
         <span>Đổi mật khẩu</span>
+      </a>
+      <a class="dropdown-item" routerLink="/portal/meal-order" (click)="isDropdownOpen = false">
+        <svg lucideUtensils width="16" height="16"></svg>
+        <span>Đăng ký cơm</span>
       </a>
       <div class="dropdown-divider"></div>
       <a class="dropdown-item text-danger" (click)="logout()">

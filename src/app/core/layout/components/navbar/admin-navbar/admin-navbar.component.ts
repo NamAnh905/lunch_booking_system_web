@@ -1,8 +1,8 @@
 import { Component, inject, Input, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
-import { LucideUser, LucideLogOut, LucideKeyRound } from '@lucide/angular';
+import { LucideUser, LucideLogOut, LucideKeyRound, LucideUtensils } from '@lucide/angular';
 import { AuthService } from '../../../../auth/auth.service';
 import { UserProfileModalComponent } from '@shared/components/account-modals/user-profile-modal/user-profile-modal.component';
 import { UserPasswordModalComponent } from '@shared/components/account-modals/user-password-modal/user-password-modal.component';
@@ -12,10 +12,12 @@ import { UserPasswordModalComponent } from '@shared/components/account-modals/us
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     BreadcrumbComponent,
     LucideUser,
     LucideLogOut,
     LucideKeyRound,
+    LucideUtensils,
     UserProfileModalComponent,
     UserPasswordModalComponent
   ],
@@ -29,7 +31,6 @@ export class AdminNavbarComponent {
   private router = inject(Router);
   private elementRef = inject(ElementRef);
 
-  // Expose current user to the template
   currentUser$ = this.authService.currentUser$;
   isDropdownOpen = false;
   profileModalOpen = false;

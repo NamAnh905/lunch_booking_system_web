@@ -19,18 +19,14 @@ export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
   page = 1;
   size = 10;
 
-  // Selection list
   selections: T[] = [];
 
-  // Query & Filters
   query: Q = {} as Q;
 
-  // Form State
   isFormOpen = false;
   formModel: F = {} as F;
   formMode: 'add' | 'edit' = 'add';
 
-  // Child component must implement this to return its API service
   abstract getService(): {
     query(query: Q, page: number, size: number): Observable<PageResponse<T>>;
     add?(form: F): Observable<T>;
@@ -39,10 +35,8 @@ export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
     deleteMany?(ids: (number | string)[]): Observable<void>;
   };
 
-  // Child component must implement this to return default form values
   abstract getDefaultForm(): F;
 
-  // Child component can override this to return search/query defaults
   getDefaultQuery(): Q {
     return {} as Q;
   }
@@ -58,7 +52,6 @@ export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
     // Spring Boot page is 0-indexed, so we subtract 1 for the API
     this.getService().query(this.query, this.page - 1, this.size).subscribe({
       next: (res) => {
-        // Handle result format from Spring Boot ApiResponse wrapper
         const pageData = (res as any).result !== undefined ? (res as any).result : res;
         
         if (Array.isArray(pageData)) {

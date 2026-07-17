@@ -1,7 +1,9 @@
-@use '../../../../../../styles/variables' as *;
-@use '../../../../../../styles/mixins' as *;
+@use '../../../../../../styles/variables';
+@use '../../../../../../styles/mixins';
+@use '../../../../../../styles/buttons';
 
-// Full-screen overlay hosting the grid editor
+@include buttons.crud-buttons;
+
 .editor-overlay {
   position: fixed;
   inset: 0;
@@ -28,7 +30,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px 24px;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid variables.$border-color;
     background: white;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
@@ -37,7 +39,7 @@
       margin: 0;
       font-size: 18px;
       font-weight: 600;
-      color: $text-primary;
+      color: variables.$text-primary;
     }
 
     .close-btn {
@@ -45,11 +47,11 @@
       border: none;
       font-size: 26px;
       line-height: 1;
-      color: $text-secondary;
+      color: variables.$text-secondary;
       cursor: pointer;
       padding: 0;
 
-      &:hover { color: $text-primary; }
+      &:hover { color: variables.$text-primary; }
     }
   }
 
@@ -58,7 +60,6 @@
   }
 }
 
-// Hide pagination footer of the inner crud
 :host ::ng-deep {
   .crud-footer {
     display: none !important;
@@ -77,45 +78,23 @@
     gap: 8px;
     margin-left: auto;
     font-weight: 500;
-    color: $text-primary;
+    color: variables.$text-primary;
 
     input[type="date"] {
       padding: 6px 12px;
-      border: 1px solid $border-color;
+      border: 1px solid variables.$border-color;
       border-radius: 6px;
       font-size: 14px;
       outline: none;
-      transition: $transition-base;
+      transition: variables.$transition-base;
 
       &:focus {
-        border-color: $primary-color;
-        box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+        border-color: variables.$primary-color;
+        box-shadow: 0 0 0 2px rgba(variables.$primary-color, 0.2);
       }
     }
   }
 
-  .btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: $transition-base;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-
-    &.btn-secondary {
-      background-color: #f1f5f9;
-      color: $text-primary;
-      border: 1px solid $border-color;
-
-      &:hover {
-        background-color: #e2e8f0;
-      }
-    }
-  }
 }
 
 .grid-table {
@@ -318,10 +297,8 @@
       }
     }
 
-    /* Slot inline search dropdown popup */
     .slot-dropdown-popup {
       position: absolute;
-      left: 0;
       top: 100%;
       width: 240px;
       background: white;
@@ -349,7 +326,7 @@
           outline: none;
 
           &:focus {
-            border-color: $primary-color;
+            border-color: variables.$primary-color;
           }
         }
       }
@@ -371,7 +348,7 @@
 
         &:hover {
           background-color: #f1f5f9;
-          color: $primary-color;
+          color: variables.$primary-color;
         }
       }
 

@@ -11,7 +11,6 @@ import { DishType } from '@shared/enums/dish-type.enum';
 export class DishClassifierService {
   getDishType(dish: Dish): DishType {
     if (!dish?.type) return DishType.REGULAR;
-    // Món đặc biệt xếp chung slot với món thường.
     if (dish.type === DishType.SPECIAL) return DishType.REGULAR;
     return dish.type;
   }

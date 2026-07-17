@@ -3,19 +3,19 @@
 
   <div crud-filters class="filters">
     <div class="filter-group">
-      <label>Từ ngày</label>
-      <input type="date" [(ngModel)]="query.startDate" (ngModelChange)="onSearch()">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-date-range-input [formGroup]="dateRange" [rangePicker]="dateRangePicker">
+          <input matStartDate formControlName="start" placeholder="Từ ngày">
+          <input matEndDate formControlName="end" placeholder="Đến ngày">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="dateRangePicker"></mat-datepicker-toggle>
+        <mat-date-range-picker #dateRangePicker panelClass="custom-date-picker-overlay"></mat-date-range-picker>
+      </mat-form-field>
     </div>
 
     <div class="filter-group">
-      <label>Đến ngày</label>
-      <input type="date" [(ngModel)]="query.endDate" (ngModelChange)="onSearch()">
-    </div>
-
-    <div class="filter-group">
-      <label>Trạng thái</label>
       <select [(ngModel)]="query.status" (ngModelChange)="onSearch()">
-        <option value="">Tất cả</option>
+        <option value="">Tất cả trạng thái</option>
         <option value="OPEN">Mở bán (OPEN)</option>
         <option value="MATCHED">Đã ghép (MATCHED)</option>
         <option value="CANCELLED">Đã hủy (CANCELLED)</option>
@@ -24,18 +24,7 @@
     </div>
 
     <div class="filter-group">
-      <label>Tìm kiếm</label>
-      <div class="search-wrapper">
-        <input type="text" [(ngModel)]="query.keyword" (keyup.enter)="onSearch()" placeholder="Người pass/nhận..."
-          class="search-input">
-        <button class="search-btn" (click)="onSearch()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-        </button>
-      </div>
+      <app-crud-search placeholder="Tìm kiếm..." [(value)]="query.keyword" (search)="onSearch()" />
     </div>
   </div>
 
@@ -46,11 +35,11 @@
           <input type="checkbox" (change)="toggleAll($event)"
             [checked]="selections.length === data.length && data.length > 0">
         </th>
-        <th class="text-center" style="width: 60px;">STT</th>
-        <th>Ngày ăn</th>
+        <th class="stt-col">STT</th>
+        <th class="date-col">Ngày ăn</th>
         <th>Người Pass</th>
         <th>Người Nhận</th>
-        <th>Trạng thái</th>
+        <th class="status-col">Trạng thái</th>
       </tr>
     </thead>
     <tbody>
@@ -59,11 +48,11 @@
         <td class="checkbox-col">
           <input type="checkbox" [checked]="isSelected(item)" (change)="toggleSelection(item)">
         </td>
-        <td class="text-center">{{ (page - 1) * size + i + 1 }}</td>
-        <td>{{ item.menuDate }}</td>
-        <td>{{ item.sellerName }}</td>
-        <td>{{ item.buyerName || '-' }}</td>
-        <td>
+        <td class="stt-col">{{ (page - 1) * size + i + 1 }}</td>
+        <td class="date-col">{{ item.menuDate }}</td>
+        <td [title]="item.sellerName">{{ item.sellerName }}</td>
+        <td [title]="item.buyerName || '-'">{{ item.buyerName || '-' }}</td>
+        <td class="status-col">
           <span [ngClass]="{
             'status-open': item.status === 'OPEN',
             'status-matched': item.status === 'MATCHED',
@@ -77,7 +66,7 @@
       }
       @if (data.length === 0 && !loading) {
       <tr>
-        <td colspan="7" class="text-center empty-state">Không có dữ liệu</td>
+        <td colspan="6" class="text-center empty-state">Không có dữ liệu</td>
       </tr>
       }
     </tbody>

@@ -1,20 +1,20 @@
-@import 'variables';
-@import 'mixins';
+@use 'variables';
+@use 'mixins';
 
 .crud-container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: $card-bg;
-  border-radius: $radius-lg;
-  box-shadow: $shadow-sm;
-  border: 1px solid $border-color;
+  background: variables.$card-bg;
+  border-radius: variables.$radius-lg;
+  box-shadow: variables.$shadow-sm;
+  border: 1px solid variables.$border-color;
   overflow: hidden;
   margin-bottom: 24px;
-  transition: $transition-base;
+  transition: variables.$transition-base;
 
   &:hover {
-    box-shadow: $shadow-base;
+    box-shadow: variables.$shadow-base;
   }
 }
 
@@ -22,16 +22,17 @@
   position: relative;
   min-height: 525px; // Approximate height for header + 10 rows
   overflow-x: auto;
-  @include custom-scroll;
+  @include mixins.custom-scroll;
 
   &.loading {
     min-height: 525px;
   }
 }
 
-// Global table standard
 .data-table, ::ng-deep .data-table {
   width: 100%;
+  min-width: 900px;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
   background: white;
@@ -49,12 +50,12 @@
     padding: 16px 20px;
     text-align: left;
     background-color: #f8fafc;
-    color: $text-secondary !important;
+    color: variables.$text-secondary !important;
     font-weight: 600 !important;
     text-transform: uppercase;
     font-size: 13px;
     letter-spacing: 0.5px;
-    border-bottom: 2px solid $border-color;
+    border-bottom: 2px solid variables.$border-color;
     white-space: nowrap;
 
     &:first-child {
@@ -70,9 +71,12 @@
     padding: 16px 20px;
     text-align: left;
     border-bottom: 1px solid #f1f5f9;
-    color: $text-primary;
+    color: variables.$text-primary;
     vertical-align: middle;
-    transition: $transition-base;
+    transition: variables.$transition-base;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     &:first-child {
       padding-left: 24px;
@@ -103,16 +107,60 @@
     }
   }
 
+  .stt-col {
+    width: 60px;
+    text-align: center;
+  }
+
+  .code-col {
+    width: 160px;
+  }
+
+  .status-col {
+    width: 140px;
+  }
+
+  .date-col {
+    width: 130px;
+  }
+
+  .datetime-col {
+    width: 180px;
+  }
+
+  .money-col {
+    width: 140px;
+    text-align: right;
+  }
+
+  .count-col {
+    width: 120px;
+    text-align: right;
+  }
+
+  .dept-col {
+    width: 200px;
+  }
+
+  .roles-col {
+    width: 100px;
+  }
+
+  .name-col {
+    width: 200px;
+  }
+
   .checkbox-col {
     width: 48px;
     text-align: center;
+    overflow: visible;
     padding-right: 0 !important;
 
     input[type="checkbox"] {
       width: 18px;
       height: 18px;
       cursor: pointer;
-      accent-color: $primary-color;
+      accent-color: variables.$primary-color;
       border-radius: 4px;
       transition: transform 0.2s ease;
 
@@ -122,7 +170,6 @@
     }
   }
 
-  // Badges
   .badge {
     padding: 6px 12px;
     border-radius: 20px;
@@ -176,7 +223,7 @@
 
   .empty-state {
     padding: 60px 20px;
-    color: $text-secondary;
+    color: variables.$text-secondary;
     font-style: italic;
     text-align: center;
     background: #fafafa;
@@ -185,6 +232,7 @@
   .action-column {
     width: 150px;
     text-align: center !important;
+    overflow: visible;
   }
 
   .row-actions {
@@ -210,12 +258,12 @@
       }
 
       &.edit {
-        color: $primary-color;
+        color: variables.$primary-color;
 
         &:hover {
           background: white;
-          border-color: rgba($primary-color, 0.3);
-          box-shadow: 0 4px 6px rgba($primary-color, 0.1);
+          border-color: rgba(variables.$primary-color, 0.3);
+          box-shadow: 0 4px 6px rgba(variables.$primary-color, 0.1);
 
           svg {
             transform: scale(1.15);
@@ -225,12 +273,12 @@
 
       &.delete,
       &.lock {
-        color: $error-color;
+        color: variables.$error-color;
 
         &:hover {
           background: white;
-          border-color: rgba($error-color, 0.3);
-          box-shadow: 0 4px 6px rgba($error-color, 0.1);
+          border-color: rgba(variables.$error-color, 0.3);
+          box-shadow: 0 4px 6px rgba(variables.$error-color, 0.1);
 
           svg {
             transform: scale(1.15);
@@ -251,6 +299,20 @@
           }
         }
       }
+
+      &.preview {
+        color: #0891b2;
+
+        &:hover {
+          background: white;
+          border-color: rgba(8, 145, 178, 0.3);
+          box-shadow: 0 4px 6px rgba(8, 145, 178, 0.1);
+
+          svg {
+            transform: scale(1.15);
+          }
+        }
+      }
     }
   }
 }
@@ -262,7 +324,7 @@
   right: 0;
   bottom: 0;
   background: rgba(255, 255, 255, 0.7);
-  @include flex-center;
+  @include mixins.flex-center;
   z-index: 10;
   backdrop-filter: blur(1.5px);
 }
@@ -270,9 +332,9 @@
 .spinner {
   width: 28px;
   height: 28px;
-  border: 3px solid rgba($primary-color, 0.15);
+  border: 3px solid rgba(variables.$primary-color, 0.15);
   border-radius: 50%;
-  border-top-color: $primary-color;
+  border-top-color: variables.$primary-color;
   animation: spin 0.8s cubic-bezier(0.6, 0.2, 0.2, 0.8) infinite;
 }
 
@@ -293,7 +355,7 @@
   flex-wrap: wrap;
   gap: 16px;
   font-size: 13.5px;
-  color: $text-secondary;
+  color: variables.$text-secondary;
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
 
@@ -301,7 +363,7 @@
     flex: 1;
 
     strong {
-      color: $text-primary;
+      color: variables.$text-primary;
       font-weight: 600;
     }
   }
@@ -314,24 +376,24 @@
     flex: 1;
 
     button {
-      @include flex-center;
+      @include mixins.flex-center;
       width: 32px;
       height: 32px;
       border-radius: 50%;
       border: 1px solid #e2e8f0;
       background: white;
-      color: $text-secondary;
+      color: variables.$text-secondary;
       font-size: 16px;
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 
       &:hover:not(:disabled) {
-        background: rgba($primary-color, 0.08);
-        color: $primary-color;
-        border-color: rgba($primary-color, 0.4);
+        background: rgba(variables.$primary-color, 0.08);
+        color: variables.$primary-color;
+        border-color: rgba(variables.$primary-color, 0.4);
         transform: translateY(-2px);
-        box-shadow: 0 4px 6px -1px rgba($primary-color, 0.15), 0 2px 4px -1px rgba($primary-color, 0.05);
+        box-shadow: 0 4px 6px -1px rgba(variables.$primary-color, 0.15), 0 2px 4px -1px rgba(variables.$primary-color, 0.05);
       }
 
       &:active:not(:disabled) {
@@ -350,13 +412,13 @@
 
     .current-page-display {
       font-weight: 600;
-      color: $primary-color;
+      color: variables.$primary-color;
       padding: 0 14px;
       font-size: 13px;
       min-width: 70px;
       text-align: center;
-      background: rgba($primary-color, 0.05);
-      border: 1px solid rgba($primary-color, 0.1);
+      background: rgba(variables.$primary-color, 0.05);
+      border: 1px solid rgba(variables.$primary-color, 0.1);
       border-radius: 16px;
       height: 30px;
       display: flex;
@@ -381,7 +443,7 @@
       background-repeat: no-repeat;
       background-position: right 8px center;
       background-size: 14px;
-      color: $text-primary;
+      color: variables.$text-primary;
       outline: none;
       cursor: pointer;
       font-size: 13px;
@@ -391,8 +453,8 @@
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 
       &:focus {
-        border-color: $primary-color;
-        box-shadow: 0 0 0 3px rgba($primary-color, 0.15);
+        border-color: variables.$primary-color;
+        box-shadow: 0 0 0 3px rgba(variables.$primary-color, 0.15);
       }
 
       &:hover {

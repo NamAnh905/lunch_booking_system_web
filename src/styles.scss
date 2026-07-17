@@ -1,7 +1,34 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+@use './styles/variables';
+@use './styles/mixins';
 @import '@fortawesome/fontawesome-free/css/all.min.css';
-@import './styles/variables';
-@import './styles/mixins';
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+html {
+  @include mat.theme((
+    color: mat.$azure-palette,
+    typography: (
+      plain-family: var(--font-sans-serif),
+      brand-family: var(--font-sans-serif)
+    ),
+    density: 0
+  ));
+}
+
+.mat-datepicker-content:has(.custom-date-picker-overlay) {
+  --mat-datepicker-calendar-container-background-color: #ffffff;
+  --mat-datepicker-calendar-container-shape: 12px;
+  --mat-datepicker-calendar-container-elevation-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+  .mat-calendar {
+    width: 320px;
+  }
+
+  .mat-calendar-content {
+    padding: 0 12px 12px;
+  }
+}
 
 * {
   box-sizing: border-box;
@@ -11,8 +38,8 @@
 
 body {
   font-family: var(--font-sans-serif);
-  background-color: $bg-color;
-  color: $text-primary;
+  background-color: variables.$bg-color; /* Đã thêm variables. */
+  color: variables.$text-primary;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;

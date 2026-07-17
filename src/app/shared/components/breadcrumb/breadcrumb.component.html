@@ -1,6 +1,5 @@
 <nav class="breadcrumb-nav" aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <!-- Root Home Icon -->
     <li class="breadcrumb-item">
       <a routerLink="/statistic" class="breadcrumb-link home-link" title="Trang chủ">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none"
@@ -11,7 +10,6 @@
       </a>
     </li>
 
-    <!-- Dynamic Path Segments -->
     <li *ngFor="let item of breadcrumbs; let last = last" class="breadcrumb-item" [class.active]="last"
       [aria-current]="last ? 'page' : null">
       <span class="separator">/</span>

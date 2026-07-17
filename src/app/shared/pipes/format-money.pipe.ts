@@ -13,7 +13,6 @@ export class FormatMoneyPipe implements PipeTransform {
     if (isNaN(num)) {
       return '0 VNĐ';
     }
-    // Formats e.g. 25000 -> 25,000
     const formatted = num.toLocaleString('en-US');
     return `${formatted} VNĐ`;
   }

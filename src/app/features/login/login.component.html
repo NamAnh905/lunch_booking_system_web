@@ -1,21 +1,17 @@
 <div class="login-page">
   <app-user-navbar [showUserMenu]="false"></app-user-navbar>
 
-  <!-- Main Content -->
   <main class="login-main">
     <div class="container">
       <div class="row-center">
-        <!-- System Logo Image (HT.png includes the dotted background and title text) -->
         <div class="logo-section">
           <img src="assets/images/HT.png" alt="Hệ Thống Đặt Cơm" class="lunch-system-logo" />
         </div>
 
-        <!-- Login Card -->
         <div class="login-card">
           <div class="card-header">Đăng nhập</div>
           <div class="card-body">
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-              <!-- Username input row -->
               <div class="form-group row">
                 <label for="username" class="col-label">Tên đăng nhập</label>
                 <div class="col-input">
@@ -34,7 +30,6 @@
                 </div>
               </div>
 
-              <!-- Password input row -->
               <div class="form-group row">
                 <label for="password" class="col-label">Mật khẩu</label>
                 <div class="col-input position-relative">
@@ -69,7 +64,6 @@
                 </div>
               </div>
 
-              <!-- Remember me checkbox row -->
               <div class="form-group row offset-row">
                 <div class="col-input">
                   <div class="form-check">
@@ -81,7 +75,6 @@
                 </div>
               </div>
 
-              <!-- Login Button row -->
               <div class="form-group row offset-row button-row">
                 <div class="col-input">
                   <button type="submit" class="btn btn-primary" [disabled]="loading">

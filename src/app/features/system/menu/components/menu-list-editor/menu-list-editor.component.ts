@@ -14,11 +14,6 @@ import { MenuSlotService, MenuSlot } from '../../services/menu-slot.service';
 import { MenuFacade } from '../../menu.facade';
 import { toIsoDate, toDisplayDate, getMonday } from '@shared/utils/date.util';
 
-/**
- * Trình soạn thực đơn dạng Danh sách (grid theo tuần x suất ăn).
- * Đây chính là UI grid cũ, được tách ra thành overlay để dùng lại nguyên vẹn.
- * Phát sự kiện (close) để màn danh sách cha tải lại bảng.
- */
 @Component({
   selector: 'app-menu-list-editor',
   standalone: true,
@@ -46,7 +41,6 @@ export class MenuListEditorComponent implements OnInit {
   weekDays: { name: string; dateStr: string; label: string }[] = [];
   menuGrid: { [key: string]: Menu } = {};
 
-  // Inline slot editing state
   activeEditSlot: { dateStr: string; priceId: number; slotIndex: number; expectedType: DishType } | null = null;
   dishSearchKeyword = '';
 

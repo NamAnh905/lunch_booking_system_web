@@ -66,7 +66,6 @@
     </div>
   </div>
 
-  <!-- OVERVIEW CALENDAR MODE -->
   <div class="overview-mode-container" *ngIf="viewMode === 'overview'">
     <div class="legend-container">
       <div class="legend-item">
@@ -100,29 +99,28 @@
     </div>
   </div>
 
-  <!-- LIST VIEW MODE -->
   @if (viewMode === 'list') {
   <div class="crud-container">
     <div class="crud-body">
       <table class="data-table">
         <thead>
           <tr>
-            <th class="text-center" style="width: 60px;">STT</th>
+            <th class="stt-col">STT</th>
             <th>Họ và Tên</th>
-            <th>Phòng ban</th>
-            <th>Tổng suất ăn</th>
-            <th>Tổng tiền ăn</th>
+            <th class="dept-col">Phòng ban</th>
+            <th class="count-col">Tổng suất ăn</th>
+            <th class="money-col">Tổng tiền ăn</th>
             <th class="action-column">Thao tác</th>
           </tr>
         </thead>
         <tbody>
           @for (item of items; track item.userId; let i = $index) {
           <tr>
-            <td class="text-center">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-            <td>{{ item.fullName }}</td>
-            <td>{{ item.departmentName }}</td>
-            <td>{{ item.normalMealCount + item.specialMealCount }}</td>
-            <td>{{ item.totalAmount | formatMoney }}</td>
+            <td class="stt-col">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+            <td [title]="item.fullName">{{ item.fullName }}</td>
+            <td class="dept-col" [title]="item.departmentName">{{ item.departmentName }}</td>
+            <td class="count-col">{{ item.normalMealCount + item.specialMealCount }}</td>
+            <td class="money-col">{{ item.totalAmount | formatMoney }}</td>
             <td class="action-column">
               @if (item.hasData) {
               <div class="row-actions">
@@ -149,14 +147,12 @@
       </table>
     </div>
 
-    <!-- Pagination Footer -->
     <div class="crud-footer">
       <div class="pagination-info">
         Hiển thị từ <strong>{{ startItem }}</strong> đến <strong>{{ endItem }}</strong> trong tổng số <strong>{{
           totalItems }}</strong> bản ghi
       </div>
 
-      <!-- Navigation Arrows -->
       <div class="pagination-buttons">
         <button [disabled]="currentPage === 1" (click)="onPageChange(1)" title="Trang đầu">
           &laquo;
@@ -177,7 +173,6 @@
         </button>
       </div>
 
-      <!-- Items Per Page selector -->
       <div class="page-size-selector">
         <span>Số dòng / trang:</span>
         <select [ngModel]="pageSize" (ngModelChange)="onSizeChange($event)">

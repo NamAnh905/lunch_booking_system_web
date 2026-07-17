@@ -48,19 +48,16 @@
           <tbody>
             @for (price of availablePrices; track price.id) {
               <tr>
-                <!-- Price category details -->
                 <td class="price-category-cell">
                   <div class="category-name">{{ price.name }}</div>
                   <div class="category-amount">{{ price.amount | number }} VNĐ</div>
                 </td>
 
-                <!-- Cells for each day of the week -->
                 @for (day of weekDays; track day.dateStr) {
                   <td class="menu-grid-cell">
                     @let menu = getMenuAt(day.dateStr, price.id!);
                     @let slots = getMenuSlots(menu, day.name, price);
 
-                    <!-- Menu Header (Status & Delete menu) -->
                     @if (menu && slots.length > 0) {
                       <div class="menu-cell-header">
                         <span class="status-clean" [class.active]="menu.status === 'ACTIVE'" [class.inactive]="menu.status !== 'ACTIVE'" (click)="onToggleCellStatus(menu)" title="Click để thay đổi trạng thái">
@@ -76,7 +73,6 @@
                       </div>
                     }
 
-                    <!-- 7 Rows of Menu Slots -->
                     @if (slots.length > 0) {
                       <div class="menu-slots-container" [class.inactive-menu]="menu && menu.status === 'INACTIVE'">
                         @for (slot of slots; track $index; let idx = $index) {
@@ -96,7 +92,6 @@
                               </button>
                             }
 
-                            <!-- Dropdown search popup -->
                             @if (activeEditSlot && activeEditSlot.dateStr === day.dateStr && activeEditSlot.priceId === price.id && activeEditSlot.slotIndex === idx) {
                               <div class="slot-dropdown-popup" (click)="$event.stopPropagation()">
                                 <div class="dropdown-search-box">
@@ -139,7 +134,6 @@
   </div>
 </div>
 
-<!-- Backdrop to close active dropdowns -->
 @if (activeEditSlot) {
   <div class="dropdown-backdrop" (click)="activeEditSlot = null"></div>
 }

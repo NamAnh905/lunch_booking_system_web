@@ -18,10 +18,6 @@ export interface WeeklyMenuGrid {
   menuGrid: MenuGridRow[];
 }
 
-/**
- * Dựng lưới thực đơn tuần (Thứ Hai -> Thứ Sáu) từ danh sách menu trả về từ API.
- * Trích từ `MealOrderComponent.buildMenuGrid` — logic thuần.
- */
 @Injectable({ providedIn: 'root' })
 export class WeeklyMenuGridBuilder {
   private readonly dayNames = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu'];
@@ -29,7 +25,6 @@ export class WeeklyMenuGridBuilder {
   build(menus: any[], monday: Date): WeeklyMenuGrid {
     const gridDays = this.buildGridDays(monday);
 
-    // Gom menu theo priceId (loại bữa sáng).
     const priceGroups = new Map<number, { name: string; amount: number; menus: any[] }>();
     for (const m of menus) {
       if (!m || !m.price) continue;

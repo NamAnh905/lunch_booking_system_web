@@ -3,11 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { TicketExchangeResponse } from '@shared/models';
+import { ticketStatusLabel } from './ticket-status.util';
 
-/**
- * Presentation component (dumb): hiển thị danh sách vé trên chợ chung.
- * Không tự gọi API — chỉ nhận dữ liệu qua input và phát sự kiện "claim".
- */
 @Component({
   selector: 'app-market-tickets-list',
   standalone: true,
@@ -22,4 +19,6 @@ export class MarketTicketsListComponent {
   isLoading = input(false);
 
   claim = output<TicketExchangeResponse>();
+
+  statusLabel = ticketStatusLabel;
 }

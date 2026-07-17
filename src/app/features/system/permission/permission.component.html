@@ -4,17 +4,7 @@
   (add)="onAdd()">
 
   <div crud-filters class="filters">
-    <div class="search-wrapper">
-      <input type="text" placeholder="Tìm kiếm quyền (Action, Mô tả)..." [(ngModel)]="query.keyword"
-        (keyup.enter)="onSearch()" class="search-input">
-      <button class="search-btn" (click)="onSearch()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-      </button>
-    </div>
+    <app-crud-search placeholder="Tìm kiếm quyền (Action, Mô tả)..." [(value)]="query.keyword" (search)="onSearch()" />
   </div>
 
   <table crud-table class="data-table">
@@ -24,9 +14,9 @@
           <input type="checkbox" (change)="toggleAll($event)"
             [checked]="selections.length === data.length && data.length > 0">
         </th>
-        <th class="text-center" style="width: 60px;">STT</th>
-        <th class="action-col">Mã Quyền (Action)</th>
-        <th class="desc-col">Mô tả</th>
+        <th class="stt-col">STT</th>
+        <th class="code-col">Mã Quyền</th>
+        <th>Mô tả</th>
         <th class="action-column">Thao tác</th>
       </tr>
     </thead>
@@ -36,26 +26,11 @@
         <td class="checkbox-col">
           <input type="checkbox" [checked]="isSelected(item)" (change)="toggleSelection(item)">
         </td>
-        <td class="text-center">{{ (page - 1) * size + i + 1 }}</td>
-        <td>{{ item.action }}</td>
-        <td>{{ item.description }}</td>
+        <td class="stt-col">{{ (page - 1) * size + i + 1 }}</td>
+        <td class="code-col" [title]="item.action">{{ item.action }}</td>
+        <td [title]="item.description">{{ item.description }}</td>
         <td class="action-column">
-          <div class="row-actions">
-            <button class="btn-icon edit" (click)="onEditRow(item)" title="Sửa">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-            </button>
-            <button class="btn-icon delete" (click)="onDeleteRow(item)" title="Xóa">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-            </button>
-          </div>
+          <app-crud-actions (edit)="onEditRow(item)" (delete)="onDeleteRow(item)" />
         </td>
       </tr>
       }
@@ -68,7 +43,6 @@
   </table>
 </app-crud>
 
-<!-- Form Modal -->
 <app-form-modal
   [open]="isFormOpen"
   [title]="formMode === 'add' ? 'Thêm Quyền' : 'Cập nhật Quyền'"

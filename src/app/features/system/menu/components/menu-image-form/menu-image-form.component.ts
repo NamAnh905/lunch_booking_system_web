@@ -7,10 +7,6 @@ import { MenuService } from '../../menu.service';
 import { Menu, MenuImageCreateRequest } from '@shared/models/menu.model';
 import { toIsoDate, toDisplayDate, getMonday } from '@shared/utils/date.util';
 
-/**
- * Modal thêm/sửa thực đơn dạng Hình ảnh (theo tuần).
- * Luồng upload 2 bước: tải ảnh lên Cloudinary lấy URL, sau đó lưu menu.
- */
 @Component({
   selector: 'app-menu-image-form',
   standalone: true,
@@ -53,7 +49,6 @@ export class MenuImageFormComponent implements OnInit {
     }
   }
 
-  /** Nhãn hiển thị tuần đang chọn (Thứ Hai của tuần). */
   get weekLabel(): string {
     if (!this.form.weekDate) return '';
     const monday = getMonday(new Date(this.form.weekDate));
