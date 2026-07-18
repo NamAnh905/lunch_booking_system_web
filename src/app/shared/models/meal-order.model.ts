@@ -1,3 +1,10 @@
+export interface DepartmentMemberOrder {
+  fullName: string;
+  departmentName: string;
+  hasOrdered: boolean;
+  isSpecial: boolean;
+}
+
 export interface CalendarDay {
   dayNumber: number | null;
   dateString: string;

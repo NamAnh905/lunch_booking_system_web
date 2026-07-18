@@ -7,9 +7,9 @@ import { AuthService } from '@core/auth/auth.service';
 import { OrderResponse, OrderItemRequest } from '@shared/models';
 import Swal from 'sweetalert2';
 
-import { CalendarDay } from '@shared/models/meal-order.model';
+import { CalendarDay, DepartmentMemberOrder } from '@shared/models/meal-order.model';
 import { FormatMoneyPipe } from '../../../shared/pipes/format-money.pipe';
-import { MoneyShortPipe } from '@shared/pipes/money-short.pipe';
+import { DepartmentMealListModalComponent } from './components/department-meal-list-modal/department-meal-list-modal.component';
 import { MealCalendarService } from './services/meal-calendar.service';
 import { MealSummaryCalculator } from './services/meal-summary.calculator';
 import { WeeklyMenuGridBuilder } from './services/weekly-menu-grid.builder';
@@ -19,11 +19,12 @@ import { BusinessConfigService, formatVnTime } from '@core/services/business-con
 import { OrderStatus } from '@shared/enums';
 import { MenuType } from '@shared/enums/menu-type.enum';
 import { toIsoDate, getWeekRange } from '@shared/utils/date.util';
+import { formatMoneyShort } from '@shared/utils/money.util';
 
 @Component({
   selector: 'app-meal-order',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormatMoneyPipe],
+  imports: [CommonModule, RouterModule, FormatMoneyPipe, DepartmentMealListModalComponent],
   templateUrl: './meal-order.component.html',
   styleUrl: './meal-order.component.scss',
   providers: [MealOrderFacade]
@@ -37,7 +38,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
   private menuGridBuilder = inject(WeeklyMenuGridBuilder);
   private facade = inject(MealOrderFacade);
   private businessConfig = inject(BusinessConfigService);
-  private moneyShort = new MoneyShortPipe();
 
   get cutOffTimeLabel(): string {
     return formatVnTime(this.businessConfig.cutOffTime);
@@ -64,6 +64,8 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
   private originalState = new Map<string, boolean>();
 
   showMenuModal = false;
+  showDepartmentList = false;
+  departmentMembers: DepartmentMemberOrder[] = [];
   menuGrid: {
     priceName: string,
     priceAmount: number,
@@ -203,8 +205,8 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
         icon: 'question',
         showDenyButton: true,
         showCancelButton: true,
-        confirmButtonText: `Suất đặc biệt (${this.moneyShort.transform(this.specialPricePerMeal)})`,
-        denyButtonText: `Suất thường (${this.moneyShort.transform(this.pricePerMeal)})`,
+        confirmButtonText: `Suất đặc biệt (${formatMoneyShort(this.specialPricePerMeal)})`,
+        denyButtonText: `Suất thường (${formatMoneyShort(this.pricePerMeal)})`,
         cancelButtonText: 'Hủy',
         confirmButtonColor: SWAL_COLORS.SPECIAL,
         denyButtonColor: SWAL_COLORS.NORMAL,
@@ -299,6 +301,17 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
 
   closeMenuModal(): void {
     this.showMenuModal = false;
+  }
+
+  openDepartmentList(): void {
+    this.mealOrderService.getDepartmentToday().subscribe((res) => {
+      this.departmentMembers = res.result || [];
+      this.showDepartmentList = true;
+    });
+  }
+
+  closeDepartmentList(): void {
+    this.showDepartmentList = false;
   }
 
   goToTicketExchange(): void {

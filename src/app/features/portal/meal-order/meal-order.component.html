@@ -2,25 +2,30 @@
     <div class="container tickets">
         <h1 style="color: #004b8c">Hệ thống đăng ký cơm trưa cho nhân viên</h1>
         <div class="container-cover" style="box-shadow: 0px 3px 8px 0px #888888;border-radius: 8px;">
-            <div class="container">
+            <div class="container meal-header">
                 <div class="col-md-12">
-                    <h5>Ngày {{ selectedDay }}/{{ currentMonth + 1 }}/{{ currentYear }}</h5>
-                    <div class="notify" style="color: black">
-                        <p><i style="color: red">Chú ý: đăng ký ăn trưa trước {{ cutOffTimeLabel }} !!</i></p>
+                    <div class="header-info">
+                        <h5>Ngày {{ selectedDay }}/{{ currentMonth + 1 }}/{{ currentYear }}</h5>
+                        <div class="notify" style="color: black">
+                            <p><i style="color: red">Chú ý: đăng ký ăn trưa trước {{ cutOffTimeLabel }} !!</i></p>
+                        </div>
                     </div>
                 </div>
+                <a href="javascript:void(0)" class="btn btn-secondary-outline btn-dept-list" (click)="openDepartmentList()">
+                    Danh sách đặt vé
+                </a>
             </div>
             <div class="lunch-selector">
                 <div class="lunch-date">
                     <div class="selector">
                         <div class="calander"></div>
                     </div>
-                    <div class="container">
+                    <div class="container meal-body">
                         <div class="row lunch-columns">
                             <div id="days" class="col" style="padding: 31.969px 0">
                                 <div class="calendar" style="width: 100%">
                                     <section class="ftco-section" style="margin: 0; padding: 0">
-                                        <div class="container">
+                                        <div class="container calendar-inner">
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="elegant-calencar d-md-flex"
@@ -133,9 +138,9 @@
                                         </div>
                                     </div>
                                     <div class="summary-actions">
-                                        <a id="allday" class="btn btn-info text-white btn-select-all" (click)="toggleSelectAll()">{{ isAllSelected ? 'Bỏ chọn tất cả' : 'Chọn tất cả' }}</a>
-                                        <a href="javascript:void(0)" class="btn btn-warning text-dark" (click)="goToTicketExchange()">Pass vé</a>
-                                        <a href="javascript:void(0)" class="btn btn-info text-white" (click)="viewMenu()">Xem thực đơn</a>
+                                        <a id="allday" class="btn btn-secondary-outline btn-select-all" (click)="toggleSelectAll()">{{ isAllSelected ? 'Bỏ chọn tất cả' : 'Chọn tất cả' }}</a>
+                                        <a href="javascript:void(0)" class="btn btn-secondary-outline" (click)="goToTicketExchange()">Pass vé</a>
+                                        <a href="javascript:void(0)" class="btn btn-secondary-outline" (click)="viewMenu()">Xem thực đơn</a>
                                     </div>
                                 </div>
                             </div>
@@ -143,7 +148,7 @@
                     </div>
                 </div>
                 <form id="ticketstore">
-                    <div class="container">
+                    <div class="container save-bar">
                         <div class="row justify-content-center">
                             <div class="col-12 text-center" style="padding-top: 1%;">
                                 <button type="button" class="btn btn-primary register" id="update" [disabled]="loading"
@@ -243,4 +248,9 @@
         </div>
     </div>
 </div>
+}
+
+@if (showDepartmentList) {
+<app-department-meal-list-modal [members]="departmentMembers" (close)="closeDepartmentList()">
+</app-department-meal-list-modal>
 }

@@ -1,0 +1,83 @@
+<div class="dept-modal-overlay" (click)="onClose()">
+  <div class="dept-modal" (click)="$event.stopPropagation()">
+    <div class="dept-modal-header">
+      <div class="title-block">
+        <h3>Danh sách đặt cơm hôm nay</h3>
+        <span class="subtitle" *ngIf="departmentName">Phòng: {{ departmentName }}</span>
+      </div>
+      <button type="button" class="close-btn" (click)="onClose()" aria-label="Đóng">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="dept-modal-toolbar">
+      <div class="filter-group">
+        <button type="button" class="filter-chip" [class.active]="selectedFilter === 'ALL'"
+          (click)="setFilter('ALL')">
+          Tất cả <span class="count">{{ members.length }}</span>
+        </button>
+        <button type="button" class="filter-chip ordered" [class.active]="selectedFilter === 'ORDERED'"
+          (click)="setFilter('ORDERED')">
+          Đã đặt cơm <span class="count">{{ orderedCount }}</span>
+        </button>
+        <button type="button" class="filter-chip not-ordered" [class.active]="selectedFilter === 'NOT_ORDERED'"
+          (click)="setFilter('NOT_ORDERED')">
+          Không đặt <span class="count">{{ notOrderedCount }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="dept-modal-body">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="stt-col">STT</th>
+            <th>Họ và Tên</th>
+            <th class="dept-col">Phòng ban</th>
+            <th class="status-col">Trạng thái</th>
+            <th class="status-col">Loại suất ăn</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (member of filteredMembers; track $index; let i = $index) {
+          <tr>
+            <td class="stt-col">{{ i + 1 }}</td>
+            <td [title]="member.fullName || 'N/A'">{{ member.fullName || 'N/A' }}</td>
+            <td class="dept-col" [title]="member.departmentName || 'N/A'">{{ member.departmentName || 'N/A' }}</td>
+            <td class="status-col">
+              <span class="status-clean" [class.active]="member.hasOrdered" [class.inactive]="!member.hasOrdered">
+                <span class="status-dot"></span> {{ member.hasOrdered ? 'Đã đặt' : 'Không đặt' }}
+              </span>
+            </td>
+            <td class="status-col">
+              @if (member.hasOrdered) {
+                @if (member.isSpecial) {
+                <span class="meal-type-special">Tăng cường</span>
+                } @else {
+                <span class="meal-type-normal">Thường</span>
+                }
+              } @else {
+                <span class="text-muted">---</span>
+              }
+            </td>
+          </tr>
+          }
+          @if (filteredMembers.length === 0) {
+          <tr>
+            <td colspan="5" class="text-center empty-state">Không có dữ liệu</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="dept-modal-footer">
+      <span class="footer-info">
+        Tổng <strong>{{ members.length }}</strong> người &middot;
+        Đã đặt <strong>{{ orderedCount }}</strong> &middot;
+        Không đặt <strong>{{ notOrderedCount }}</strong>
+      </span>
+      <button type="button" class="btn-close-modal" (click)="onClose()">Đóng</button>
+    </div>
+  </div>
+</div>

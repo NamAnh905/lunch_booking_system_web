@@ -7,6 +7,38 @@ body {
   color: gray;
 }
 
+.container.meal-header {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-right: 0;
+}
+
+.meal-header .col-md-12 {
+  flex: 1;
+}
+
+.meal-header .header-info h5 {
+  margin: 0;
+}
+
+.meal-header .header-info .notify,
+.meal-header .header-info .notify p {
+  margin-bottom: 0;
+}
+
+@media (max-width: 576px) {
+  .meal-header {
+    padding-right: 15px;
+  }
+
+  .meal-header .btn-dept-list {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 a {
   -webkit-transition: .3s all ease;
   -o-transition: .3s all ease;
@@ -317,10 +349,14 @@ a:focus {
 .btn.btn-primary.register {
   background-color: #FCB71E;
   border: none;
-  border-radius: 25px;
-  width: 250px;
+  border-radius: 10px;
+  width: 200px;
   height: 55px;
-  font-size: 19px;
+  color: #1a1a1a;
+  font-family: var(--font-sans-serif);
+  font-style: normal;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .container.tickets {
@@ -816,6 +852,29 @@ tbody td#disabled:active {
   transform: scale(0.8);
 }
 
+.btn-secondary-outline {
+  background-color: #FCB71E;
+  color: #000000;
+  font-family: var(--font-sans-serif), "Poppins", sans-serif;
+  font-style: normal;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+.btn-secondary-outline:hover,
+.btn-secondary-outline:focus {
+  background-color: #FCB71E;
+  border-color: #000000;
+  color: #000000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.btn-dept-list {
+  font-size: 14px;
+}
+
 .btn-select-all {
   text-align: center;
   white-space: nowrap;
@@ -977,7 +1036,7 @@ tbody td.draft:before {
 
 #days .calendar,
 #days .ftco-section,
-#days .ftco-section .container,
+#days .ftco-section .calendar-inner,
 #days .ftco-section .row,
 #days .ftco-section .col-md-12,
 #days .elegant-calencar {
