@@ -1,10 +1,10 @@
 <div class="app-layout">
   @if (isAdminPage) {
-    <app-admin-sidebar></app-admin-sidebar>
+    <app-admin-sidebar [isSidebarOpen]="mobileSidebarOpen()" (closed)="closeMobileSidebar()"></app-admin-sidebar>
   }
   <main class="main-content">
     @if (isAdminPage) {
-      <app-admin-navbar [showBreadcrumb]="showBreadcrumb"></app-admin-navbar>
+      <app-admin-navbar [showBreadcrumb]="showBreadcrumb" (toggleSidebar)="toggleMobileSidebar()"></app-admin-navbar>
     } @else {
       <app-user-navbar></app-user-navbar>
     }

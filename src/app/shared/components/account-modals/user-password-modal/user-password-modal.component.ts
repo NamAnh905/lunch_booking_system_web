@@ -4,6 +4,7 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Va
 import Swal from 'sweetalert2';
 import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { ProfileService } from '@core/services/profile.service';
+import { ErrorHandlerService } from '@core/services/error-handler.service';
 
 function passwordsMatchValidator(group: AbstractControl): ValidationErrors | null {
   const newPassword = group.get('newPassword')?.value;
@@ -27,6 +28,7 @@ export class UserPasswordModalComponent implements OnChanges {
 
   private fb = inject(FormBuilder);
   private profileService = inject(ProfileService);
+  private errorHandler = inject(ErrorHandlerService);
 
   saving = false;
 
@@ -65,8 +67,7 @@ export class UserPasswordModalComponent implements OnChanges {
         error: (err) => {
           console.error('Đổi mật khẩu thất bại', err);
           this.saving = false;
-          const message = err?.error?.message || 'Đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu hiện tại.';
-          Swal.fire('Thất bại', message, 'error');
+          Swal.fire('Thất bại', this.errorHandler.getMessage(err), 'error');
         },
       });
   }

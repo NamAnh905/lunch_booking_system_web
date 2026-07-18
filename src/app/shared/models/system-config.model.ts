@@ -4,7 +4,7 @@ export interface SystemConfig {
   configValue?: string;
   description?: string;
   updatedBy?: number;
-  updatedAt?: string; // ISO Date string
+  updatedAt?: string;
 }
 
 export interface SystemConfigUpdateRequest {

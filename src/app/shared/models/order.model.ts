@@ -10,9 +10,9 @@ export interface Order {
   ticketSource?: string;
   originalUser?: User;
   isPrinted: boolean;
-  createdAt?: string; // ISO Date string
+  createdAt?: string;
   updatedBy?: number;
-  updatedAt?: string; // ISO Date string
+  updatedAt?: string;
 }
 
 export interface OrderItemRequest {

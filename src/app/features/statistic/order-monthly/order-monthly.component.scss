@@ -114,17 +114,35 @@
         button {
           padding: 8px 16px;
           border: none;
+          outline: none;
           background: transparent;
           border-radius: 6px;
           font-size: 14px;
           font-weight: 500;
           color: #64748b;
           cursor: pointer;
-          transition: all 0.2s;
+          -webkit-tap-highlight-color: transparent;
+          transition: background-color 0.25s ease, color 0.25s ease,
+            box-shadow 0.25s ease;
+
+          &:focus,
+          &:focus-visible {
+            outline: none;
+            box-shadow: none;
+          }
+
+          &:hover:not(.active) {
+            color: #475569;
+            background: rgba(255, 255, 255, 0.6);
+          }
 
           &.active {
             background: white;
             color: #0ea5e9;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          }
+
+          &.active:focus-visible {
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           }
         }
@@ -339,5 +357,93 @@
       border-color: color.adjust(#13c2c2, $lightness: 6%, $space: hsl);
       box-shadow: rgba(19, 194, 194, 0.15) 0px 4px 12px;
     }
+  }
+}
+
+@media (max-width: 768px) {
+  .monthly-meal-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px;
+  }
+
+  .monthly-meal-container .header-section {
+    margin-bottom: 16px;
+  }
+  .monthly-meal-container .header-section h2 {
+    font-size: 18px;
+  }
+
+  .monthly-meal-container .summary-cards {
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .monthly-meal-container .summary-cards .card {
+    max-width: none;
+    flex: 1 1 100%;
+    padding: 16px;
+  }
+
+  .monthly-meal-container .filter-section {
+    margin-bottom: 16px;
+  }
+  .monthly-meal-container .filter-section .toolbar-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .monthly-meal-container .filter-section .toolbar-top .spacer {
+    display: none;
+  }
+  .monthly-meal-container .filter-section .toolbar-top .action-buttons {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .monthly-meal-container .filter-section .toolbar-top .action-buttons .btn-info {
+    flex: 1 1 auto;
+  }
+  .monthly-meal-container .filter-section .toolbar-top .view-toggle {
+    flex: 1 1 100%;
+  }
+  .monthly-meal-container .filter-section .toolbar-top .view-toggle button {
+    flex: 1;
+  }
+
+  .monthly-meal-container .overview-mode-container {
+    overflow-y: visible;
+    flex: none;
+  }
+  .monthly-meal-container .calendar-container .dense-grid {
+    gap: 10px;
+  }
+  .monthly-meal-container .calendar-container .dense-grid .dense-cell {
+    width: calc((100% - 30px) / 4);
+  }
+
+  .monthly-meal-container .crud-container {
+    height: auto;
+    flex: none;
+  }
+  .monthly-meal-container .crud-container .crud-body {
+    overflow-x: auto;
+    overflow-y: visible;
+    display: block;
+  }
+  .monthly-meal-container .crud-container .crud-body .data-table {
+    display: table;
+    table-layout: auto;
+    height: auto;
+    min-width: 680px;
+  }
+  .monthly-meal-container .crud-container .crud-body .data-table thead {
+    display: table-header-group;
+    width: 100%;
+  }
+  .monthly-meal-container .crud-container .crud-body .data-table tbody {
+    display: table-row-group;
+    overflow: visible;
+  }
+  .monthly-meal-container .crud-container .crud-body .data-table tbody tr {
+    display: table-row;
   }
 }

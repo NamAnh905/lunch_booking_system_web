@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { ApiResponse } from '@shared/models';
 import { UserResponse, ProfileUpdateRequest, ChangePasswordRequest } from '@shared/models/user.model';
+import { skipErrorToast } from '@core/interceptors/http-context.tokens';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +22,8 @@ export class ProfileService {
   }
 
   changePassword(body: ChangePasswordRequest): Observable<ApiResponse<void>> {
-    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/change-password`, body);
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/change-password`, body, {
+      context: skipErrorToast(),
+    });
   }
 }

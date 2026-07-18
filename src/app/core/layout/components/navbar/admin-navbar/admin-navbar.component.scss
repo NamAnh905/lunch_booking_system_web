@@ -12,6 +12,30 @@
   box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
 
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.sidebar-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: variables.$radius-sm;
+  color: variables.$text-primary;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f8fafc;
+  }
+}
+
 .user-profile-dropdown {
   position: relative;
   outline: none;
@@ -119,5 +143,35 @@
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+  }
+}
+
+@media (max-width: 767.98px) {
+  .admin-navbar {
+    padding: 0 16px;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+
+  app-breadcrumb {
+    display: none;
+  }
+
+  .user-profile-dropdown {
+    .user-trigger {
+      gap: 0;
+      padding: 4px;
+    }
+
+    .user-info {
+      display: none;
+    }
+
+    .dropdown-menu {
+      right: 0;
+      max-width: calc(100vw - 32px);
+    }
   }
 }

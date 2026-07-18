@@ -4,6 +4,7 @@ import { ApiResponse } from './base.model';
 export interface TokenResponse {
   token?: string;
   authenticated: boolean;
+  rememberMe?: boolean;
 }
 
 export interface UserClaims {

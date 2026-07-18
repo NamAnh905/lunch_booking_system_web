@@ -21,11 +21,8 @@ export class OrderMonthlyService {
     return this.http.get<{ result: MonthlyOrderSummaryResponse }>(this.summaryUrl, { params });
   }
 
-  // NOTE: This API currently doesn't exist in backend as per the required exact match (returning array of dates for a user)
-  // But we define it here and will suggest the backend developer to create it: GET /admin/orders/user/{userId}?fromDate=...&toDate=...
   getUserOrders(userId: number, fromDate: string, toDate: string): Observable<{ result: any[] }> {
     let params = new HttpParams().set('fromDate', fromDate).set('toDate', toDate);
-    // Suggest backend endpoint: /admin/orders/user/{userId}
     return this.http.get<{ result: any[] }>(`${this.adminOrderUrl}/user/${userId}`, { params });
   }
 

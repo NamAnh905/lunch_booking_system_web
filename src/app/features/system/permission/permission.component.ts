@@ -18,7 +18,7 @@ import { Permission, PermissionCreateRequest, PermissionUpdateRequest } from '@s
 })
 export class PermissionComponent extends BaseCrudComponent<Permission, { keyword?: string }, PermissionCreateRequest | PermissionUpdateRequest> implements OnInit {
   private permissionService = inject(PermissionService);
-  
+
   override ngOnInit() {
     super.ngOnInit();
   }
@@ -29,7 +29,7 @@ export class PermissionComponent extends BaseCrudComponent<Permission, { keyword
       add: (data: PermissionCreateRequest) => this.permissionService.createPermission(data),
       edit: (id: number, data: PermissionUpdateRequest) => this.permissionService.updatePermission(id, data),
       delete: (id: number) => this.permissionService.deletePermission(id)
-    } as any; 
+    } as any;
   }
 
   getDefaultForm(): any {
@@ -64,7 +64,6 @@ export class PermissionComponent extends BaseCrudComponent<Permission, { keyword
   }
 
   onExport() {
-    // Placeholder since the backend does not have an export API yet.
     alert('Tính năng xuất Excel đang được phát triển ở phía Backend!');
   }
 }

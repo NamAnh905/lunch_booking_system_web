@@ -6,7 +6,7 @@ export interface TicketExchange {
   order?: Order;
   buyer?: User;
   status: string;
-  createdAt?: string; // ISO Date string
+  createdAt?: string;
 }
 
 export interface TicketExchangeCreateRequest {

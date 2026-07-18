@@ -1,7 +1,7 @@
 import { Component, OnInit, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { CanComponentDeactivate } from '@core/guards/pending-changes-guard';
+import { CanComponentDeactivate } from '@core/guards/pending-changes.guard';
 import { MealOrderService } from './meal-order.service';
 import { AuthService } from '@core/auth/auth.service';
 import { OrderResponse, OrderItemRequest } from '@shared/models';
@@ -15,7 +15,7 @@ import { MealSummaryCalculator } from './services/meal-summary.calculator';
 import { WeeklyMenuGridBuilder } from './services/weekly-menu-grid.builder';
 import { MealOrderFacade } from './meal-order.facade';
 import { MEAL_PRICE, SWAL_COLORS } from '@shared/constants/business.constants';
-import { BusinessConfigService, formatVnTime } from '@shared/services/business-config.service';
+import { BusinessConfigService, formatVnTime } from '@core/services/business-config.service';
 import { OrderStatus } from '@shared/enums';
 import { MenuType } from '@shared/enums/menu-type.enum';
 import { toIsoDate, getWeekRange } from '@shared/utils/date.util';
@@ -61,21 +61,16 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
   orderMap: Record<string, OrderResponse> = {};
   originalOrders: OrderResponse[] = [];
 
-  /**
-   * Ảnh chụp trạng thái đăng ký gốc từ backend: key = 'YYYY-MM-DD', value = có phải suất đặc biệt.
-   * Ô nào có mặt trong map = đã đăng ký. Dùng để so sánh phát hiện thay đổi chưa lưu (dirty).
-   */
   private originalState = new Map<string, boolean>();
 
   showMenuModal = false;
-  menuGrid: { 
-    priceName: string, 
-    priceAmount: number, 
+  menuGrid: {
+    priceName: string,
+    priceAmount: number,
     maxDishes: number,
-    dishRows: { dayDishes: string[] }[] 
+    dishRows: { dayDishes: string[] }[]
   }[] = [];
   gridDays: { date: string, dayOfWeek: string }[] = [];
-  // Thực đơn dạng ảnh (fallback khi tuần không có thực đơn dạng danh sách)
   menuImageUrl: string | null = null;
   menuImageName = '';
   isLoadingMenu = false;
@@ -83,13 +78,11 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
   toastMessage = '';
   toastType: 'success' | 'danger' = 'success';
 
-  /** Ngày đại diện tháng đang xem — để hiển thị tên tháng qua DatePipe (bỏ mảng MONTH_NAMES cứng). */
   get headerDate(): Date {
     return new Date(this.currentYear, this.currentMonth, 1);
   }
 
   ngOnInit(): void {
-    // Clear cache mỗi khi vào trang (tránh dùng dữ liệu cũ sau khi mua/bán vé).
     this.facade.clearCache();
 
     this.facade.loadPrices().subscribe((prices) => {
@@ -107,7 +100,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
       this.menuMap = data.menuMap;
       this.registeredDates = data.registeredDates;
 
-      // Chụp lại trạng thái gốc để phát hiện thay đổi chưa lưu (dirty).
       this.originalState.clear();
       this.originalOrders.forEach((order) => {
         if (order.menuDate && order.status !== OrderStatus.CANCELLED) {
@@ -118,7 +110,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
 
       this.setupCalendar();
 
-      // Khôi phục cờ suất đặc biệt từ đơn trên backend sau khi dựng lịch.
       this.calendarDays.forEach((day) => {
         if (day.dayNumber && day.isRegistered && day.dateString) {
           const order = this.orderMap[day.dateString];
@@ -186,7 +177,7 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
 
   onDayClick(day: CalendarDay): void {
     if (!day.dayNumber || day.isDisabled) return;
-    
+
     if (day.isPastOrCutoff) {
       this.showToast('Đã qua giờ chốt, không thể thay đổi!', 'danger');
       return;
@@ -240,12 +231,10 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
   }
 
 
-  /** Các ô hợp lệ có thể chọn/bỏ chọn trong tháng (bỏ qua ô trống, ngày bị khoá, ngày đã qua giờ chốt). */
   private getSelectableDays(): CalendarDay[] {
     return this.calendarDays.filter(d => d.dayNumber !== null && !d.isDisabled && !d.isPastOrCutoff);
   }
 
-  /** True khi mọi ngày hợp lệ trong tháng đều đã được đăng ký (dùng để đổi text nút "Chọn tất cả"). */
   get isAllSelected(): boolean {
     const selectableDays = this.getSelectableDays();
     return selectableDays.length > 0 && selectableDays.every(d => d.isRegistered);
@@ -299,8 +288,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
     this.gridDays = grid.gridDays;
     this.menuGrid = grid.menuGrid;
 
-    // Fallback: nếu tuần không có thực đơn dạng danh sách nhưng có thực đơn dạng ảnh,
-    // hiển thị ảnh thay cho lưới.
     if (this.menuGrid.length === 0) {
       const imageMenu = menus.find((m) => m?.type === MenuType.IMAGE && m?.imageUrl);
       if (imageMenu) {
@@ -323,10 +310,8 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
   }
 
   saveRegistration(): void {
-    // Chuẩn hoá menuDate về dạng 'YYYY-MM-DD' để khớp với key trong registeredDates.
     const dateKey = (value: string): string => value.split('T')[0];
 
-    // Đơn gốc còn hiệu lực trên backend, tra cứu nhanh theo ngày.
     const activeOriginalOrders = this.originalOrders.filter(
       (o) => o.menuDate && o.status !== OrderStatus.CANCELLED
     );
@@ -344,8 +329,6 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
       if (!originalOrder) {
         datesToRegister.push({ orderDate: key, isSpecial });
       } else if ((originalOrder.isSpecial ?? false) !== isSpecial) {
-        // Đã đăng ký nhưng đổi loại suất (thường <-> đặc biệt):
-        // huỷ đơn cũ rồi tạo lại đơn mới với cờ suất đặc biệt tương ứng.
         ordersToCancel.push(originalOrder);
         datesToRegister.push({ orderDate: key, isSpecial });
       }
@@ -379,13 +362,12 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
       allowOutsideClick: false
     }).then((result) => {
       if (result.isConfirmed) {
-        this.loadData(); // Tải lại để làm mới mappings.
+        this.loadData();
       }
     });
   }
 
 
-  /** Một ô đang ở trạng thái nháp nếu trạng thái hiện tại khác với trạng thái gốc từ backend. */
   isDayDirty(day: CalendarDay): boolean {
     if (!day.dayNumber || !day.dateString) return false;
 
@@ -398,29 +380,22 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
     return false;
   }
 
-  /** Còn thay đổi chưa lưu nếu có bất kỳ ô nào khác trạng thái gốc. */
   get hasUnsavedChanges(): boolean {
     return this.calendarDays.some((day) => this.isDayDirty(day));
   }
 
-  /** Chặn F5 / đóng tab bằng hộp thoại cảnh báo mặc định của trình duyệt khi còn thay đổi chưa lưu. */
   @HostListener('window:beforeunload', ['$event'])
   onBeforeUnload(event: BeforeUnloadEvent): void {
     if (this.hasUnsavedChanges) {
       event.preventDefault();
-      event.returnValue = true; // Bắt buộc cho một số trình duyệt cũ để hiện cảnh báo.
+      event.returnValue = true;
     }
   }
 
-  /** Guard CanDeactivate gọi hàm này khi điều hướng nội bộ Angular. */
   canDeactivate(): boolean | Promise<boolean> {
     return this.confirmDiscardChanges();
   }
 
-  /**
-   * Xác nhận bỏ thay đổi chưa lưu. Trả về true nếu được phép tiếp tục (không dirty hoặc user đồng ý rời).
-   * Dùng chung cho guard CanDeactivate và chuyển tháng trong màn hình.
-   */
   private confirmDiscardChanges(): Promise<boolean> {
     if (!this.hasUnsavedChanges) return Promise.resolve(true);
 

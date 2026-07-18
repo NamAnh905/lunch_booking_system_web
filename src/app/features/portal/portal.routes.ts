@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { pendingChangesGuard } from '@core/guards/pending-changes-guard';
+import { pendingChangesGuard } from '@core/guards/pending-changes.guard';
 
 export const portalRoutes: Routes = [
   {

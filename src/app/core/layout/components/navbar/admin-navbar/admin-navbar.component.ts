@@ -1,8 +1,8 @@
-import { Component, inject, Input, HostListener, ElementRef } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
-import { LucideUser, LucideLogOut, LucideKeyRound, LucideUtensils } from '@lucide/angular';
+import { LucideUser, LucideLogOut, LucideKeyRound, LucideUtensils, LucideMenu } from '@lucide/angular';
 import { AuthService } from '../../../../auth/auth.service';
 import { UserProfileModalComponent } from '@shared/components/account-modals/user-profile-modal/user-profile-modal.component';
 import { UserPasswordModalComponent } from '@shared/components/account-modals/user-password-modal/user-password-modal.component';
@@ -18,6 +18,7 @@ import { UserPasswordModalComponent } from '@shared/components/account-modals/us
     LucideLogOut,
     LucideKeyRound,
     LucideUtensils,
+    LucideMenu,
     UserProfileModalComponent,
     UserPasswordModalComponent
   ],
@@ -26,7 +27,8 @@ import { UserPasswordModalComponent } from '@shared/components/account-modals/us
 })
 export class AdminNavbarComponent {
   @Input() showBreadcrumb = true;
-  
+  @Output() toggleSidebar = new EventEmitter<void>();
+
   private authService = inject(AuthService);
   private router = inject(Router);
   private elementRef = inject(ElementRef);
@@ -63,7 +65,6 @@ export class AdminNavbarComponent {
         this.router.navigate(['/login']);
       },
       error: () => {
-        // Fallback navigate to login even if API fails
         this.router.navigate(['/login']);
       }
     });

@@ -1,11 +1,5 @@
-
-/** Kiểu ngày trả về từ backend: chuỗi ISO hoặc mảng [y, m, d, hh?, mm?, ss?] (Jackson LocalDate/LocalDateTime). */
 export type BackendDate = string | number[] | null | undefined;
 
-/**
- * Định dạng `Date` -> `'YYYY-MM-DD'` theo **giờ địa phương**.
- * Cố ý KHÔNG dùng `toISOString()` vì hàm đó quy về UTC và có thể lệch 1 ngày ở múi giờ +07.
- */
 export function toIsoDate(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -19,10 +13,6 @@ export function toDisplayDate(date: Date): string {
   return `${day}/${month}/${date.getFullYear()}`;
 }
 
-/**
- * Parse giá trị ngày trả về từ backend về `Date`.
- * Trả về `null` nếu không hợp lệ (thay cho việc rải logic parse `[y, m, d]` khắp component).
- */
 export function parseBackendDate(value: BackendDate): Date | null {
   if (value == null) {
     return null;
@@ -35,7 +25,6 @@ export function parseBackendDate(value: BackendDate): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-/** Trả về ngày **Thứ Hai** của tuần chứa `date` (đã reset giờ về 00:00:00). */
 export function getMonday(date: Date): Date {
   const result = new Date(date);
   const day = result.getDay(); // 0 = Chủ Nhật
@@ -56,10 +45,6 @@ export interface WeekRange {
   end: string;
 }
 
-/**
- * Tính khoảng ngày làm việc `[Thứ Hai ... Thứ Hai + (workingDays - 1)]` của tuần chứa `base`.
- * Mặc định 5 ngày (Thứ Hai -> Thứ Sáu).
- */
 export function getWeekRange(base: Date, workingDays = 5): WeekRange {
   const monday = getMonday(base);
   const end = new Date(monday);

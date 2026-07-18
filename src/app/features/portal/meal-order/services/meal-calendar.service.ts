@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { CalendarDay } from '@shared/models/meal-order.model';
 import { OrderResponse } from '@shared/models';
 import { SOLAR_HOLIDAYS } from '@shared/constants/business.constants';
-import { BusinessConfigService } from '@shared/services/business-config.service';
+import { BusinessConfigService } from '@core/services/business-config.service';
 import { toIsoDate, isWeekend } from '@shared/utils/date.util';
 
 export interface BuildCalendarParams {
@@ -32,7 +32,6 @@ export class MealCalendarService {
       today.getHours() > cutHour ||
       (today.getHours() === cutHour && today.getMinutes() >= cutMinute);
 
-    // Sau giờ chốt -> chỉ chọn được từ ngày kia; trước giờ chốt -> từ ngày mai.
     const dayOffset = isPastCutoff ? 2 : 1;
     const earliestSelectableDate = new Date(todayStart.getTime() + dayOffset * 24 * 60 * 60 * 1000);
 
@@ -60,7 +59,7 @@ export class MealCalendarService {
         dayNumber: i,
         dateString: dateStr,
         isRegistered: isReg,
-        menuId: menuMap[dateStr]?.id, // id thực đơn thật từ BE (undefined nếu ngày chưa có thực đơn)
+        menuId: menuMap[dateStr]?.id,
         orderId: orderMap[dateStr]?.id,
         isPast: cellDate.getTime() < todayStart.getTime(),
         isDisabled,

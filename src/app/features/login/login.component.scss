@@ -51,7 +51,7 @@
 
 .login-card {
   width: 100%;
-  max-width: 580px; /* Aligns with col-md-7 column spacing */
+  max-width: 580px;
   background-color: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-radius: 0.25rem;
@@ -60,7 +60,7 @@
 }
 
 .card-header {
-  background-color: #FCB71E !important; /* Exact color of card header */
+  background-color: #FCB71E !important;
   border-bottom: none !important;
   color: #212529 !important;
   padding: 0.75rem 1.25rem;
@@ -69,7 +69,7 @@
 }
 
 .card-body {
-  background-color: #FFFAD5 !important; /* Exact light yellow-beige background */
+  background-color: #FFFAD5 !important;
   padding: 2.25rem 2.5rem;
 }
 
@@ -82,7 +82,7 @@
 }
 
 .col-label {
-  width: 33.333333%; /* Equivalent to col-md-4 spacing */
+  width: 33.333333%;
   text-align: right;
   padding-right: 1.5rem;
   font-size: 0.9rem;
@@ -92,13 +92,13 @@
 }
 
 .col-input {
-  width: 50%; /* Equivalent to col-md-6 spacing */
+  width: 50%;
   box-sizing: border-box;
-  position: relative; /* Mốc định vị cho .field-error nằm tuyệt đối bên dưới input */
+  position: relative;
 }
 
 .offset-row {
-  margin-left: 33.333333%; /* Equivalent to offset-md-4 */
+  margin-left: 33.333333%;
 }
 
 .form-control {
@@ -134,11 +134,6 @@
   }
 }
 
-/*
- * Text lỗi nằm TUYỆT ĐỐI ngay dưới input -> chiếm 0 không gian trong document flow,
- * nên việc ẩn/hiện (qua [style.visibility]) KHÔNG làm xê dịch layout (chống CLS).
- * Nằm gọn trong khoảng margin-bottom 1.25rem của .form-group.
- */
 .field-error {
   position: absolute;
   top: 100%;

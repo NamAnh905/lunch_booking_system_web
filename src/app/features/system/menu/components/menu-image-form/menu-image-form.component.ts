@@ -15,7 +15,6 @@ import { toIsoDate, toDisplayDate, getMonday } from '@shared/utils/date.util';
   styleUrl: './menu-image-form.component.scss'
 })
 export class MenuImageFormComponent implements OnInit {
-  /** Menu cần sửa; bỏ trống nghĩa là thêm mới. */
   @Input() menu: Menu | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
@@ -83,7 +82,6 @@ export class MenuImageFormComponent implements OnInit {
 
     this.loading = true;
 
-    // Có ảnh mới → upload trước rồi mới lưu; ngược lại dùng lại imageUrl cũ (khi sửa).
     if (this.selectedFile) {
       this.menuService.uploadImage(this.selectedFile).subscribe({
         next: (res) => {

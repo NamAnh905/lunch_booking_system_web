@@ -24,16 +24,9 @@
     <div class="toolbar-top">
       <div class="filters-inline">
         <div class="filter-item">
-          <select [(ngModel)]="selectedMonth" (change)="onFilterChange()">
-            @for (m of months; track m) {
-              <option [ngValue]="m">Tháng {{ m }}</option>
-            }
-          </select>
-        </div>
-        <div class="filter-item">
-          <select [(ngModel)]="selectedYear" (change)="onFilterChange()">
-            @for (y of years; track y) {
-              <option [ngValue]="y">{{ y }}</option>
+          <select [(ngModel)]="selectedPeriod" (change)="onPeriodChange()">
+            @for (p of periods; track p.value) {
+              <option [ngValue]="p.value">{{ p.label }}</option>
             }
           </select>
         </div>

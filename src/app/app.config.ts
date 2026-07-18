@@ -5,7 +5,7 @@ import { DATE_PIPE_DEFAULT_OPTIONS } from '@angular/common';
 import { catchError, of } from 'rxjs';
 
 import { routes } from './app.routes';
-import { jwtInterceptor } from './core/interceptors/jwt-interceptor';
+import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { csrfInterceptor } from './core/interceptors/csrf.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { AuthService } from './core/auth/auth.service';

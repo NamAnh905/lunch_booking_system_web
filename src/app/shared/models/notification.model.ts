@@ -6,7 +6,7 @@ export interface Notification {
   title: string;
   content: string;
   isRead: boolean;
-  createdAt?: string; // ISO Date string
+  createdAt?: string;
 }
 
 export interface NotificationSendRequest {

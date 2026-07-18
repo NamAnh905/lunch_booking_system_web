@@ -28,10 +28,6 @@ export class LoginComponent {
     password: 'Không được để trống mật khẩu',
   };
 
-  /**
-   * Map mã lỗi xác thực từ Backend (ApiResponse.code) sang { field, message }
-   * để hiển thị NGAY DƯỚI ô tương ứng như một lỗi validate — không dùng banner/toast.
-   */
   private readonly authErrors: Record<number, { field: string; message: string }> = {
     2001: { field: 'username', message: 'Tài khoản không tồn tại' },        // USER_NOT_FOUND
     2002: { field: 'username', message: 'Tài khoản đã bị khóa' },           // USER_LOCKED
@@ -40,7 +36,6 @@ export class LoginComponent {
 
   private readonly TOO_MANY_LOGIN_ATTEMPTS = 1004;
 
-  /** Lỗi trả về từ Backend, gắn theo tên field (được xoá ngay khi người dùng gõ lại). */
   private serverErrors: Record<string, string> = {};
 
   loading = false;
@@ -54,9 +49,6 @@ export class LoginComponent {
     this.serverErrors = {};
   }
 
-  /**
-   * Lỗi hiển thị dưới ô: ưu tiên lỗi Backend, sau đó tới lỗi required (on blur).
-   */
   getFieldError(fieldName: string): string {
     if (this.serverErrors[fieldName]) {
       return this.serverErrors[fieldName];
@@ -78,7 +70,6 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-    // Nút Submit luôn bật; nếu form trống/không hợp lệ thì lộ lỗi required, không gọi API.
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
@@ -87,9 +78,9 @@ export class LoginComponent {
     this.loading = true;
     this.clearServerErrors();
 
-    const { username, password } = this.loginForm.value;
+    const { username, password, rememberMe } = this.loginForm.value;
 
-    this.authService.login({ username, password }).subscribe({
+    this.authService.login({ username, password, rememberMe }).subscribe({
       next: (res) => {
         this.loading = false;
         if (res.authenticated) {

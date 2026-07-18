@@ -9,7 +9,6 @@ import { ConfirmService } from '../../../core/services/confirm.service';
 export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
   protected toastService = inject(ToastService);
 
-  /** Regex/độ dài dùng chung cho template form (đồng bộ với validation Backend). */
   readonly VALIDATION = VALIDATION_PATTERNS;
   readonly VALIDATION_LEN = VALIDATION_LENGTHS;
 
@@ -49,11 +48,10 @@ export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
   loadData(): void {
     this.loading = true;
     this.selections = []; // Clear selections on reload
-    // Spring Boot page is 0-indexed, so we subtract 1 for the API
     this.getService().query(this.query, this.page - 1, this.size).subscribe({
       next: (res) => {
         const pageData = (res as any).result !== undefined ? (res as any).result : res;
-        
+
         if (Array.isArray(pageData)) {
           this.data = pageData;
           this.total = pageData.length;
@@ -140,7 +138,7 @@ export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
         this.loading = true;
         const service = this.getService();
 
-        const deleteObservable = service.deleteMany 
+        const deleteObservable = service.deleteMany
           ? service.deleteMany(ids)
           : service.delete && ids.length === 1
             ? service.delete(ids[0])

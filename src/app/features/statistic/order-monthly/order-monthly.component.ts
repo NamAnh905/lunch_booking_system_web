@@ -27,28 +27,40 @@ export class OrderMonthlyComponent implements OnInit {
   selectedDepartmentIds: number[] = [];
   selectedDepartmentId: number | null = null;
   isExporting: boolean = false;
-  
+
   departments: DepartmentResponse[] = [];
   summary?: MonthlyOrderSummaryResponse;
-  
+
   viewMode: 'overview' | 'list' = 'overview';
-  
+
   daysInMonth: { day: number | null, date: Date | null, totalMeals: number, isPadding: boolean, isWeekend: boolean }[] = [];
-  
+
   currentPage: number = 1;
   pageSize: number = DEFAULT_PAGE_SIZE;
   totalItems: number = 0;
   items: any[] = [];
   allMergedItems: any[] = [];
   sizeOptions = [10, 20, 50, 100];
-  
+
   isModalOpen: boolean = false;
   selectedUserId?: number;
   selectedUserName?: string;
   selectedUserTotalMeals: number = 0;
 
-  months = Array.from({length: 12}, (_, i) => i + 1);
-  years = [this.selectedYear - 1, this.selectedYear, this.selectedYear + 1];
+  periods = Array.from({ length: 12 }, (_, i) => {
+    const date = new Date(this.selectedYear, this.selectedMonth - 1 - i, 1);
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return { value: `${year}-${month}`, label: `Tháng ${month}/${year}` };
+  });
+  selectedPeriod: string = `${this.selectedYear}-${this.selectedMonth}`;
+
+  onPeriodChange(): void {
+    const [year, month] = this.selectedPeriod.split('-');
+    this.selectedYear = Number(year);
+    this.selectedMonth = Number(month);
+    this.onFilterChange();
+  }
 
   setViewMode(mode: 'overview' | 'list'): void {
     this.viewMode = mode;
@@ -92,11 +104,11 @@ export class OrderMonthlyComponent implements OnInit {
         this.summary = res.summaryRes.result;
         let allUsers = res.usersRes.result || [];
         let fetchedItems = this.summary?.items || [];
-        
+
         let mergedItems = allUsers.map(user => {
           let item = fetchedItems.find(i => i.userId === user.id);
           let dept = this.departments.find(d => d.name === user.department);
-          
+
           return {
             userId: user.id,
             fullName: user.fullName,
@@ -127,16 +139,12 @@ export class OrderMonthlyComponent implements OnInit {
 
   generateCalendarGrid(): void {
     const daysInMonthCount = new Date(this.selectedYear, this.selectedMonth, 0).getDate();
-    
-    // Calculate weekday of the 1st day of the month (0 = Sunday, 1 = Monday, ...)
+
     const firstDayOfMonth = new Date(this.selectedYear, this.selectedMonth - 1, 1).getDay();
-    // Week starts on Monday (1), so if first day is Sunday (0), offset is 6.
-    // If first day is Monday (1), offset is 0.
     const offset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
-    
-    // Khởi tạo mảng mới hoàn toàn để ép Change Detection cập nhật đúng dữ liệu
+
     const newCalendarGrid: { day: number | null, date: Date | null, totalMeals: number, isPadding: boolean, isWeekend: boolean }[] = [];
-    
+
     for (let i = 0; i < offset; i++) {
       newCalendarGrid.push({ day: null, date: null, totalMeals: 0, isPadding: true, isWeekend: false });
     }
@@ -166,7 +174,7 @@ export class OrderMonthlyComponent implements OnInit {
           m = parseInt(parts[1], 10);
           dNum = parseInt(parts[2], 10);
         }
-        
+
         if (y === this.selectedYear && m === this.selectedMonth) {
           const cell = newCalendarGrid.find(c => c.day === dNum);
           if (cell) {
@@ -175,8 +183,7 @@ export class OrderMonthlyComponent implements OnInit {
         }
       });
     }
-    
-    // Gán lại reference mới cho biến template binding
+
     this.daysInMonth = [...newCalendarGrid];
   }
 
@@ -217,19 +224,19 @@ export class OrderMonthlyComponent implements OnInit {
 
   goToDailyDetail(date: Date | null): void {
     if (!date) return;
-    
+
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
     const formattedDate = `${yyyy}-${mm}-${dd}`;
-    
+
     this.router.navigate(['/statistic/order-daily'], { queryParams: { date: formattedDate } });
   }
 
   exportExcel(): void {
     this.isExporting = true;
     const deptId = this.selectedDepartmentId !== null ? this.selectedDepartmentId : undefined;
-    
+
     this.orderMonthlyService.exportMonthlyExcel(this.selectedMonth, this.selectedYear, deptId).subscribe({
       next: (blob) => {
         this.fileDownloadService.save(blob, EXCEL_FILE_NAMES.MONTHLY_ORDER_TRACKING(this.selectedMonth, this.selectedYear));

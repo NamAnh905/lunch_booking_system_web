@@ -65,7 +65,7 @@ export class AuthService {
       if (claims) {
         const userInfo = this.mapClaimsToUserInfo(claims);
         this.currentUserSubject.next(userInfo);
-        this.tokenStorage.setLoggedIn(true);
+        this.tokenStorage.setLoggedIn(true, tokenResult.rememberMe === true);
       }
     } else {
       this.clearSession();

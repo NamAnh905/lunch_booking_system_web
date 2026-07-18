@@ -9,7 +9,7 @@ export interface Payment extends BaseEntity {
   paymentMonth: number;
   paymentYear: number;
   note?: string;
-  paidAt?: string; // ISO Date string
+  paidAt?: string;
 }
 
 export interface PaymentCreateRequest {

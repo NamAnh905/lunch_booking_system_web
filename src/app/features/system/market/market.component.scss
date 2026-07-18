@@ -70,6 +70,27 @@
       }
     }
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+
+    .filter-group {
+      width: 100%;
+
+      > input[type="text"],
+      > input[type="date"],
+      > select {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+
+    .btn {
+      width: 100%;
+    }
+  }
 }
 
 :host ::ng-deep .filters .filter-group .mat-mdc-form-field {
@@ -156,6 +177,13 @@
 
   .mat-mdc-form-field-subscript-wrapper {
     display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  :host ::ng-deep .filters .filter-group .mat-mdc-form-field {
+    width: 100%;
+    min-width: 0;
   }
 }
 

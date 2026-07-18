@@ -38,7 +38,7 @@ html {
 
 body {
   font-family: var(--font-sans-serif);
-  background-color: variables.$bg-color; /* Đã thêm variables. */
+  background-color: variables.$bg-color;
   color: variables.$text-primary;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -48,4 +48,10 @@ body {
 thead th {
   font-weight: 700 !important;
   color: #000000 !important;
+}
+
+@media (max-width: 768px) {
+  .crud-header .crud-left-actions .filters {
+    width: 100%;
+  }
 }

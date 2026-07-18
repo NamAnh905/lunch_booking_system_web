@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ApiResponse, PageResponse, TicketExchangeCreateRequest, TicketExchangeResponse } from '@shared/models';
+import { skipErrorToast } from '@core/interceptors/http-context.tokens';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,10 @@ export class TicketExchangeService {
     if (keyword) {
       params = params.set('keyword', keyword);
     }
-    return this.http.get<ApiResponse<PageResponse<TicketExchangeResponse>>>(this.apiUrl, { params });
+    return this.http.get<ApiResponse<PageResponse<TicketExchangeResponse>>>(this.apiUrl, {
+      params,
+      context: skipErrorToast(),
+    });
   }
 
   getMyListedTickets(): Observable<ApiResponse<TicketExchangeResponse[]>> {
@@ -29,14 +33,20 @@ export class TicketExchangeService {
   }
 
   postTicket(request: TicketExchangeCreateRequest): Observable<ApiResponse<TicketExchangeResponse>> {
-    return this.http.post<ApiResponse<TicketExchangeResponse>>(this.apiUrl, request);
+    return this.http.post<ApiResponse<TicketExchangeResponse>>(this.apiUrl, request, {
+      context: skipErrorToast(),
+    });
   }
 
   withdrawTicket(exchangeId: number): Observable<ApiResponse<string>> {
-    return this.http.delete<ApiResponse<string>>(`${this.apiUrl}/${exchangeId}`);
+    return this.http.delete<ApiResponse<string>>(`${this.apiUrl}/${exchangeId}`, {
+      context: skipErrorToast(),
+    });
   }
 
   claimTicket(exchangeId: number): Observable<ApiResponse<TicketExchangeResponse>> {
-    return this.http.post<ApiResponse<TicketExchangeResponse>>(`${this.apiUrl}/${exchangeId}/claim`, {});
+    return this.http.post<ApiResponse<TicketExchangeResponse>>(`${this.apiUrl}/${exchangeId}/claim`, {}, {
+      context: skipErrorToast(),
+    });
   }
 }

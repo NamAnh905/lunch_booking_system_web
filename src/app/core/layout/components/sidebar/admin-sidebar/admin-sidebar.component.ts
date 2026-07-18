@@ -1,4 +1,4 @@
-import { Component, signal, Input } from '@angular/core';
+import { Component, signal, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import {
@@ -24,6 +24,9 @@ import {
   styleUrl: './admin-sidebar.component.scss'
 })
 export class AdminSidebarComponent {
+  @Input() isSidebarOpen = false;
+  @Output() closed = new EventEmitter<void>();
+
   isCollapsed = signal<boolean>(false);
 
   menuGroups = [

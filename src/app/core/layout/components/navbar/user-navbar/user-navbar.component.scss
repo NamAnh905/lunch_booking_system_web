@@ -84,30 +84,13 @@
  */
 .navbar-collapse {
   display: flex;
-  flex-basis: 100%;
+  flex-basis: auto;
   flex-grow: 1;
   align-items: center;
 }
 
 .navbar-toggler {
-  padding: 0.25rem 0.75rem;
-  font-size: 1.25rem;
-  line-height: 1;
-  background: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 0.25rem;
-  cursor: pointer;
-}
-
-/* Từ md trở lên: menu luôn bung ngang, ẩn nút toggler (giống navbar-expand-md). */
-@media (min-width: 768px) {
-  .navbar-expand-md .navbar-collapse {
-    display: flex !important;
-    flex-basis: auto;
-  }
-  .navbar-expand-md .navbar-toggler {
-    display: none;
-  }
+  display: none;
 }
 
 .navbar-nav {

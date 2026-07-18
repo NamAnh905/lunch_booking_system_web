@@ -1,4 +1,4 @@
 export enum PaymentMethod {
-  CASH = 'CASH',                     // Tiền mặt
-  BANK_TRANSFER = 'BANK_TRANSFER'    // Chuyển khoản
+  CASH = 'CASH',
+  BANK_TRANSFER = 'BANK_TRANSFER'
 }

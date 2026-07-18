@@ -1,4 +1,4 @@
-﻿<aside class="admin-sidebar" [class.collapsed]="isCollapsed()">
+﻿<aside class="admin-sidebar" [class.collapsed]="isCollapsed()" [class.open]="isSidebarOpen">
   <div class="sidebar-header">
     <div class="logo-container">
       @if (!isCollapsed()) {
@@ -46,3 +46,7 @@
     }
   </div>
 </aside>
+
+@if (isSidebarOpen) {
+  <div class="sidebar-backdrop" (click)="closed.emit()"></div>
+}

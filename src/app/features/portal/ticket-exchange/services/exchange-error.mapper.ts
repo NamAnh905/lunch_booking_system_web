@@ -1,16 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { BusinessConfigService, formatVnTime } from '@shared/services/business-config.service';
-
-const ERROR_CODE = {
-  ORDER_CUTOFF_REACHED: 7002,
-  ORDER_ALREADY_EXISTS: 7003,
-  ORDER_IN_MARKET: 7005,
-  ORDER_CANNOT_PASS: 7006,
-  ORDER_CLAIMED_CANNOT_PASS: 7007,
-  EXCHANGE_NOT_FOUND: 10001,
-  EXCHANGE_NOT_OPEN: 10002,
-  CANNOT_CLAIM_OWN_TICKET: 10003,
-} as const;
+import { BusinessConfigService, formatVnTime } from '@core/services/business-config.service';
+import { ERROR_CODES } from '@shared/constants/error-message.constants';
 
 @Injectable({ providedIn: 'root' })
 export class ExchangeErrorMapper {
@@ -29,18 +19,18 @@ export class ExchangeErrorMapper {
   map(err: any): string {
     if (err?.error?.code) {
       switch (err.error.code) {
-        case ERROR_CODE.ORDER_CUTOFF_REACHED:
-        case ERROR_CODE.ORDER_CANNOT_PASS:
+        case ERROR_CODES.ORDER_CUTOFF_REACHED:
+        case ERROR_CODES.ORDER_CANNOT_PASS:
           return this.outOfWindow;
-        case ERROR_CODE.ORDER_CLAIMED_CANNOT_PASS:
+        case ERROR_CODES.ORDER_CLAIMED_CANNOT_PASS:
           return this.claimedCannotPass;
-        case ERROR_CODE.ORDER_IN_MARKET:
+        case ERROR_CODES.ORDER_IN_MARKET:
           return this.alreadyInMarket;
-        case ERROR_CODE.ORDER_ALREADY_EXISTS:
+        case ERROR_CODES.ORDER_ALREADY_EXISTS:
           return this.alreadyHasMeal;
-        case ERROR_CODE.EXCHANGE_NOT_FOUND:
-        case ERROR_CODE.EXCHANGE_NOT_OPEN:
-        case ERROR_CODE.CANNOT_CLAIM_OWN_TICKET:
+        case ERROR_CODES.EXCHANGE_NOT_FOUND:
+        case ERROR_CODES.EXCHANGE_NOT_OPEN:
+        case ERROR_CODES.CANNOT_CLAIM_OWN_TICKET:
           return this.ticketTaken;
         default:
           return err.error.message || this.generic;

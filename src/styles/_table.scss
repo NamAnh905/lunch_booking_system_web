@@ -20,7 +20,7 @@
 
 .crud-body {
   position: relative;
-  min-height: 525px; // Approximate height for header + 10 rows
+  min-height: 525px;
   overflow-x: auto;
   @include mixins.custom-scroll;
 
@@ -460,6 +460,25 @@
       &:hover {
         border-color: #94a3b8;
       }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .crud-footer {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+
+    .pagination-info,
+    .pagination-buttons,
+    .page-size-selector {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .pagination-buttons {
+      flex-wrap: wrap;
     }
   }
 }

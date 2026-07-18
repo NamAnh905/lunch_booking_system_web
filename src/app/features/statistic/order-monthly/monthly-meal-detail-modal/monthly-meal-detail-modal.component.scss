@@ -151,6 +151,18 @@
   }
 }
 
+@media (max-width: 768px) {
+  .modal-overlay .modal-content .modal-header {
+    padding: 16px;
+  }
+  .modal-overlay .modal-content .modal-body {
+    padding: 16px;
+  }
+  .modal-overlay .modal-content .modal-body .calendar-grid {
+    gap: 8px;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

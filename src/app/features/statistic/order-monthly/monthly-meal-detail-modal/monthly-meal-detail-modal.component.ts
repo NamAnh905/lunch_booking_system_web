@@ -15,9 +15,9 @@ export class MonthlyMealDetailModalComponent implements OnInit {
   @Input() totalMeals!: number;
   @Input() month!: number;
   @Input() year!: number;
-  
+
   @Output() close = new EventEmitter<void>();
-  
+
   days: { day: number, hasOrder: boolean }[] = [];
 
   constructor(private orderMonthlyService: OrderMonthlyService) {}
@@ -36,21 +36,16 @@ export class MonthlyMealDetailModalComponent implements OnInit {
   }
 
   loadUserOrders(): void {
-    // Note: This calls the mocked endpoint in service.
-    // In real app, the API should return a list of dates this user ordered in this month.
     const fromDate = `${this.year}-${this.month.toString().padStart(2, '0')}-01`;
     const toDate = `${this.year}-${this.month.toString().padStart(2, '0')}-${this.days.length}`;
-    
+
     this.orderMonthlyService.getUserOrders(this.userId, fromDate, toDate).subscribe({
       next: (res) => {
         if (res.result) {
           const orders = res.result;
           console.log('List order dates:', orders);
           orders.forEach((order: any) => {
-             // Theo logic thống kê của backend (OrderSummaryRepository), 
-             // chỉ tính những đơn đã được chốt (status != 'CANCELLED')
              if (order.status !== 'CANCELLED') {
-                // Handle both array [YYYY, MM, DD] and string "YYYY-MM-DD"
                 let day: number | null = null;
                 const targetDate = order.menuDate || order.orderDate;
                 if (Array.isArray(targetDate)) {
@@ -63,7 +58,7 @@ export class MonthlyMealDetailModalComponent implements OnInit {
                 } else if (targetDate instanceof Date) {
                   day = targetDate.getDate();
                 }
-                
+
                 if (day !== null && !isNaN(day)) {
                   const dayObj = this.days.find(d => d.day === day);
                   if (dayObj) {

@@ -52,7 +52,6 @@ export class MenuSlotService {
     if (menu && menu.dishes) {
       const unassignedDishes: (Dish | null)[] = [...menu.dishes];
 
-      // Pass 1: khớp đúng loại.
       for (let i = 0; i < unassignedDishes.length; i++) {
         const dish = unassignedDishes[i];
         if (!dish) continue;
@@ -64,7 +63,6 @@ export class MenuSlotService {
         }
       }
 
-      // Pass 2: nhét phần còn lại vào slot trống.
       for (const dish of unassignedDishes) {
         if (!dish) continue;
         const emptySlot = mappedSlots.find((s) => !s.dish);
@@ -77,10 +75,6 @@ export class MenuSlotService {
     return mappedSlots;
   }
 
-  /**
-   * Kiểm tra một món có được phép đặt vào slot không.
-   * Trả về thông báo lỗi (string) nếu không hợp lệ, hoặc `null` nếu hợp lệ.
-   */
   validateDishForSlot(
     dish: Dish,
     slots: MenuSlot[],

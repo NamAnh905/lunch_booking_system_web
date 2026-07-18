@@ -104,7 +104,7 @@
   margin-top: 16px;
   background-color: white;
   border-radius: 8px;
-  overflow: visible; // Allow dropdowns to pop out of table
+  overflow: visible;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
   th, td {
@@ -131,7 +131,7 @@
   }
 
   tr:hover {
-    background-color: transparent !important; // override global hover
+    background-color: transparent !important;
   }
 
   .price-category-cell {
@@ -212,7 +212,7 @@
     flex-direction: column;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
-    overflow: visible; // allow popups
+    overflow: visible;
 
     &.inactive-menu {
       opacity: 0.6;
@@ -248,7 +248,7 @@
     }
 
     &.drink-slot {
-      background-color: #f0fdf4; // soft light green for drink row
+      background-color: #f0fdf4;
 
       &:hover {
         background-color: #dcfce7;
@@ -256,7 +256,7 @@
 
       &.empty-slot {
         .slot-text-wrapper {
-          color: #16a34a; // green placeholder for drinks
+          color: #16a34a;
           font-weight: 500;
         }
       }

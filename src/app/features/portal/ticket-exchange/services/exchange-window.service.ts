@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { BusinessConfigService, formatVnTime } from '@shared/services/business-config.service';
+import { BusinessConfigService, formatVnTime } from '@core/services/business-config.service';
 
 @Injectable({ providedIn: 'root' })
 export class ExchangeWindowService {
