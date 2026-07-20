@@ -1,5 +1,11 @@
 <div class="notification-bell">
-  <button type="button" class="bell-button" (click)="toggleDropdown()" aria-label="Thông báo">
+  <button
+    type="button"
+    class="bell-button"
+    [class.bell-button--active]="dropdownOpen"
+    [attr.aria-expanded]="dropdownOpen"
+    (click)="toggleDropdown()"
+    aria-label="Thông báo">
     <i class="fas fa-bell"></i>
     @if (unreadCount$ | async; as unreadCount) {
       <span class="bell-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>

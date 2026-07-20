@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { OverlayModule } from '@angular/cdk/overlay';
 import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
 import { CrudActionsComponent } from '@shared/components/crud/crud-actions.component';
@@ -15,7 +16,7 @@ import { AutoFocusDirective } from '../../../shared/directives/autofocus.directi
 @Component({
   selector: 'app-role',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent, CrudActionsComponent, CrudSearchComponent, FormModalComponent, AutoFocusDirective],
+  imports: [CommonModule, FormsModule, OverlayModule, CrudComponent, CrudActionsComponent, CrudSearchComponent, FormModalComponent, AutoFocusDirective],
   templateUrl: './role.component.html',
   styleUrl: './role.component.scss'
 })

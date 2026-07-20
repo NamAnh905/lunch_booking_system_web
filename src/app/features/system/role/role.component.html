@@ -86,12 +86,22 @@
 
     <div class="form-field full-span">
       <label>Phân quyền (Permissions)</label>
-      <div class="multi-select-dropdown" (click)="togglePermissionsDropdown()">
-        <div class="dropdown-header">
+      <div class="multi-select-dropdown">
+        <div class="dropdown-header" cdkOverlayOrigin #permissionsTrigger="cdkOverlayOrigin"
+          (click)="togglePermissionsDropdown()">
           {{ getPermissionsDisplayText() }}
         </div>
-        @if (isPermissionsDropdownOpen) {
-        <div class="dropdown-list" (click)="$event.stopPropagation()">
+      </div>
+      <ng-template
+        cdkConnectedOverlay
+        [cdkConnectedOverlayOrigin]="permissionsTrigger"
+        [cdkConnectedOverlayOpen]="isFormOpen && isPermissionsDropdownOpen"
+        [cdkConnectedOverlayWidth]="permissionsTrigger.elementRef.nativeElement.offsetWidth"
+        cdkConnectedOverlayHasBackdrop
+        cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+        (backdropClick)="isPermissionsDropdownOpen = false"
+        (detach)="isPermissionsDropdownOpen = false">
+        <div class="dropdown-list">
           @for (perm of availablePermissions; track perm.id) {
           <label class="dropdown-item">
             <input type="checkbox" [value]="perm.action" (change)="onPermissionChange(perm.action, $event)"
@@ -104,8 +114,7 @@
           <div class="p-2 text-center text-muted">Chưa có dữ liệu phân quyền</div>
           }
         </div>
-        }
-      </div>
+      </ng-template>
     </div>
   </form>
 </app-form-modal>

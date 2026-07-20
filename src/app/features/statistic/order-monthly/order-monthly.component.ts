@@ -112,6 +112,7 @@ export class OrderMonthlyComponent implements OnInit {
           return {
             userId: user.id,
             fullName: user.fullName,
+            username: user.username,
             departmentName: user.department || '',
             departmentId: dept?.id,
             normalMealCount: item ? item.normalMealCount : 0,

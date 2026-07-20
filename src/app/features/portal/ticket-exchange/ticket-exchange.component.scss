@@ -8,52 +8,41 @@ $brand-dark: #003a6d;
 .exchange-page {
   height: 100%;
   overflow: auto;
-  padding: 28px 20px 48px;
-  background: #f4f6fb;
+  padding: 28px 0 48px;
 }
 
 .exchange-shell {
-  max-width: 1200px;
-  margin: 0 auto;
   width: 100%;
+  margin: 0 auto;
+  padding: 0 15px;
+
+  @media (min-width: 576px) {
+    max-width: 540px;
+  }
+  @media (min-width: 768px) {
+    max-width: 720px;
+  }
+  @media (min-width: 992px) {
+    max-width: 960px;
+  }
+  @media (min-width: 1200px) {
+    max-width: 1140px;
+  }
 }
 
 .exchange-header {
+  display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
   margin-bottom: 20px;
 
   &__title {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-
-    h2 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 700;
-      color: $brand;
-    }
-
-    p {
-      margin: 2px 0 0;
-      font-size: 13px;
-      color: #64748b;
-    }
-  }
-
-  &__icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, $brand, #0369a1);
-    color: #fff;
-    font-size: 18px;
-    box-shadow: 0 6px 14px rgba(0, 75, 140, 0.28);
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: $brand;
   }
 }
 
@@ -80,8 +69,8 @@ $brand-dark: #003a6d;
 
 .exchange-body {
   background: #fff;
-  border: 1px solid #eef0f5;
-  box-shadow: 0 6px 20px rgba(16, 24, 40, 0.06);
+  border-radius: 8px;
+  box-shadow: 0px 3px 8px 0px #888888;
   padding: 24px;
 }
 
@@ -96,17 +85,14 @@ $brand-dark: #003a6d;
 
 @media (max-width: 768px) {
   .exchange-page {
-    padding: 16px 12px 32px;
+    padding: 16px 0 32px;
   }
 
   .exchange-header {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
     gap: 12px;
 
-    .btn-back {
-      align-self: flex-start;
+    &__title {
+      font-size: 1.2rem;
     }
   }
 

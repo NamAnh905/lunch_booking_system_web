@@ -1,6 +1,9 @@
-import { Component, signal, Input, Output, EventEmitter } from '@angular/core';
+import { Component, signal, computed, inject, Input, Output, EventEmitter } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '@core/auth/auth.service';
+import { ROLES } from '@shared/constants/role.constants';
 import {
   LucideCalendarDays, LucidePieChart,
   LucideUsers, LucideShield, LucideKey, LucideBuilding,
@@ -8,6 +11,18 @@ import {
   LucideTicket, LucideMessageSquare, LucideBell,
   LucideMenu, LucideSettings
 } from '@lucide/angular';
+
+interface MenuItem {
+  label: string;
+  icon: string;
+  route: string;
+  superAdminOnly?: boolean;
+}
+
+interface MenuGroup {
+  title: string;
+  items: MenuItem[];
+}
 
 @Component({
   selector: 'app-admin-sidebar',
@@ -27,9 +42,14 @@ export class AdminSidebarComponent {
   @Input() isSidebarOpen = false;
   @Output() closed = new EventEmitter<void>();
 
+  private authService = inject(AuthService);
+  private currentUser = toSignal(this.authService.currentUser$, {
+    initialValue: this.authService.currentUserValue
+  });
+
   isCollapsed = signal<boolean>(false);
 
-  menuGroups = [
+  private menuGroups: MenuGroup[] = [
     {
       title: 'THỐNG KÊ',
       items: [
@@ -56,12 +76,14 @@ export class AdminSidebarComponent {
         {
           label: 'Vai trò',
           icon: 'shield',
-          route: '/system/admin/role'
+          route: '/system/admin/role',
+          superAdminOnly: true
         },
         {
           label: 'Quyền',
           icon: 'key',
-          route: '/system/admin/permission'
+          route: '/system/admin/permission',
+          superAdminOnly: true
         },
         {
           label: 'Phòng ban',
@@ -71,7 +93,8 @@ export class AdminSidebarComponent {
         {
           label: 'Cấu hình hệ thống',
           icon: 'settings',
-          route: '/system/admin/config'
+          route: '/system/admin/config',
+          superAdminOnly: true
         }
       ]
     },
@@ -111,6 +134,15 @@ export class AdminSidebarComponent {
       ]
     }
   ];
+
+  visibleGroups = computed<MenuGroup[]>(() => {
+    if (this.currentUser()?.roles.includes(ROLES.SUPER_ADMIN)) {
+      return this.menuGroups;
+    }
+    return this.menuGroups
+      .map(group => ({ ...group, items: group.items.filter(item => !item.superAdminOnly) }))
+      .filter(group => group.items.length > 0);
+  });
 
   toggleSidebar() {
     this.isCollapsed.set(!this.isCollapsed());

@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { OverlayModule } from '@angular/cdk/overlay';
 import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
 import { CrudActionsComponent } from '@shared/components/crud/crud-actions.component';
@@ -17,7 +18,7 @@ import { EXCEL_FILE_NAMES } from '@shared/constants/business.constants';
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent, CrudActionsComponent, CrudSearchComponent, FormModalComponent, AutoFocusDirective],
+  imports: [CommonModule, FormsModule, OverlayModule, CrudComponent, CrudActionsComponent, CrudSearchComponent, FormModalComponent, AutoFocusDirective],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss'
 })

@@ -12,7 +12,7 @@
   </div>
 
   <div class="sidebar-menu">
-    @for (group of menuGroups; track group.title) {
+    @for (group of visibleGroups(); track group.title) {
       <div class="menu-group">
         @if (!isCollapsed()) {
           <div class="group-title">{{ group.title }}</div>

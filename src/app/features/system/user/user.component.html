@@ -157,21 +157,29 @@
 
     <div class="form-field full-span">
       <label>Vai trò</label>
-      <div class="multi-select-dropdown" (click)="toggleRolesDropdown()">
-        <div class="dropdown-header">
+      <div class="multi-select-dropdown">
+        <div class="dropdown-header" cdkOverlayOrigin #rolesTrigger="cdkOverlayOrigin" (click)="toggleRolesDropdown()">
           {{ getRolesDisplayText() }}
         </div>
-        @if (isRolesDropdownOpen) {
-          <div class="dropdown-list" (click)="$event.stopPropagation()">
-            @for (role of availableRoles; track role.code) {
-              <label class="dropdown-item">
-                <input type="checkbox" [value]="role.code" (change)="onRoleChange(role.code, $event)" [checked]="formModel.roles?.includes(role.code)">
-                {{ role.name }} ({{ role.code }})
-              </label>
-            }
-          </div>
-        }
       </div>
+      <ng-template
+        cdkConnectedOverlay
+        [cdkConnectedOverlayOrigin]="rolesTrigger"
+        [cdkConnectedOverlayOpen]="isFormOpen && isRolesDropdownOpen"
+        [cdkConnectedOverlayWidth]="rolesTrigger.elementRef.nativeElement.offsetWidth"
+        cdkConnectedOverlayHasBackdrop
+        cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+        (backdropClick)="isRolesDropdownOpen = false"
+        (detach)="isRolesDropdownOpen = false">
+        <div class="dropdown-list">
+          @for (role of availableRoles; track role.code) {
+            <label class="dropdown-item">
+              <input type="checkbox" [value]="role.code" (change)="onRoleChange(role.code, $event)" [checked]="formModel.roles?.includes(role.code)">
+              {{ role.name }} ({{ role.code }})
+            </label>
+          }
+        </div>
+      </ng-template>
     </div>
 
     @if (formMode === 'edit') {

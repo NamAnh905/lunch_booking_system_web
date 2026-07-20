@@ -43,44 +43,40 @@
     }
   }
 
-  .dropdown-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid $border-color;
-    border-radius: 6px;
-    margin-top: 4px;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 10;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    transform-origin: top;
+}
 
-    .dropdown-item {
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      user-select: none;
-      font-size: 14px;
-      font-weight: normal;
+.dropdown-list {
+  background: white;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top;
+
+  .dropdown-item {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 14px;
+    font-weight: normal;
+    margin: 0;
+    color: $text-primary;
+
+    &:hover {
+      background-color: #f8fafc;
+    }
+
+    input[type="checkbox"] {
       margin: 0;
-      color: $text-primary;
-
-      &:hover {
-        background-color: #f8fafc;
-      }
-
-      input[type="checkbox"] {
-        margin: 0;
-        cursor: pointer;
-        width: 16px;
-        height: 16px;
-      }
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
     }
   }
 }
