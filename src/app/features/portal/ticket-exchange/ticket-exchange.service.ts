@@ -12,13 +12,10 @@ export class TicketExchangeService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/tickets/market`;
 
-  getMarketTickets(page: number = 1, size: number = 10, status?: string | null, keyword?: string | null): Observable<ApiResponse<PageResponse<TicketExchangeResponse>>> {
+  getMarketTickets(page: number = 1, size: number = 10, keyword?: string | null): Observable<ApiResponse<PageResponse<TicketExchangeResponse>>> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
-    if (status) {
-      params = params.set('status', status);
-    }
     if (keyword) {
       params = params.set('keyword', keyword);
     }

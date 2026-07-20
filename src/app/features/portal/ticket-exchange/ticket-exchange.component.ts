@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import { ExchangeWindowService } from './services/exchange-window.service';
 import { ExchangeErrorMapper } from './services/exchange-error.mapper';
 import { toIsoDate } from '@shared/utils/date.util';
-import { OrderStatus, TicketExchangeStatus } from '@shared/enums';
+import { OrderStatus } from '@shared/enums';
 import { SWAL_COLORS, DEFAULT_PAGE_SIZE } from '@shared/constants/business.constants';
 import { MarketTicketsListComponent } from './components/market-tickets-list.component';
 import { EligibleOrdersListComponent } from './components/eligible-orders-list.component';
@@ -67,9 +67,9 @@ export class TicketExchangeComponent implements OnInit {
 
   loadMarketTickets(): void {
     this.isLoading = true;
-    this.ticketExchangeService.getMarketTickets(this.currentPage, this.pageSize, TicketExchangeStatus.OPEN, null).subscribe({
+    this.ticketExchangeService.getMarketTickets(this.currentPage, this.pageSize, null).subscribe({
       next: (res) => {
-        const data = res.result?.data || [];
+        this.marketTickets = res.result?.data || [];
         this.isLoading = false;
       },
       error: (err) => {
@@ -114,7 +114,8 @@ export class TicketExchangeComponent implements OnInit {
         this.eligibleOrders = pendingOrders.filter(o => this.isValidExchangeTime(o.menuDate));
 
         if (this.eligibleOrders.length === 0 && pendingOrders.length > 0) {
-          const closestOrder = pendingOrders.sort((a, b) => new Date(a.menuDate).getTime() - new Date(b.menuDate).getTime())[0];
+          const closestOrder = [...pendingOrders].sort((a, b) => new Date(a.menuDate).getTime() - new Date(b.menuDate).getTime())[0];
+          this.pendingOrderWarning = this.exchangeWindow.getWarning(closestOrder.menuDate);
         } else {
           this.pendingOrderWarning = null;
         }
