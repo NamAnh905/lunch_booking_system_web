@@ -16,4 +16,5 @@ export interface CalendarDay {
   isDisabled?: boolean;
   isPastOrCutoff?: boolean;
   isClaimedTicket?: boolean;
+  claimedFromName?: string;
 }

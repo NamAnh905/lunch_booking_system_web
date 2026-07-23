@@ -1,6 +1,6 @@
 import { Injectable, NgZone, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, Subject, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, map, tap } from 'rxjs';
 import { environment } from '@env/environment';
 import { ApiResponse } from '@shared/models';
 import { NotificationResponse } from '@shared/models/notification.model';
@@ -8,6 +8,7 @@ import { NotificationResponse } from '@shared/models/notification.model';
 interface NotificationPage {
   content: NotificationResponse[];
   totalElements: number;
+  last: boolean;
 }
 
 @Injectable({
@@ -28,12 +29,19 @@ export class NotificationService {
   private unreadCountSubject = new BehaviorSubject<number>(0);
   unreadCount$ = this.unreadCountSubject.asObservable();
 
+  private hasMoreSubject = new BehaviorSubject<boolean>(false);
+  hasMore$ = this.hasMoreSubject.asObservable();
+
+  private loadingMoreSubject = new BehaviorSubject<boolean>(false);
+  loadingMore$ = this.loadingMoreSubject.asObservable();
+
   private incomingSubject = new Subject<NotificationResponse>();
   incoming$ = this.incomingSubject.asObservable();
 
   private eventSource: EventSource | null = null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private reconnectAttempts = 0;
+  private loadedPage = 0;
 
   start(): void {
     this.refresh();
@@ -44,22 +52,55 @@ export class NotificationService {
     this.closeStream();
     this.notificationsSubject.next([]);
     this.unreadCountSubject.next(0);
+    this.hasMoreSubject.next(false);
+    this.loadingMoreSubject.next(false);
+    this.loadedPage = 0;
   }
 
   refresh(): void {
-    this.http
-      .get<ApiResponse<NotificationPage>>(`${this.apiUrl}/me`, {
-        params: { page: 0, size: this.listSize },
-      })
-      .subscribe({
-        next: (res) => this.notificationsSubject.next(res.result?.content ?? []),
-        error: () => {},
-      });
+    this.loadedPage = 0;
+    this.fetchPage(0).subscribe({
+      next: (page) => {
+        this.notificationsSubject.next(page?.content ?? []);
+        this.hasMoreSubject.next(!(page?.last ?? true));
+      },
+      error: () => {},
+    });
 
     this.http.get<ApiResponse<number>>(`${this.apiUrl}/me/unread-count`).subscribe({
       next: (res) => this.unreadCountSubject.next(res.result ?? 0),
       error: () => {},
     });
+  }
+
+  loadMore(): void {
+    if (!this.hasMoreSubject.value || this.loadingMoreSubject.value) {
+      return;
+    }
+
+    const nextPage = this.loadedPage + 1;
+    this.loadingMoreSubject.next(true);
+
+    this.fetchPage(nextPage).subscribe({
+      next: (page) => {
+        const known = new Set(this.notificationsSubject.value.map((item) => item.id));
+        const fresh = (page?.content ?? []).filter((item) => !known.has(item.id));
+
+        this.notificationsSubject.next([...this.notificationsSubject.value, ...fresh]);
+        this.hasMoreSubject.next(!(page?.last ?? true));
+        this.loadedPage = nextPage;
+        this.loadingMoreSubject.next(false);
+      },
+      error: () => this.loadingMoreSubject.next(false),
+    });
+  }
+
+  private fetchPage(page: number): Observable<NotificationPage | undefined> {
+    return this.http
+      .get<ApiResponse<NotificationPage>>(`${this.apiUrl}/me`, {
+        params: { page, size: this.listSize },
+      })
+      .pipe(map((res) => res.result));
   }
 
   markAsRead(id: number): Observable<ApiResponse<string>> {
@@ -117,9 +158,7 @@ export class NotificationService {
       return;
     }
 
-    this.notificationsSubject.next(
-      [notification, ...this.notificationsSubject.value].slice(0, this.listSize)
-    );
+    this.notificationsSubject.next([notification, ...this.notificationsSubject.value]);
     if (!notification.isRead) {
       this.unreadCountSubject.next(this.unreadCountSubject.value + 1);
     }

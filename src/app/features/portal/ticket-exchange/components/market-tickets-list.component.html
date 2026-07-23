@@ -1,62 +1,52 @@
-@if (isLoading() && tickets().length === 0) {
-  <div class="tickets-grid">
-    @for (i of [1, 2, 3]; track i) {
-      <div class="skeleton-card">
-        <div class="skeleton-top">
-          <div class="skeleton skeleton--tile"></div>
-          <div class="skeleton-lines">
-            <div class="skeleton skeleton--line skeleton--w60"></div>
-            <div class="skeleton skeleton--line skeleton--w40"></div>
-          </div>
-        </div>
-        <div class="skeleton skeleton--btn"></div>
-      </div>
-    }
-  </div>
-} @else if (tickets().length > 0) {
-  <div class="tickets-grid">
-    @for (ticket of tickets(); track ticket.exchangeId) {
-      <mat-card class="ticket-card">
-        <div class="card-top">
-          <div class="date-tile" [class.special]="ticket.isSpecial">
-            <span class="date-tile__day">{{ ticket.menuDate | date: 'dd' }}</span>
-            <span class="date-tile__month">Th{{ ticket.menuDate | date: 'MM' }}</span>
-          </div>
-          <div class="card-heading">
-            <span class="card-heading__date">{{ ticket.menuDate | date: 'dd/MM/yyyy' }}</span>
-            <span class="meal-chip" [class.special]="ticket.isSpecial">
-              <i class="fas" [ngClass]="ticket.isSpecial ? 'fa-star' : 'fa-utensils'"></i>
-              {{ ticket.isSpecial ? 'Suất đặc biệt' : 'Suất thường' }}
-            </span>
-          </div>
-        </div>
+<app-crud [loading]="loading" [total]="total" [page]="page" [size]="size" [hideAdd]="true"
+  [permissions]="hiddenPermissions" (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)"
+  (refresh)="onReset()">
 
-        <div class="card-body">
-          <div class="info-row">
-            <i class="fas fa-user"></i>
-            <span class="info-row__label">Người pass</span>
-            <strong>{{ ticket.sellerName }}</strong>
-          </div>
-          <div class="info-row">
-            <i class="fas fa-circle-info"></i>
-            <span class="info-row__label">Trạng thái</span>
-            <span class="status-badge" [ngClass]="ticket.status.toLowerCase()">{{ statusLabel(ticket.status) }}</span>
-          </div>
-        </div>
+  <div crud-filters class="filters">
+    <div class="filter-group">
+      <app-crud-search placeholder="Tìm theo người pass vé..." [(value)]="query.keyword" (search)="onSearch()" />
+    </div>
+  </div>
 
-        @if (ticket.sellerId !== currentUserId()) {
-          <div class="card-actions">
-            <button mat-flat-button color="primary" (click)="claim.emit(ticket)" [disabled]="isLoading()">
-              <i class="fas fa-hand-holding-heart"></i> Nhận vé
-            </button>
-          </div>
-        }
-      </mat-card>
-    }
-  </div>
-} @else {
-  <div class="empty-state">
-    <i class="fas fa-store-slash empty-state__icon"></i>
-    <p>Hiện tại chưa có vé nào trên chợ.</p>
-  </div>
-}
+  <table crud-table class="data-table">
+    <thead>
+      <tr>
+        <th class="stt-col">STT</th>
+        <th class="date-col">Vé ngày</th>
+        <th class="datetime-col">Thời gian đăng</th>
+        <th class="name-col">Người pass vé</th>
+        <th class="dept-col">Phòng ban</th>
+        <th class="meal-col">Loại suất ăn</th>
+        <th class="action-column">Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of data; track item.exchangeId; let i = $index) {
+      <tr>
+        <td class="stt-col">{{ (page - 1) * size + i + 1 }}</td>
+        <td class="date-col">{{ item.menuDate | date: 'dd/MM/yyyy' }}</td>
+        <td class="datetime-col">{{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+        <td class="name-col" [title]="item.sellerName">
+          {{ item.sellerName }}@if (item.sellerId === currentUserId) {<span class="self-tag">(Bạn)</span>}
+        </td>
+        <td class="dept-col" [title]="item.departmentName || '-'">{{ item.departmentName || '-' }}</td>
+        <td class="meal-col">{{ item.isSpecial ? 'Suất đặc biệt' : 'Suất thường' }}</td>
+        <td class="action-column">
+          @if (item.sellerId !== currentUserId) {
+          <button type="button" class="btn-claim" (click)="onClaim(item)" [disabled]="loading">
+            Nhận vé
+          </button>
+          } @else {
+          <span class="own-ticket">Vé của bạn</span>
+          }
+        </td>
+      </tr>
+      }
+      @if (data.length === 0 && !loading) {
+      <tr>
+        <td colspan="7" class="text-center empty-state">Hiện tại chưa có vé nào trên chợ.</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</app-crud>

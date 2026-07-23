@@ -38,13 +38,13 @@ export class MealOrderService {
   }
 
   getMenus(): Observable<ApiResponse<PageResponse<MenuResponse>>> {
-    return this.http.get<ApiResponse<PageResponse<MenuResponse>>>(`${this.apiUrl}/admin/menus`, {
+    return this.http.get<ApiResponse<PageResponse<MenuResponse>>>(`${this.apiUrl}/portal/menus`, {
       params: { size: 100 }
     });
   }
 
   getMenusByDate(date: string): Observable<ApiResponse<MenuResponse[]>> {
-    return this.http.get<ApiResponse<MenuResponse[]>>(`${this.apiUrl}/admin/menus/by-date`, {
+    return this.http.get<ApiResponse<MenuResponse[]>>(`${this.apiUrl}/portal/menus/by-date`, {
       params: { date }
     });
   }
@@ -52,7 +52,7 @@ export class MealOrderService {
   getWeeklyMenus(startDate: string, endDate: string): Observable<ApiResponse<MenuResponse[]>> {
     if (!this.weeklyMenusCache$) {
       this.weeklyMenusCache$ = this.refreshWeeklyMenus$.pipe(
-        switchMap(() => this.http.get<ApiResponse<MenuResponse[]>>(`${this.apiUrl}/admin/menus/weekly`, {
+        switchMap(() => this.http.get<ApiResponse<MenuResponse[]>>(`${this.apiUrl}/portal/menus/weekly`, {
           params: { startDate, endDate }
         })),
         shareReplay(1),

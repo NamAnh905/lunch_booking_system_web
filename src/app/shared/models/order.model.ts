@@ -43,6 +43,7 @@ export interface OrderResponse {
   ticketSource: string;
   isSpecial: boolean;
   originalUserId?: number;
+  originalUserFullName?: string;
   isPrinted: boolean;
   errorMessage?: string;
   createdAt?: string;

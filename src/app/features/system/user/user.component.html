@@ -3,15 +3,12 @@
   [total]="total"
   [page]="page"
   [size]="size"
-  [selections]="selections"
   [permissions]="{ add: 'MANAGE_USERS', edit: 'MANAGE_USERS', delete: 'MANAGE_USERS', export: 'EXPORT_USERS' }"
   (pageChange)="onPageChange($event)"
   (sizeChange)="onSizeChange($event)"
   (refresh)="onReset()"
   (export)="onExport()"
-  (add)="onAdd()"
-  (edit)="onEdit($event)"
-  (delete)="onDelete($event)">
+  (add)="onAdd()">
 
   <div crud-filters class="filters">
     <div class="toolbar-top">
@@ -40,9 +37,6 @@
   <table crud-table class="data-table">
     <thead>
       <tr>
-        <th class="checkbox-col">
-          <input type="checkbox" (change)="toggleAll($event)" [checked]="selections.length === data.length && data.length > 0">
-        </th>
         <th class="stt-col">STT</th>
         <th class="code-col">Tài khoản</th>
         <th class="name-col">Họ tên</th>
@@ -55,9 +49,6 @@
     <tbody>
       @for (item of data; track item.id; let i = $index) {
         <tr>
-          <td class="checkbox-col">
-            <input type="checkbox" [checked]="isSelected(item)" (change)="toggleSelection(item)">
-          </td>
           <td class="stt-col">{{ (page - 1) * size + i + 1 }}</td>
           <td class="code-col" [title]="item.username">{{ item.username }}</td>
           <td class="name-col" [title]="item.fullName">{{ item.fullName }}</td>
@@ -76,7 +67,7 @@
       }
       @if (data.length === 0 && !loading) {
         <tr>
-          <td colspan="8" class="text-center empty-state">Không có dữ liệu</td>
+          <td colspan="7" class="text-center empty-state">Không có dữ liệu</td>
         </tr>
       }
     </tbody>

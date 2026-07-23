@@ -49,6 +49,7 @@ export class MenuComponent extends BaseCrudComponent<Menu, { keyword?: string },
 
   onAddOption(value: string) {
     if (value === 'list') {
+      this.openListEditor();
     } else {
       this.openImageForm();
     }

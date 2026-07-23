@@ -1,5 +1,7 @@
 $brand: #004b8c;
 $brand-dark: #003a6d;
+$primary: #2c7be5;
+$primary-dark: #1b64c9;
 
 :host {
   display: block;
@@ -9,33 +11,37 @@ $brand-dark: #003a6d;
   height: 100%;
   overflow: auto;
   padding: 28px 0 48px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.scale-wrapper {
+  width: 100%;
 }
 
 .exchange-shell {
   width: 100%;
   margin: 0 auto;
-  padding: 0 15px;
 
   @media (min-width: 576px) {
     max-width: 540px;
   }
   @media (min-width: 768px) {
-    max-width: 720px;
-  }
-  @media (min-width: 992px) {
-    max-width: 960px;
-  }
-  @media (min-width: 1200px) {
-    max-width: 1140px;
+    max-width: 65%;
   }
 }
 
 .exchange-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
+  align-items: flex-end;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
 
   &__title {
     margin: 0;
@@ -44,39 +50,49 @@ $brand-dark: #003a6d;
     line-height: 1.2;
     color: $brand;
   }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 }
 
 .btn-back {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 18px;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 18px;
+  border: 0;
   border-radius: 10px;
-  border: 1px solid #d5dced;
-  background: #fff;
-  color: #475569;
+  background: $primary;
+  color: #ffffff;
   font-weight: 600;
   font-size: 14px;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: all 0.18s ease;
+  box-shadow: 0 2px 5px 0 rgba(44, 123, 229, 0.28);
+  transition: background 0.18s ease, box-shadow 0.18s ease;
 
   &:hover {
-    border-color: $brand;
-    color: $brand;
-    box-shadow: 0 4px 10px rgba(0, 75, 140, 0.12);
+    background: $primary-dark;
+    box-shadow: 0 4px 10px 0 rgba(44, 123, 229, 0.35);
+  }
+
+  &:active {
+    box-shadow: 0 1px 3px 0 rgba(44, 123, 229, 0.3);
   }
 }
 
-.exchange-body {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0px 3px 8px 0px #888888;
-  padding: 24px;
+::ng-deep .crud-container {
+  box-shadow: 0 2px 5px 0 rgba(44, 123, 229, 0.28);
 }
 
 .tab-content {
-  padding: 24px 8px 8px;
-  min-height: 300px;
+  padding: 8px 0 8px;
+  min-height: 550px;
 }
 
 .section-divider {
@@ -94,38 +110,14 @@ $brand-dark: #003a6d;
     &__title {
       font-size: 1.2rem;
     }
-  }
 
-  .exchange-body {
-    padding: 16px;
+    &__nav {
+      width: 100%;
+      justify-content: space-between;
+    }
   }
 
   .tab-content {
     padding: 16px 0 4px;
-  }
-}
-
-::ng-deep {
-  .flat-tabs {
-    .mat-mdc-tab-header {
-      margin-bottom: 8px;
-    }
-    .mdc-tab {
-      background-color: transparent !important;
-      letter-spacing: normal;
-      &.mdc-tab--active .mdc-tab__text-label {
-        color: #004b8c !important;
-        font-weight: 700;
-      }
-    }
-    .mdc-tab__text-label {
-      color: #64748b;
-      font-weight: 600;
-    }
-    .mdc-tab-indicator__content--underline {
-      border-color: #004b8c !important;
-      border-width: 3px !important;
-      border-radius: 3px;
-    }
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, Input, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
@@ -29,9 +29,10 @@ export class AdminNavbarComponent {
   @Input() showBreadcrumb = true;
   @Output() toggleSidebar = new EventEmitter<void>();
 
+  @ViewChild('dropdownRef') dropdownRef!: ElementRef<HTMLElement>;
+
   private authService = inject(AuthService);
   private router = inject(Router);
-  private elementRef = inject(ElementRef);
 
   currentUser$ = this.authService.currentUser$;
   isDropdownOpen = false;
@@ -40,7 +41,7 @@ export class AdminNavbarComponent {
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
-    if (!this.elementRef.nativeElement.contains(event.target)) {
+    if (this.isDropdownOpen && !this.dropdownRef.nativeElement.contains(event.target as Node)) {
       this.isDropdownOpen = false;
     }
   }

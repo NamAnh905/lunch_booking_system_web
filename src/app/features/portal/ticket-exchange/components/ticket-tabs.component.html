@@ -1,0 +1,22 @@
+<div class="ticket-tabs" role="tablist">
+  <div
+    class="ticket-tabs__indicator"
+    [class.ticket-tabs__indicator--animated]="measured()"
+    [style.width.px]="indicator().width"
+    [style.transform]="'translateX(' + indicator().left + 'px)'">
+  </div>
+
+  @for (label of labels(); track label; let i = $index) {
+    <button
+      #tabButton
+      type="button"
+      role="tab"
+      class="ticket-tabs__item"
+      [class.ticket-tabs__item--active]="i === activeIndex()"
+      [attr.aria-selected]="i === activeIndex()"
+      [attr.tabindex]="i === activeIndex() ? 0 : -1"
+      (click)="select(i)">
+      {{ label }}
+    </button>
+  }
+</div>

@@ -2,41 +2,94 @@
   <button
     type="button"
     class="bell-button"
-    [class.bell-button--active]="dropdownOpen"
-    [attr.aria-expanded]="dropdownOpen"
+    [class.bell-button--active]="dropdownOpen()"
+    [attr.aria-expanded]="dropdownOpen()"
     (click)="toggleDropdown()"
     aria-label="Thông báo">
     <i class="fas fa-bell"></i>
-    @if (unreadCount$ | async; as unreadCount) {
-      <span class="bell-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+    @if (unreadCount()) {
+      <span class="bell-badge">{{ unreadCount() > 99 ? '99+' : unreadCount() }}</span>
     }
   </button>
 
-  @if (dropdownOpen) {
-    <div class="notification-panel">
+  @if (dropdownOpen()) {
+    <div
+      class="notification-panel"
+      [class.notification-panel--expanded]="expanded()"
+      [style.right.px]="-panelOffset()"
+      [style.--arrow-offset.px]="arrowOffset()">
       <div class="notification-panel__header">
-        <span class="notification-panel__title">Thông báo</span>
-        @if ((unreadCount$ | async)) {
-          <button type="button" class="notification-panel__action" (click)="onMarkAllAsRead($event)">
-            Đánh dấu đã đọc tất cả
-          </button>
+        <div class="notification-panel__heading">
+          <span class="notification-panel__title">Thông báo</span>
+          @if (unreadCount()) {
+            <button type="button" class="notification-panel__action" (click)="onMarkAllAsRead($event)">
+              Đánh dấu đã đọc tất cả
+            </button>
+          }
+        </div>
+
+        <div class="notification-tabs" role="tablist">
+          @for (tab of filters; track tab.key) {
+            <button
+              type="button"
+              role="tab"
+              class="notification-tab"
+              [class.notification-tab--active]="filter() === tab.key"
+              [attr.aria-selected]="filter() === tab.key"
+              (click)="setFilter(tab.key, $event)">
+              {{ tab.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="notification-body">
+        @for (group of groups(); track group.label) {
+          <section class="notification-section">
+            <h3 class="notification-section__title">{{ group.label }}</h3>
+            <ul class="notification-list">
+              @for (item of group.items; track item.id) {
+                <li
+                  class="notification-item"
+                  [class.notification-item--unread]="!item.isRead"
+                  (click)="onSelect(item)">
+                  <span class="notification-item__avatar" aria-hidden="true">
+                    <i class="fas fa-utensils"></i>
+                  </span>
+                  <div class="notification-item__body">
+                    <div class="notification-item__title">{{ item.title }}</div>
+                    <div class="notification-item__content">{{ item.content }}</div>
+                    <div class="notification-item__time">{{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}</div>
+                  </div>
+                  @if (!item.isRead) {
+                    <span class="notification-item__dot" aria-hidden="true"></span>
+                  }
+                </li>
+              }
+            </ul>
+          </section>
+        } @empty {
+          <p class="notification-empty">
+            {{ filter() === 'unread' ? 'Không có thông báo chưa đọc' : 'Chưa có thông báo nào' }}
+          </p>
         }
       </div>
 
-      <ul class="notification-list">
-        @for (item of notifications$ | async; track item.id) {
-          <li
-            class="notification-item"
-            [class.notification-item--unread]="!item.isRead"
-            (click)="onSelect(item)">
-            <div class="notification-item__title">{{ item.title }}</div>
-            <div class="notification-item__content">{{ item.content }}</div>
-            <div class="notification-item__time">{{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}</div>
-          </li>
-        } @empty {
-          <li class="notification-empty">Chưa có thông báo nào</li>
-        }
-      </ul>
+      @if (canExpand()) {
+        <div class="notification-panel__footer">
+          <button
+            type="button"
+            class="notification-more"
+            [disabled]="loadingMore()"
+            (click)="onExpand($event)">
+            @if (loadingMore()) {
+              Đang tải...
+            } @else {
+              {{ expanded() ? 'Tải thêm thông báo' : 'Xem thông báo trước đó' }}
+            }
+          </button>
+        </div>
+      }
     </div>
   }
 </div>

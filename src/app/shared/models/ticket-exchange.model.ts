@@ -24,4 +24,5 @@ export interface TicketExchangeResponse {
   createdAt: string;
   buyerId?: number;
   buyerName?: string;
+  departmentName?: string;
 }

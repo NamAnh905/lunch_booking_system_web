@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { ProfileService } from '@core/services/profile.service';
+import { AuthService } from '@core/auth/auth.service';
 import { UserResponse } from '@shared/models/user.model';
 
 @Component({
@@ -19,6 +20,7 @@ export class UserProfileModalComponent implements OnChanges {
 
   private fb = inject(FormBuilder);
   private profileService = inject(ProfileService);
+  private authService = inject(AuthService);
 
   loading = false;
   saving = false;
@@ -66,7 +68,9 @@ export class UserProfileModalComponent implements OnChanges {
     const fullName = (this.form.value.fullName ?? '').trim();
     this.saving = true;
     this.profileService.updateMe({ fullName }).subscribe({
-      next: () => {
+      next: (res) => {
+        this.user = res.result ?? this.user;
+        this.authService.patchCurrentUser({ fullName: res.result?.fullName ?? fullName });
         this.saving = false;
         this.closed.emit();
         Swal.fire('Thành công', 'Cập nhật thông tin cá nhân thành công!', 'success');

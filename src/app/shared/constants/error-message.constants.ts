@@ -45,7 +45,6 @@ export const ERROR_CODES = {
 
   NOTIFICATION_NOT_FOUND: 11001,
 
-  PAYMENT_NOT_FOUND: 12001,
   INVALID_ENUM_VALUE: 12002,
 
   PRICE_NOT_FOUND: 13001,
@@ -120,7 +119,6 @@ export const ERROR_MESSAGES: Readonly<Record<ErrorMessageKey, string>> = {
 
   NOTIFICATION_NOT_FOUND: 'Không tìm thấy thông báo.',
 
-  PAYMENT_NOT_FOUND: 'Không tìm thấy thông tin thanh toán.',
   INVALID_ENUM_VALUE: 'Giá trị lựa chọn không hợp lệ.',
 
   PRICE_NOT_FOUND: 'Không tìm thấy bảng giá.',

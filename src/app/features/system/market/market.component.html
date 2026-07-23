@@ -1,16 +1,9 @@
-<app-crud [loading]="loading" [total]="total" [page]="page" [size]="size" [selections]="selections" [hideAdd]="true"
+<app-crud [loading]="loading" [total]="total" [page]="page" [size]="size" [hideAdd]="true"
   (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)" (refresh)="onReset()">
 
   <div crud-filters class="filters">
     <div class="filter-group">
-      <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-date-range-input [formGroup]="dateRange" [rangePicker]="dateRangePicker">
-          <input matStartDate formControlName="start" placeholder="Từ ngày">
-          <input matEndDate formControlName="end" placeholder="Đến ngày">
-        </mat-date-range-input>
-        <mat-datepicker-toggle matIconSuffix [for]="dateRangePicker"></mat-datepicker-toggle>
-        <mat-date-range-picker #dateRangePicker panelClass="custom-date-picker-overlay"></mat-date-range-picker>
-      </mat-form-field>
+      <input type="date" lang="vi-VN" [(ngModel)]="query.date" (ngModelChange)="onSearch()" />
     </div>
 
     <div class="filter-group">
@@ -31,27 +24,22 @@
   <table crud-table class="data-table">
     <thead>
       <tr>
-        <th class="checkbox-col">
-          <input type="checkbox" (change)="toggleAll($event)"
-            [checked]="selections.length === data.length && data.length > 0">
-        </th>
         <th class="stt-col">STT</th>
         <th class="date-col">Ngày ăn</th>
-        <th>Người Pass</th>
-        <th>Người Nhận</th>
+        <th class="date-col">Thời gian đăng</th>
+        <th class="name-col">Người Pass</th>
+        <th class="name-col">Người Nhận</th>
         <th class="status-col">Trạng thái</th>
       </tr>
     </thead>
     <tbody>
       @for (item of data; track item.exchangeId; let i = $index) {
       <tr>
-        <td class="checkbox-col">
-          <input type="checkbox" [checked]="isSelected(item)" (change)="toggleSelection(item)">
-        </td>
         <td class="stt-col">{{ (page - 1) * size + i + 1 }}</td>
         <td class="date-col">{{ item.menuDate }}</td>
-        <td [title]="item.sellerName">{{ item.sellerName }}</td>
-        <td [title]="item.buyerName || '-'">{{ item.buyerName || '-' }}</td>
+        <td class="date-col">{{ item.createdAt | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+        <td class="name-col" [title]="item.sellerName">{{ item.sellerName }}</td>
+        <td class="name-col" [title]="item.buyerName || '-'">{{ item.buyerName || '-' }}</td>
         <td class="status-col">
           <span [ngClass]="{
             'status-open': item.status === 'OPEN',

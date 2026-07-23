@@ -41,6 +41,10 @@
   outline: none;
   margin-left: auto;
 
+  &.dropdown-open {
+    z-index: 1050;
+  }
+
   .user-trigger {
     display: flex;
     align-items: center;

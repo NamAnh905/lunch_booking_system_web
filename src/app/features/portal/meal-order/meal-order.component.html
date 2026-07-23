@@ -3,176 +3,139 @@
         <h1 style="color: #004b8c">Hệ thống đăng ký cơm trưa cho nhân viên</h1>
         <div class="container-cover" style="box-shadow: 0px 3px 8px 0px #888888;border-radius: 8px;">
             <div class="container meal-header">
-                <div class="col-md-12">
-                    <div class="header-info">
-                        <h5>Ngày {{ selectedDay }}/{{ currentMonth + 1 }}/{{ currentYear }}</h5>
-                        <div class="notify" style="color: black">
-                            <p><i style="color: red">Chú ý: đăng ký ăn trưa trước {{ cutOffTimeLabel }} !!</i></p>
-                        </div>
+                <div class="header-info">
+                    <h5>Ngày {{ selectedDay }}/{{ currentMonth + 1 }}/{{ currentYear }}</h5>
+                    <div class="notify" style="color: black">
+                        <p><i style="color: red">Chú ý: đăng ký ăn trưa trước {{ cutOffTimeLabel }} !!</i></p>
                     </div>
                 </div>
-                <a href="javascript:void(0)" class="btn btn-secondary-outline btn-dept-list" (click)="openDepartmentList()">
+                <a href="javascript:void(0)" class="btn btn-outline-primary btn-dept-list" (click)="openDepartmentList()">
                     Danh sách đặt vé
                 </a>
             </div>
             <div class="lunch-selector">
-                <div class="lunch-date">
-                    <div class="selector">
-                        <div class="calander"></div>
-                    </div>
-                    <div class="container meal-body">
-                        <div class="row lunch-columns">
-                            <div id="days" class="col" style="padding: 31.969px 0">
-                                <div class="calendar" style="width: 100%">
-                                    <section class="ftco-section" style="margin: 0; padding: 0">
-                                        <div class="container calendar-inner">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <div class="elegant-calencar d-md-flex"
-                                                        style="box-shadow: 3px 4px 7px #888888 !important">
-                                                        <div class="wrap-header d-flex align-items-center">
-                                                            <p id="reset"><img class="calendar img"
-                                                                    src="assets/icons/calendar.ico" alt=""></p>
-                                                            <div id="header" class="p-0">
-                                                                <form id="monthYear">
-                                                                    <div class="pre-button d-flex align-items-center justify-content-center"
-                                                                        (click)="prevMonth()"><i
-                                                                            class="fas fa-chevron-left"></i></div>
-                                                                    <div class="head-info">
-                                                                        <div class="head-day">{{ selectedDay }}</div>
-                                                                        <div class="head-month">{{
-                                                                            headerDate | date:'MMMM' | uppercase }} - {{
-                                                                            currentYear }}</div>
-                                                                    </div>
-                                                                    <div class="next-button d-flex align-items-center justify-content-center"
-                                                                        (click)="nextMonth()"><i
-                                                                            class="fas fa-chevron-right"></i></div>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                        <div class="calendar-wrap">
-                                                            <table id="calendar">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Sun</th>
-                                                                        <th>Mon</th>
-                                                                        <th>Tue</th>
-                                                                        <th>Wed</th>
-                                                                        <th>Thu</th>
-                                                                        <th>Fri</th>
-                                                                        <th>Sat</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    @for (row of calendarRows; track $index) {
-                                                                    <tr>
-                                                                        @for (day of row; track $index) {
-                                                                        <td [attr.data-date]="day.dateString"
-                                                                            [class.daySelect]="day.isRegistered && !day.isSpecial"
-                                                                            [class.daySelectSpecial]="day.isRegistered && day.isSpecial"
-                                                                            [class.notSelect]="!day.isRegistered && !day.isDisabled && day.dayNumber"
-                                                                            [class.disabled]="day.isDisabled && day.dayNumber"
-                                                                            [class.past-day]="day.isPastOrCutoff && day.dayNumber"
-                                                                            [class.draft]="isDayDirty(day)"
-                                                                            [attr.id]="(day.isDisabled || !day.dayNumber) ? 'disabled' : ''"
-                                                                            (click)="onDayClick(day)"
-                                                                            [style.cursor]="(day.isDisabled || day.isPastOrCutoff) ? 'not-allowed' : (day.dayNumber ? 'pointer' : 'default')">
-                                                                            {{ day.dayNumber || '' }}
-                                                                            @if (day.isClaimedTicket) {
-                                                                            <span class="claimed-badge" title="Vé nhận từ chợ Pass">PASS</span>
-                                                                            }
-                                                                        </td>
-                                                                        }
-                                                                    </tr>
-                                                                    }
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                <div class="lunch-columns">
+                    <div id="days">
+                        <div class="elegant-calencar d-md-flex" style="box-shadow: 3px 4px 7px #888888 !important">
+                            <div class="wrap-header d-flex align-items-center">
+                                <p id="reset"><img class="calendar img" src="assets/icons/calendar.ico" alt=""></p>
+                                <div id="header" class="p-0">
+                                    <form id="monthYear">
+                                        <div class="pre-button d-flex align-items-center justify-content-center"
+                                            (click)="prevMonth()"><i class="fas fa-chevron-left"></i></div>
+                                        <div class="head-info">
+                                            <div class="head-day">{{ selectedDay }}</div>
+                                            <div class="head-month">{{ headerDate | date:'MMMM' | uppercase }} - {{
+                                                currentYear }}</div>
                                         </div>
-                                    </section>
+                                        <div class="next-button d-flex align-items-center justify-content-center"
+                                            (click)="nextMonth()"><i class="fas fa-chevron-right"></i></div>
+                                    </form>
                                 </div>
                             </div>
-                            <div class="col-md-auto right-panel"
-                                style="color: black; font-size: 16px;">
-                                <div class="legend-panel">
-                                    <h4 class="legend-title">Chú giải trạng thái</h4>
-                                    <ul class="legend-list">
-                                        <li class="legend-item">
-                                            <span class="legend-dot legend-dot--active"></span>
-                                            <span class="legend-text">Ngày đăng ký suất thường</span>
-                                        </li>
-                                        <li class="legend-item">
-                                            <span class="legend-dot legend-dot--special"></span>
-                                            <span class="legend-text">Ngày đăng ký suất đặc biệt</span>
-                                        </li>
-                                        <li class="legend-item">
-                                            <span class="legend-dot legend-dot--none"></span>
-                                            <span class="legend-text">Ngày chưa đăng ký ăn</span>
-                                        </li>
-                                        <li class="legend-item">
-                                            <span class="legend-dot legend-dot--draft"></span>
-                                            <span class="legend-text">Thay đổi chưa lưu</span>
-                                        </li>
-                                    </ul>
+                            <div class="calendar-wrap">
+                                <table id="calendar">
+                                    <thead>
+                                        <tr>
+                                            <th>Sun</th>
+                                            <th>Mon</th>
+                                            <th>Tue</th>
+                                            <th>Wed</th>
+                                            <th>Thu</th>
+                                            <th>Fri</th>
+                                            <th>Sat</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (row of calendarRows; track $index) {
+                                        <tr>
+                                            @for (day of row; track $index) {
+                                            <td [attr.data-date]="day.dateString"
+                                                [class.daySelect]="day.isRegistered && !day.isSpecial"
+                                                [class.daySelectSpecial]="day.isRegistered && day.isSpecial"
+                                                [class.notSelect]="!day.isRegistered && !day.isDisabled && day.dayNumber"
+                                                [class.disabled]="day.isDisabled && day.dayNumber"
+                                                [class.past-day]="day.isPastOrCutoff && day.dayNumber"
+                                                [class.draft]="isDayDirty(day)"
+                                                [attr.id]="(day.isDisabled || !day.dayNumber) ? 'disabled' : ''"
+                                                (click)="onDayClick(day)"
+                                                [style.cursor]="(day.isDisabled || day.isPastOrCutoff) ? 'not-allowed' : (day.dayNumber ? 'pointer' : 'default')">
+                                                {{ day.dayNumber || '' }}
+                                                @if (day.isClaimedTicket) {
+                                                <span class="claimed-badge" [attr.data-tooltip]="'Vé mua từ ' + (day.claimedFromName || 'người khác')">
+                                                    <i class="fas fa-right-left"></i>
+                                                </span>
+                                                }
+                                            </td>
+                                            }
+                                        </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-panel" style="color: black; font-size: 16px;">
+                        <div class="legend-panel">
+                            <h4 class="legend-title">Chú giải trạng thái</h4>
+                            <ul class="legend-list">
+                                <li class="legend-item">
+                                    <span class="legend-dot legend-dot--active"></span>
+                                    <span class="legend-text">Ngày đăng ký suất thường</span>
+                                </li>
+                                <li class="legend-item">
+                                    <span class="legend-dot legend-dot--special"></span>
+                                    <span class="legend-text">Ngày đăng ký suất đặc biệt</span>
+                                </li>
+                                <li class="legend-item">
+                                    <span class="legend-dot legend-dot--none"></span>
+                                    <span class="legend-text">Ngày chưa đăng ký ăn</span>
+                                </li>
+                                <li class="legend-item">
+                                    <span class="legend-dot legend-dot--draft"></span>
+                                    <span class="legend-text">Thay đổi chưa lưu</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="summary-panel d-flex flex-column">
+                            <div class="summary-info" id="lunch-infor">
+                                <div class="summary-row">
+                                    <span class="summary-key">Suất thường:</span>
+                                    <span class="summary-val"><label id="price" for="price" [attr.value]="pricePerMeal">{{ pricePerMeal | formatMoney }} / vé</label></span>
                                 </div>
-                                <div class="summary-panel d-flex flex-column">
-                                    <div class="summary-info" id="lunch-infor">
-                                        <div class="summary-row">
-                                            <span class="summary-key">Suất thường:</span>
-                                            <span class="summary-val"><label id="price" for="price" [attr.value]="pricePerMeal">{{ pricePerMeal | formatMoney }} / vé</label></span>
-                                        </div>
-                                        <div class="summary-row">
-                                            <span class="summary-key">Suất đặc biệt:</span>
-                                            <span class="summary-val"><label id="special-price" for="special-price" [attr.value]="specialPricePerMeal">{{ specialPricePerMeal | formatMoney }} / vé</label></span>
-                                        </div>
-                                        <div class="summary-row">
-                                            <span class="summary-key">Tổng ngày ăn:</span>
-                                            <span class="summary-val"><label id="countday" for="day">{{ totalDaysEat }}</label> ngày</span>
-                                        </div>
-                                        <div class="summary-row">
-                                            <span class="summary-key">Tổng tiền:</span>
-                                            <span class="summary-val"><label class="total" id="total" for="totalprice" [attr.value]="totalPrice">{{ totalPrice | formatMoney }}</label></span>
-                                        </div>
-                                    </div>
-                                    <div class="summary-actions">
-                                        <a id="allday" class="btn btn-secondary-outline btn-select-all" (click)="toggleSelectAll()">{{ isAllSelected ? 'Bỏ chọn tất cả' : 'Chọn tất cả' }}</a>
-                                        <a href="javascript:void(0)" class="btn btn-secondary-outline" (click)="goToTicketExchange()">Pass vé</a>
-                                        <a href="javascript:void(0)" class="btn btn-secondary-outline" (click)="viewMenu()">Xem thực đơn</a>
-                                    </div>
+                                <div class="summary-row">
+                                    <span class="summary-key">Suất đặc biệt:</span>
+                                    <span class="summary-val"><label id="special-price" for="special-price" [attr.value]="specialPricePerMeal">{{ specialPricePerMeal | formatMoney }} / vé</label></span>
                                 </div>
+                                <div class="summary-row">
+                                    <span class="summary-key">Tổng ngày ăn:</span>
+                                    <span class="summary-val"><label id="countday" for="day">{{ totalDaysEat }}</label> ngày</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-key">Tổng tiền:</span>
+                                    <span class="summary-val"><label class="total" id="total" for="totalprice" [attr.value]="totalPrice">{{ totalPrice | formatMoney }}</label></span>
+                                </div>
+                            </div>
+                            <div class="summary-actions">
+                                <a id="allday" href="javascript:void(0)" class="btn btn-light btn-select-all" (click)="toggleSelectAll()">{{ isAllSelected ? 'Bỏ chọn tất cả' : 'Chọn tất cả' }}</a>
+                                <a href="javascript:void(0)" class="btn btn-light" (click)="goToTicketExchange()">Chợ vé</a>
+                                <a href="javascript:void(0)" class="btn btn-light" (click)="viewMenu()">Thực đơn</a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <form id="ticketstore">
-                    <div class="container save-bar">
-                        <div class="row justify-content-center">
-                            <div class="col-12 text-center" style="padding-top: 1%;">
-                                <button type="button" class="btn btn-primary register" id="update" [disabled]="loading"
-                                    (click)="saveRegistration()">Lưu đăng ký</button>
-                            </div>
-                        </div>
-                    </div>
+                <form id="ticketstore" class="save-bar">
+                    <button type="button" class="btn btn-primary register" id="update" [disabled]="loading"
+                        (click)="saveRegistration()">Lưu đăng ký</button>
                 </form>
             </div>
         </div>
     </div>
 </main>
 
-<style>
-    @media (min-width: 768px) {
-        .modal-xl {
-            width: 90%;
-            max-width: 1500px;
-        }
-    }
-</style>
 @if (showMenuModal) {
 <div class="modal fade show" id="exampleModalXl" tabindex="-1" aria-labelledby="exampleModalXlLabel" aria-modal="true"
-    role="dialog" style="display: block; padding-right: 17px; background: rgba(0,0,0,0.5);">
+    role="dialog" style="display: block; background: rgba(0,0,0,0.5);">
     <div class="modal-dialog modal-xl" [class.image-mode]="!!menuImageUrl">
         <div class="modal-content" style="overflow: auto">
             <div class="modal-header">

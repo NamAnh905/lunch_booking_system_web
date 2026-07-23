@@ -18,8 +18,6 @@ export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
   page = 1;
   size = 10;
 
-  selections: T[] = [];
-
   query: Q = {} as Q;
 
   isFormOpen = false;
@@ -47,7 +45,6 @@ export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
 
   loadData(): void {
     this.loading = true;
-    this.selections = []; // Clear selections on reload
     this.getService().query(this.query, this.page - 1, this.size).subscribe({
       next: (res) => {
         const pageData = (res as any).result !== undefined ? (res as any).result : res;
@@ -88,31 +85,6 @@ export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
     this.query = this.getDefaultQuery();
     this.page = 1;
     this.loadData();
-  }
-
-  onSelectionChange(selectedItems: T[]): void {
-    this.selections = selectedItems;
-  }
-
-  isSelected(item: T): boolean {
-    return this.selections.some((s: any) => s.id === (item as any).id);
-  }
-
-  toggleSelection(item: T): void {
-    if (this.isSelected(item)) {
-      this.selections = this.selections.filter((s: any) => s.id !== (item as any).id);
-    } else {
-      this.selections = [...this.selections, item];
-    }
-  }
-
-  toggleAll(event: Event): void {
-    const isChecked = (event.target as HTMLInputElement).checked;
-    if (isChecked) {
-      this.selections = [...this.data];
-    } else {
-      this.selections = [];
-    }
   }
 
   onAdd(): void {

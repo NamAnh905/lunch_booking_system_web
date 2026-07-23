@@ -10,6 +10,7 @@ import { MonthlyMealDetailModalComponent } from './monthly-meal-detail-modal/mon
 import { UserService } from '../../system/user/user.service';
 import { forkJoin } from 'rxjs';
 import { FormatMoneyPipe } from '../../../shared/pipes/format-money.pipe';
+import { MonthPickerComponent } from '../../../shared/components/month-picker/month-picker.component';
 import { ToastService } from '@core/services/toast.service';
 import { FileDownloadService } from '@core/services/file-download.service';
 import { EXCEL_FILE_NAMES, DEFAULT_PAGE_SIZE } from '@shared/constants/business.constants';
@@ -17,7 +18,7 @@ import { EXCEL_FILE_NAMES, DEFAULT_PAGE_SIZE } from '@shared/constants/business.
 @Component({
   selector: 'app-order-monthly',
   standalone: true,
-  imports: [CommonModule, FormsModule, MonthlyMealDetailModalComponent, FormatMoneyPipe],
+  imports: [CommonModule, FormsModule, MonthPickerComponent, MonthlyMealDetailModalComponent, FormatMoneyPipe],
   templateUrl: './order-monthly.component.html',
   styleUrls: ['./order-monthly.component.scss']
 })
@@ -46,21 +47,6 @@ export class OrderMonthlyComponent implements OnInit {
   selectedUserId?: number;
   selectedUserName?: string;
   selectedUserTotalMeals: number = 0;
-
-  periods = Array.from({ length: 12 }, (_, i) => {
-    const date = new Date(this.selectedYear, this.selectedMonth - 1 - i, 1);
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return { value: `${year}-${month}`, label: `Tháng ${month}/${year}` };
-  });
-  selectedPeriod: string = `${this.selectedYear}-${this.selectedMonth}`;
-
-  onPeriodChange(): void {
-    const [year, month] = this.selectedPeriod.split('-');
-    this.selectedYear = Number(year);
-    this.selectedMonth = Number(month);
-    this.onFilterChange();
-  }
 
   setViewMode(mode: 'overview' | 'list'): void {
     this.viewMode = mode;

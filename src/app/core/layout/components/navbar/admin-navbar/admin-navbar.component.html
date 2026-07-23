@@ -8,7 +8,7 @@
     }
   </div>
 
-  <div class="user-profile-dropdown" tabindex="0">
+  <div class="user-profile-dropdown" [class.dropdown-open]="isDropdownOpen" tabindex="0" #dropdownRef>
     <div class="user-trigger" *ngIf="currentUser$ | async as user" (click)="toggleDropdown()">
       <div class="user-info">
         <span class="user-name">{{ user.username }}</span>

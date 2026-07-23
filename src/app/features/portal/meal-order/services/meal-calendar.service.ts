@@ -65,6 +65,7 @@ export class MealCalendarService {
         isDisabled,
         isPastOrCutoff,
         isClaimedTicket,
+        claimedFromName: isClaimedTicket ? order?.originalUserFullName : undefined,
       });
     }
 

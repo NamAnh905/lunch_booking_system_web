@@ -5,8 +5,6 @@ export interface OrderSummaryItemResponse {
   normalMealCount: number;
   specialMealCount: number;
   totalAmount: number;
-  totalPaid: number;
-  remainingAmount: number;
 }
 
 export interface DailyOrderSummaryResponse {
@@ -23,8 +21,6 @@ export interface MonthlyOrderSummaryResponse {
   totalNormalMeals: number;
   totalSpecialMeals: number;
   totalAmount: number;
-  totalPaid: number;
-  totalRemaining: number;
   items: OrderSummaryItemResponse[];
   dailyCounts?: { date: string, totalMeals: number }[];
 }

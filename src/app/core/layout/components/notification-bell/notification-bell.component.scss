@@ -34,6 +34,23 @@
   background-color: #eef4fc;
 }
 
+@media (max-width: 767.98px) {
+  .notification-bell {
+    flex: 1 1 0;
+    justify-content: center;
+    margin-right: 0;
+  }
+
+  .bell-button {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .bell-button:not(.bell-button--active) {
+    background-color: #f4f6fb;
+  }
+}
+
 .bell-badge {
   position: absolute;
   top: -0.1rem;
@@ -55,7 +72,9 @@
   top: 100%;
   right: 0;
   z-index: 1000;
-  width: 22rem;
+  display: flex;
+  flex-direction: column;
+  width: 23rem;
   max-width: calc(100vw - 2rem);
   margin-top: 0.7rem;
   font-size: 0.95rem;
@@ -75,7 +94,7 @@
 .notification-panel::after {
   content: '';
   position: absolute;
-  right: 1.125rem;
+  right: var(--arrow-offset, 1.125rem);
   width: 0;
   height: 0;
   border-style: solid;
@@ -97,16 +116,20 @@
 }
 
 .notification-panel__header {
+  padding: 0.75rem 1rem 0;
+}
+
+.notification-panel__heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.65rem 1rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .notification-panel__title {
-  font-weight: 600;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .notification-panel__action {
@@ -122,27 +145,82 @@
   }
 }
 
+.notification-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.65rem 0 0.25rem;
+}
+
+.notification-tab {
+  padding: 0.35rem 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475467;
+  background-color: transparent;
+  border: 0;
+  border-radius: 1.25rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f0f2f5;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #004b8c;
+    outline-offset: 1px;
+  }
+}
+
+.notification-tab--active {
+  color: #004b8c;
+  background-color: #e7f0fb;
+
+  &:hover {
+    background-color: #ddeafa;
+  }
+}
+
+.notification-body {
+  max-height: 21rem;
+  padding: 0.35rem 0.5rem 0.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transition: max-height 0.2s ease;
+}
+
+.notification-panel--expanded .notification-body {
+  max-height: min(32rem, calc(100vh - 10rem));
+}
+
+.notification-section + .notification-section {
+  margin-top: 0.35rem;
+}
+
+.notification-section__title {
+  margin: 0;
+  padding: 0.4rem 0.5rem 0.25rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #101828;
+}
+
 .notification-list {
-  max-height: 24rem;
   margin: 0;
   padding: 0;
-  overflow-y: auto;
   list-style: none;
-  border-bottom-right-radius: 0.75rem;
-  border-bottom-left-radius: 0.75rem;
 }
 
 .notification-item {
-  padding: 0.65rem 1rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.6rem 1.4rem 0.6rem 0.5rem;
+  border-radius: 0.5rem;
   cursor: pointer;
 
-  &:last-child {
-    border-bottom: 0;
-  }
-
   &:hover {
-    background-color: #f4f6fb;
+    background-color: #f2f4f7;
   }
 }
 
@@ -152,6 +230,28 @@
   .notification-item__title {
     font-weight: 600;
   }
+
+  &:hover {
+    background-color: #e4eefb;
+  }
+}
+
+.notification-item__avatar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1rem;
+  color: #004b8c;
+  background-color: #e7f0fb;
+  border-radius: 50%;
+}
+
+.notification-item__body {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .notification-item__title {
@@ -169,9 +269,48 @@
   color: #98a2b3;
 }
 
+.notification-item__dot {
+  position: absolute;
+  top: 50%;
+  right: 0.55rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  background-color: #1877f2;
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+
 .notification-empty {
-  padding: 1.25rem 1rem;
+  margin: 0;
+  padding: 1.5rem 1rem;
   font-size: 0.9rem;
   color: #667085;
   text-align: center;
+}
+
+.notification-panel__footer {
+  padding: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.notification-more {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #344054;
+  background-color: #f0f2f5;
+  border: 0;
+  border-radius: 0.5rem;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: #e4e6eb;
+  }
+
+  &:disabled {
+    color: #98a2b3;
+    cursor: default;
+  }
 }

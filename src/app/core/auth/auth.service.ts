@@ -128,4 +128,10 @@ export class AuthService {
   public get currentUserValue(): UserInfo | null {
     return this.currentUserSubject.value;
   }
+
+  public patchCurrentUser(patch: Partial<UserInfo>): void {
+    const current = this.currentUserSubject.value;
+    if (!current) return;
+    this.currentUserSubject.next({ ...current, ...patch });
+  }
 }

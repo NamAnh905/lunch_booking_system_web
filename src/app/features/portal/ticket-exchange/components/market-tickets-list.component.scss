@@ -1,0 +1,68 @@
+@use '../../../../../styles/variables' as *;
+
+:host ::ng-deep .crud-container {
+  box-shadow: $shadow-base;
+}
+
+.filters {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+
+    .filter-group {
+      width: 100%;
+    }
+  }
+}
+
+.meal-col {
+  width: 140px;
+}
+
+.btn-claim {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: $primary-color;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: $transition-base;
+
+  &:hover:not(:disabled) {
+    background-color: #1479d9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba($primary-color, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.own-ticket {
+  font-size: 12.5px;
+  color: $text-secondary;
+  font-style: italic;
+}
+
+.self-tag {
+  color: $text-secondary;
+  font-style: italic;
+}

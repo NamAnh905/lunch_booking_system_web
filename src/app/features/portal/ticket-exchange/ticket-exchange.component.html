@@ -1,44 +1,41 @@
 <main class="exchange-page">
-  <div class="exchange-shell">
+  <div class="scale-wrapper" #scaleWrapper>
+  <div class="exchange-shell" #scaleContent>
     <header class="exchange-header">
       <h1 class="exchange-header__title">Chợ Pass Vé</h1>
-      <button class="btn-back" routerLink="/portal/meal-order">
-        <i class="fas fa-arrow-left"></i> Quay lại
-      </button>
+      <div class="exchange-header__nav">
+        <app-ticket-tabs [labels]="tabLabels" [(activeIndex)]="activeTabIndex"></app-ticket-tabs>
+        <button class="btn-back" routerLink="/portal/meal-order">
+          <i class="fas fa-arrow-left"></i> Quay lại
+        </button>
+      </div>
     </header>
 
-    <div class="exchange-body bg-white">
-      <mat-tab-group animationDuration="0ms" class="flat-tabs">
-        <mat-tab label="Chợ vé chung">
-          <div class="tab-content">
-            <app-market-tickets-list
-              [tickets]="marketTickets"
-              [currentUserId]="currentUserId"
-              [isLoading]="isLoading"
-              (claim)="claimTicket($event)">
-            </app-market-tickets-list>
-          </div>
-        </mat-tab>
+    @if (activeTabIndex() === 0) {
+      <div class="tab-content">
+        <app-market-tickets-list
+          [currentUserId]="currentUserId"
+          (claim)="claimTicket($event)">
+        </app-market-tickets-list>
+      </div>
+    } @else {
+      <div class="tab-content">
+        <app-eligible-orders-list
+          [orders]="eligibleOrders"
+          [pendingOrderWarning]="pendingOrderWarning"
+          [isLoading]="isLoading"
+          (post)="postTicket($event)">
+        </app-eligible-orders-list>
 
-        <mat-tab label="Vé tôi đang Pass">
-          <div class="tab-content">
-            <app-eligible-orders-list
-              [orders]="eligibleOrders"
-              [pendingOrderWarning]="pendingOrderWarning"
-              [isLoading]="isLoading"
-              (post)="postTicket($event)">
-            </app-eligible-orders-list>
+        <mat-divider class="section-divider"></mat-divider>
 
-            <mat-divider class="section-divider"></mat-divider>
-
-            <app-my-tickets-list
-              [tickets]="myTickets"
-              [isLoading]="isLoading"
-              (withdraw)="withdrawTicket($event)">
-            </app-my-tickets-list>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
-    </div>
+        <app-my-tickets-list
+          [tickets]="myTickets"
+          [isLoading]="isLoading"
+          (withdraw)="withdrawTicket($event)">
+        </app-my-tickets-list>
+      </div>
+    }
+  </div>
   </div>
 </main>

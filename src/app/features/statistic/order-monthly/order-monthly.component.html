@@ -24,11 +24,8 @@
     <div class="toolbar-top">
       <div class="filters-inline">
         <div class="filter-item">
-          <select [(ngModel)]="selectedPeriod" (change)="onPeriodChange()">
-            @for (p of periods; track p.value) {
-              <option [ngValue]="p.value">{{ p.label }}</option>
-            }
-          </select>
+          <app-month-picker [(month)]="selectedMonth" [(year)]="selectedYear"
+                            (selected)="onFilterChange()"></app-month-picker>
         </div>
         <div class="filter-item">
           <select [(ngModel)]="selectedDepartmentId" (change)="onFilterChange()">

@@ -19,7 +19,6 @@ export class CrudComponent {
   @Input() total = 0;
   @Input() page = 1;
   @Input() size = 10;
-  @Input() selections: any[] = [];
   @Input() hideAdd = false;
   @Input() addOptions: CrudAddOption[] = [];
 
@@ -34,8 +33,6 @@ export class CrudComponent {
   @Output() sizeChange = new EventEmitter<number>();
   @Output() add = new EventEmitter<void>();
   @Output() addOption = new EventEmitter<string>();
-  @Output() edit = new EventEmitter<any>();
-  @Output() delete = new EventEmitter<any[]>();
   @Output() export = new EventEmitter<void>();
   @Output() refresh = new EventEmitter<void>();
 
@@ -90,18 +87,6 @@ export class CrudComponent {
     if (!this.isAddMenuOpen) return;
     if (!this.elementRef.nativeElement.contains(event.target as Node)) {
       this.isAddMenuOpen = false;
-    }
-  }
-
-  onEdit(): void {
-    if (this.selections.length === 1) {
-      this.edit.emit(this.selections[0]);
-    }
-  }
-
-  onDelete(): void {
-    if (this.selections.length > 0) {
-      this.delete.emit(this.selections);
     }
   }
 

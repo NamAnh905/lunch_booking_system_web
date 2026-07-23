@@ -13,6 +13,8 @@
   justify-content: center;
   padding: 16px;
   background: rgba(15, 23, 42, 0.55);
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
 }
 
 .dept-modal {
@@ -32,8 +34,8 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 18px 24px;
-  background: #FCB71E;
-  color: #000000;
+  background: #1890ff;
+  color: #ffffff;
 
   .title-block h3 {
     margin: 0;
@@ -103,7 +105,7 @@
     }
 
     &.active {
-      background: #FCB71E;
+      background: #1890ff;
       border-color: #ffffff;
       color: #ffffff;
 
@@ -127,7 +129,7 @@
 
 .dept-modal-body {
   flex: none;
-  height: 50vh;
+  height: 55vh;
   overflow: auto;
   padding: 0 24px 16px;
 

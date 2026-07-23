@@ -27,6 +27,10 @@
   align-items: center;
   justify-content: space-between;
 
+  &.dropdown-open {
+    z-index: 1050;
+  }
+
   /* class bg-white trên <nav> (Bootstrap util) cho nền trắng navbar. */
   &.bg-white {
     background-color: #fff;
@@ -43,8 +47,8 @@
 /* .container căn giữa + max-width theo breakpoint như Bootstrap 4 -> logo thụt vào đúng vị trí. */
 .container {
   width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
+  padding-right: 0;
+  padding-left: 0;
   margin-right: auto;
   margin-left: auto;
 }
@@ -53,13 +57,7 @@
   .container { max-width: 540px; }
 }
 @media (min-width: 768px) {
-  .container { max-width: 720px; }
-}
-@media (min-width: 992px) {
-  .container { max-width: 960px; }
-}
-@media (min-width: 1200px) {
-  .container { max-width: 1140px; }
+  .container { max-width: 65%; }
 }
 
 /* inline-block để logo width:68% tính trên kích thước ẢNH, không phải cả trang. */
@@ -177,6 +175,10 @@
   }
 }
 
+.user-icon {
+  display: none;
+}
+
 .dropdown-item {
   display: block;
   width: 100%;
@@ -197,5 +199,69 @@
   &:focus {
     color: #004b8c;
     background-color: #f4f6fb;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .navbar > .container {
+    flex-wrap: nowrap;
+    gap: 0.75rem;
+  }
+
+  .navbar-brand {
+    flex: 0 0 auto;
+    margin-right: auto;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .logo-vnpost {
+    width: auto;
+    height: 2.25rem;
+    max-width: 100%;
+  }
+
+  .navbar-collapse {
+    flex: 0 0 auto;
+    flex-grow: 0;
+  }
+
+  .navbar-nav.mr-auto {
+    display: none;
+  }
+
+  .navbar-nav.ml-auto {
+    flex: 0 0 auto;
+    gap: 0.5rem;
+  }
+
+  .nav-item {
+    display: flex;
+    flex: 1 1 0;
+    justify-content: center;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    font-size: 1.05rem;
+    background-color: #f4f6fb;
+    border-radius: 50%;
+  }
+
+  .dropdown-toggle::after {
+    display: none;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .user-icon {
+    display: block;
   }
 }

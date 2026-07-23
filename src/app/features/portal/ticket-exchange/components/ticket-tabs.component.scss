@@ -1,0 +1,84 @@
+$tab-track: #e3e6ed;
+$tab-idle: #5e6e82;
+$tab-active: #0b1727;
+$tab-pad: 0.25rem;
+$tab-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+:host {
+  display: inline-block;
+}
+
+.ticket-tabs {
+  position: relative;
+  display: inline-flex;
+  width: auto;
+  padding: $tab-pad;
+  border-radius: 10px;
+  background: $tab-track;
+
+  &__item {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+    padding: 6px 16px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: $tab-idle;
+    font: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.3;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0.65;
+    transform: scale(0.96);
+    transition: all 0.3s $tab-ease;
+
+    &:hover {
+      opacity: 0.85;
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      box-shadow: none;
+    }
+
+    &--active {
+      color: $tab-active;
+      font-weight: 700;
+      opacity: 1;
+      transform: scale(1);
+
+      &:hover {
+        opacity: 1;
+        background: transparent;
+      }
+    }
+  }
+
+  &__indicator {
+    position: absolute;
+    z-index: 0;
+    left: 0;
+    top: $tab-pad;
+    bottom: $tab-pad;
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    will-change: transform;
+
+    &--animated {
+      transition: transform 0.3s $tab-ease, width 0.3s $tab-ease;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .ticket-tabs__item {
+    padding: 6px 12px;
+    font-size: 13.5px;
+  }
+}

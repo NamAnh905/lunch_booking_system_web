@@ -93,100 +93,6 @@
   }
 }
 
-:host ::ng-deep .filters .filter-group .mat-mdc-form-field {
-  min-width: 260px;
-  font-size: 14px;
-  color: $text-primary;
-  line-height: normal;
-
-  .mat-mdc-text-field-wrapper {
-    height: 38px;
-    padding: 0;
-    background-color: white;
-    border-radius: $radius-base;
-    transition: $transition-base;
-  }
-
-  .mat-mdc-form-field-flex {
-    height: 38px;
-    align-items: center;
-    padding: 0 4px 0 12px;
-  }
-
-  .mat-mdc-form-field-infix {
-    min-height: 38px;
-    width: auto;
-    flex: 1 1 auto;
-    padding: 0;
-    display: flex;
-    align-items: center;
-  }
-
-  .mdc-notched-outline__leading,
-  .mdc-notched-outline__notch,
-  .mdc-notched-outline__trailing {
-    border-color: $border-color;
-    border-width: 1px;
-  }
-
-  .mdc-notched-outline__leading {
-    border-radius: $radius-base 0 0 $radius-base;
-  }
-
-  .mdc-notched-outline__trailing {
-    border-radius: 0 $radius-base $radius-base 0;
-  }
-
-  &.mat-focused {
-    .mat-mdc-text-field-wrapper {
-      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
-    }
-
-    .mdc-notched-outline__leading,
-    .mdc-notched-outline__notch,
-    .mdc-notched-outline__trailing {
-      border-color: $primary-color;
-      border-width: 1px;
-    }
-  }
-
-  .mat-date-range-input-container {
-    align-items: center;
-  }
-
-  .mat-date-range-input-inner {
-    font-size: 14px;
-    color: $text-primary;
-  }
-
-  .mat-mdc-form-field-icon-suffix {
-    padding: 0;
-
-    .mat-mdc-icon-button.mat-mdc-button-base {
-      --mdc-icon-button-state-layer-size: 30px;
-      width: 30px;
-      height: 30px;
-      padding: 3px;
-
-      svg {
-        width: 18px;
-        height: 18px;
-      }
-    }
-  }
-
-  .mat-mdc-form-field-subscript-wrapper {
-    display: none;
-  }
-}
-
-@media (max-width: 768px) {
-  :host ::ng-deep .filters .filter-group .mat-mdc-form-field {
-    width: 100%;
-    min-width: 0;
-  }
-}
-
 .data-table {
   border-collapse: collapse;
 
@@ -208,6 +114,13 @@
     font-weight: 600;
     color: $text-secondary;
     background-color: #f8fafc;
+  }
+
+  .name-col {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
