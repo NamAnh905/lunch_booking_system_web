@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { LucideUser, LucideLogOut, LucideKeyRound, LucideUtensils, LucideMenu } from '@lucide/angular';
-import { AuthService } from '../../../../auth/auth.service';
-import { UserProfileModalComponent } from '@shared/components/account-modals/user-profile-modal/user-profile-modal.component';
-import { UserPasswordModalComponent } from '@shared/components/account-modals/user-password-modal/user-password-modal.component';
+import { AuthService } from '@core/auth/auth.service';
+import { AdminProfileModalComponent } from './admin-profile-modal/admin-profile-modal.component';
+import { AdminPasswordModalComponent } from './admin-password-modal/admin-password-modal.component';
 
 @Component({
   selector: 'app-admin-navbar',
@@ -19,8 +19,8 @@ import { UserPasswordModalComponent } from '@shared/components/account-modals/us
     LucideKeyRound,
     LucideUtensils,
     LucideMenu,
-    UserProfileModalComponent,
-    UserPasswordModalComponent
+    AdminProfileModalComponent,
+    AdminPasswordModalComponent
   ],
   templateUrl: './admin-navbar.component.html',
   styleUrl: './admin-navbar.component.scss'

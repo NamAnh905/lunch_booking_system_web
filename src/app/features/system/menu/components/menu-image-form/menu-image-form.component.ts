@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AutoFocusDirective } from '../../../../../shared/directives/autofocus.directive';
-import { ToastService } from '@core/services/toast.service';
+import { AutoFocusDirective } from '@shared/directives/autofocus.directive';
+import { ToastService } from '@shared/services/toast.service';
 import { MenuService } from '../../menu.service';
 import { Menu, MenuImageCreateRequest } from '@shared/models/menu.model';
 import { toIsoDate, toDisplayDate, getMonday } from '@shared/utils/date.util';

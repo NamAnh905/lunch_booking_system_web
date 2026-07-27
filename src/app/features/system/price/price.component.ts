@@ -8,7 +8,7 @@ import { CrudSearchComponent } from '@shared/components/crud/crud-search.compone
 import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { PriceService } from './price.service';
 import { PriceResponse, PriceCreateRequest, PriceUpdateRequest } from '@shared/models/price.model';
-import { AutoFocusDirective } from '../../../shared/directives/autofocus.directive';
+import { AutoFocusDirective } from '@shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-price',

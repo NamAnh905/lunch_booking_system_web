@@ -11,7 +11,7 @@ import { RoleService } from './role.service';
 import { RoleResponse, RoleCreateRequest, RoleUpdateRequest } from '@shared/models/role.model';
 import { PermissionService } from '../permission/permission.service';
 import { Permission } from '@shared/models/permission.model';
-import { AutoFocusDirective } from '../../../shared/directives/autofocus.directive';
+import { AutoFocusDirective } from '@shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-role',

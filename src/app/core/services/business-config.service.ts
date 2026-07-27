@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+import { environment } from '@env/environment';
 import { ApiResponse } from '@shared/models';
 import { CUTOFF_TIME } from '@shared/constants/business.constants';
 import { AuthService } from '@core/auth/auth.service';

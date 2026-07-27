@@ -1,0 +1,108 @@
+<app-crud [loading]="loading" [total]="total" [page]="page" [size]="size" [hideAdd]="true" [permissions]="{}"
+  (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)" (refresh)="onReset()">
+
+  <div crud-filters class="filters">
+    <div class="filter-group">
+      <label>Từ ngày</label>
+      <input type="date" lang="vi-VN" [(ngModel)]="query.startDate" (ngModelChange)="onSearch()" />
+    </div>
+
+    <div class="filter-group">
+      <label>Đến ngày</label>
+      <input type="date" lang="vi-VN" [(ngModel)]="query.endDate" (ngModelChange)="onSearch()" />
+    </div>
+
+    <div class="filter-group align-end">
+      <select [(ngModel)]="query.action" (ngModelChange)="onSearch()">
+        <option value="">Tất cả hành động</option>
+        @for (action of availableActions; track action) {
+          <option [value]="action">{{ actionLabel(action) }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-group align-end">
+      <app-crud-search placeholder="Tìm theo người thực hiện..." [(value)]="query.keyword" (search)="onSearch()" />
+    </div>
+  </div>
+
+  <table crud-table class="data-table">
+    <thead>
+      <tr>
+        <th class="stt-col">STT</th>
+        <th class="time-col">Thời gian</th>
+        <th class="name-col">Người thực hiện</th>
+        <th class="action-col">Hành động</th>
+        <th class="target-col">Đối tượng</th>
+        <th class="ip-col">Địa chỉ IP</th>
+        <th class="detail-col">Chi tiết</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of data; track item.id; let i = $index) {
+        <tr>
+          <td class="stt-col">{{ (page - 1) * size + i + 1 }}</td>
+          <td class="time-col">{{ item.createdAt | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+          <td class="name-col" [title]="performerLabel(item)">
+            <span class="performer-name">{{ item.fullName || 'Hệ thống' }}</span>
+            @if (item.username) {
+              <span class="performer-account">{{ item.username }}</span>
+            }
+          </td>
+          <td class="action-col">
+            <span class="action-badge" [ngClass]="'action-' + actionKind(item.action)">{{ actionLabel(item.action) }}</span>
+          </td>
+          <td class="target-col">{{ entityLabel(item) }}</td>
+          <td class="ip-col">{{ item.ipAddress || '-' }}</td>
+          <td class="detail-col">
+            @if (item.newValue) {
+              <app-crud-actions [showPreview]="true" [showEdit]="false" [showDelete]="false" (preview)="openDetail(item)" />
+            } @else {
+              <span class="muted">-</span>
+            }
+          </td>
+        </tr>
+      }
+      @if (data.length === 0 && !loading) {
+        <tr>
+          <td colspan="7" class="text-center empty-state">Không có dữ liệu</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</app-crud>
+
+@if (selectedLog) {
+  <div class="detail-overlay" (click)="closeDetail()">
+    <div class="detail-panel" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <header class="detail-header">
+        <div>
+          <h3 class="detail-title">{{ actionLabel(selectedLog.action) }}</h3>
+          <p class="detail-subtitle">{{ selectedLog.createdAt | date:'dd/MM/yyyy HH:mm:ss' }} · {{ performerLabel(selectedLog) }}</p>
+        </div>
+        <button type="button" class="detail-close" (click)="closeDetail()" aria-label="Đóng">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </header>
+
+      <div class="detail-body">
+        <div class="detail-row">
+          <span class="detail-label">Đối tượng</span>
+          <span class="detail-value">{{ entityLabel(selectedLog) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Địa chỉ IP</span>
+          <span class="detail-value">{{ selectedLog.ipAddress || '-' }}</span>
+        </div>
+        <div class="detail-row full">
+          <span class="detail-label">Dữ liệu mới</span>
+          <pre class="detail-json">{{ formatValue(selectedLog.newValue) }}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+}

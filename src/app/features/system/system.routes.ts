@@ -1,11 +1,14 @@
 import { Routes } from '@angular/router';
+import { roleGuard } from '@core/guards/role.guard';
 import { superAdminGuard } from '@core/guards/super-admin.guard';
+import { ROLES } from '@shared/constants/role.constants';
 
 export const systemRoutes: Routes = [
 
     {
         path: 'admin',
-        data: { breadcrumb: 'Hệ thống' },
+        data: { breadcrumb: 'Hệ thống', expectedRoles: [ROLES.ADMIN, ROLES.SUPER_ADMIN] },
+        canActivate: [roleGuard],
         children: [
             {
                 path: 'user',
@@ -39,12 +42,20 @@ export const systemRoutes: Routes = [
                 title: 'Cấu hình hệ thống',
                 canActivate: [superAdminGuard],
                 loadComponent: () => import('./config/config.component').then(m => m.ConfigComponent)
+            },
+            {
+                path: 'audit-log',
+                data: { breadcrumb: 'Nhật ký hoạt động' },
+                title: 'Nhật ký hoạt động',
+                canActivate: [superAdminGuard],
+                loadComponent: () => import('./audit-log/audit-log.component').then(m => m.AuditLogComponent)
             }
         ]
     },
     {
         path: 'meal',
-        data: { breadcrumb: 'Quản lý suất ăn' },
+        data: { breadcrumb: 'Quản lý suất ăn', expectedRoles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
+        canActivate: [roleGuard],
         children: [
             {
                 path: 'menu',
@@ -68,19 +79,14 @@ export const systemRoutes: Routes = [
     },
     {
         path: 'interaction',
-        data: { breadcrumb: 'Tương tác' },
+        data: { breadcrumb: 'Tương tác', expectedRoles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
+        canActivate: [roleGuard],
         children: [
             {
                 path: 'ticket-exchange',
                 data: { breadcrumb: 'Trao đổi vé' },
                 title: 'Trao đổi vé',
                 loadComponent: () => import('./market/market.component').then(m => m.MarketComponent)
-            },
-            {
-                path: 'notification',
-                data: { breadcrumb: 'Thông báo' },
-                title: 'Thông báo',
-                loadComponent: () => import('../../shared/components/placeholder/placeholder.component').then(m => m.PlaceholderComponent)
             }
         ]
     }

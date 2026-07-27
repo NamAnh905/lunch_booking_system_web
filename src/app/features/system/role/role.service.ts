@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { RoleResponse, RoleCreateRequest, RoleUpdateRequest, PageResponse } from '@shared/models';
-import { environment } from '../../../../environments/environment';
+import { environment } from '@env/environment';
 import { BaseCachedCrudService } from '@shared/services/base-cached-crud.service';
 
 @Injectable({

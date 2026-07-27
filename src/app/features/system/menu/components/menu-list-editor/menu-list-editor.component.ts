@@ -2,9 +2,9 @@ import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CrudComponent } from '@shared/components/crud/crud.component';
-import { AutoFocusDirective } from '../../../../../shared/directives/autofocus.directive';
-import { ToastService } from '@core/services/toast.service';
-import { ConfirmService } from '@core/services/confirm.service';
+import { AutoFocusDirective } from '@shared/directives/autofocus.directive';
+import { ToastService } from '@shared/services/toast.service';
+import { ConfirmService } from '@shared/services/confirm.service';
 import { Menu } from '@shared/models/menu.model';
 import { PriceResponse } from '@shared/models/price.model';
 import { Dish } from '@shared/models/dish.model';

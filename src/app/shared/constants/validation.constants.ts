@@ -1,12 +1,3 @@
-/**
- * Quy tắc validate dùng chung cho các form (Add/Edit) ở khối System & Core.
- *
- * Đồng bộ 1-1 với validation phía Backend (ValidationConstants.java + @Size trên DTO)
- * để FE chặn lỗi sớm, tránh round-trip xuống server. KHÔNG hardcode Regex trong template —
- * mọi form tham chiếu tới các hằng số ở đây.
- */
-
-/** Các mẫu Regex (mirror của ValidationConstants phía Backend). */
 export const VALIDATION_PATTERNS = {
   /** Chỉ chữ số, không khoảng trắng (tài khoản đăng nhập). */
   ACCOUNT: /^\d+$/,
@@ -20,7 +11,7 @@ export const VALIDATION_PATTERNS = {
   CODE: /^[A-Z_]+$/,
 } as const;
 
-/** Giới hạn độ dài — khớp chính xác với @Size(...) trên DTO Backend / schema DB. */
+/** Giới hạn độ dài.*/
 export const VALIDATION_LENGTHS = {
   ACCOUNT: { min: 10, max: 50 },
   PASSWORD: { min: 8, max: 255 },

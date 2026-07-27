@@ -58,34 +58,29 @@
 
   <div class="crud-footer">
     <div class="pagination-info">
-      Hiển thị từ <strong>{{ startItem }}</strong> đến <strong>{{ endItem }}</strong> trong tổng số <strong>{{ total }}</strong> bản ghi
+      Hiển thị {{ startItem }}-{{ endItem }} trên {{ total }} kết quả
     </div>
 
-    <div class="pagination-buttons">
-      <button [disabled]="page === 1 || loading" (click)="onPageChange(1)" title="Trang đầu">
-        &laquo;
-      </button>
-      <button [disabled]="page === 1 || loading" (click)="onPageChange(page - 1)" title="Trang trước">
-        &lsaquo;
+    <nav class="pagination-nav" aria-label="Phân trang">
+      <button class="page-btn page-arrow" [disabled]="page === 1 || loading" (click)="onPageChange(page - 1)" title="Trang trước" aria-label="Trang trước">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
       </button>
 
-      <span class="current-page-display">Trang {{ page }} / {{ totalPages || 1 }}</span>
-
-      <button [disabled]="page === totalPages || totalPages === 0 || loading" (click)="onPageChange(page + 1)" title="Trang sau">
-        &rsaquo;
-      </button>
-      <button [disabled]="page === totalPages || totalPages === 0 || loading" (click)="onPageChange(totalPages)" title="Trang cuối">
-        &raquo;
-      </button>
-    </div>
-
-    <div class="page-size-selector">
-      <span>Số dòng / trang:</span>
-      <select [ngModel]="size" (ngModelChange)="onSizeChange($event)">
-        @for (s of sizeOptions; track s) {
-          <option [value]="s">{{ s }}</option>
+      @for (item of pageItems; track $index) {
+        @if (item === '...') {
+          <span class="page-ellipsis">…</span>
+        } @else {
+          <button class="page-btn page-number" [class.active]="item === page" [disabled]="loading" [attr.aria-current]="item === page ? 'page' : null" (click)="onPageChange($any(item))">{{ item }}</button>
         }
-      </select>
-    </div>
+      }
+
+      <button class="page-btn page-arrow" [disabled]="page === totalPages || totalPages === 0 || loading" (click)="onPageChange(page + 1)" title="Trang sau" aria-label="Trang sau">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </nav>
   </div>
 </div>

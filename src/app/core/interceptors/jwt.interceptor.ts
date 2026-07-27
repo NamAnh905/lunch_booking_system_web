@@ -1,5 +1,5 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+import { environment } from '@env/environment';
 
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   if (req.url.startsWith(environment.apiUrl)) {

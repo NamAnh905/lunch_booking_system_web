@@ -2,9 +2,9 @@ import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { BaseCrudComponent } from '../../../../shared/components/crud/base-crud.component';
-import { CrudComponent } from '../../../../shared/components/crud/crud.component';
-import { CrudSearchComponent } from '../../../../shared/components/crud/crud-search.component';
+import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
+import { CrudComponent } from '@shared/components/crud/crud.component';
+import { CrudSearchComponent } from '@shared/components/crud/crud-search.component';
 import { TicketExchangeResponse } from '@shared/models';
 import { TicketExchangeService } from '../ticket-exchange.service';
 

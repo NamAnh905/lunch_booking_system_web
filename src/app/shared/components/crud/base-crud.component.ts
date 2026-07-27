@@ -2,8 +2,8 @@ import { Directive, OnInit, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PageResponse } from '@shared/models';
 import { VALIDATION_PATTERNS, VALIDATION_LENGTHS } from '@shared/constants/validation.constants';
-import { ToastService } from '../../../core/services/toast.service';
-import { ConfirmService } from '../../../core/services/confirm.service';
+import { ToastService } from '@shared/services/toast.service';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 @Directive()
 export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {

@@ -8,7 +8,7 @@ import { OrderResponse, OrderItemRequest } from '@shared/models';
 import Swal from 'sweetalert2';
 
 import { CalendarDay, DepartmentMemberOrder } from '@shared/models/meal-order.model';
-import { FormatMoneyPipe } from '../../../shared/pipes/format-money.pipe';
+import { FormatMoneyPipe } from '@shared/pipes/format-money.pipe';
 import { DepartmentMealListModalComponent } from './components/department-meal-list-modal/department-meal-list-modal.component';
 import { MealCalendarService } from './services/meal-calendar.service';
 import { MealSummaryCalculator } from './services/meal-summary.calculator';

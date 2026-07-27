@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { map } from 'rxjs';
 import { AuthService } from '@core/auth/auth.service';
-import { UserProfileModalComponent } from '@shared/components/account-modals/user-profile-modal/user-profile-modal.component';
-import { UserPasswordModalComponent } from '@shared/components/account-modals/user-password-modal/user-password-modal.component';
+import { UserProfileModalComponent } from './user-profile-modal/user-profile-modal.component';
+import { UserPasswordModalComponent } from './user-password-modal/user-password-modal.component';
 import { NotificationBellComponent } from '@core/layout/components/notification-bell/notification-bell.component';
 
 @Component({

@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse, PageResponse } from '@shared/models/base.model';
 import { Permission, PermissionCreateRequest, PermissionUpdateRequest } from '@shared/models/permission.model';
-import { environment } from '../../../../environments/environment';
+import { environment } from '@env/environment';
 
 @Injectable({
   providedIn: 'root'

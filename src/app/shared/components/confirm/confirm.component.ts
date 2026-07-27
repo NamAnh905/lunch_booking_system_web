@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ConfirmService, ConfirmRequest } from '../../../core/services/confirm.service';
+import { ConfirmService, ConfirmRequest } from '@shared/services/confirm.service';
 import { Subscription } from 'rxjs';
 
 @Component({

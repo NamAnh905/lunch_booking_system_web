@@ -68,7 +68,7 @@ export class MealOrderService {
   getActivePrices(): Observable<ApiResponse<PriceResponse[]>> {
     if (!this.activePricesCache$) {
       this.activePricesCache$ = this.refreshActivePrices$.pipe(
-        switchMap(() => this.http.get<ApiResponse<PriceResponse[]>>(`${this.apiUrl}/admin/prices/active`)),
+        switchMap(() => this.http.get<ApiResponse<PriceResponse[]>>(`${this.apiUrl}/portal/prices/active`)),
         shareReplay(1),
         catchError(error => {
           this.activePricesCache$ = null;

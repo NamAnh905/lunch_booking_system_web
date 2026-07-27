@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '@core/auth/auth.service';
 import { NotificationService } from '@core/services/notification.service';
-import { ToastService } from '@core/services/toast.service';
+import { ToastService } from '@shared/services/toast.service';
 import { NotificationResponse } from '@shared/models/notification.model';
 import {
   NOTIFICATION_COLLAPSED_LIMIT,

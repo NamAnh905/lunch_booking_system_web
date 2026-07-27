@@ -8,7 +8,7 @@ import { CrudSearchComponent } from '@shared/components/crud/crud-search.compone
 import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { DepartmentService } from './department.service';
 import { DepartmentResponse, DepartmentCreateRequest, DepartmentUpdateRequest } from '@shared/models/department.model';
-import { AutoFocusDirective } from '../../../shared/directives/autofocus.directive';
+import { AutoFocusDirective } from '@shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-department',

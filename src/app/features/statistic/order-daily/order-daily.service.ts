@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DailyOrderSummaryResponse } from '../../../shared/models/order-summary.model';
-import { AdminOrderListResponse } from '../../../shared/models/order.model';
-import { environment } from '../../../../environments/environment';
+import { DailyOrderSummaryResponse } from '@shared/models/order-summary.model';
+import { AdminOrderListResponse } from '@shared/models/order.model';
+import { environment } from '@env/environment';
 
 @Injectable({
   providedIn: 'root'

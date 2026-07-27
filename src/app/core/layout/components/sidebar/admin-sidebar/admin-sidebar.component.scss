@@ -36,6 +36,10 @@
       }
     }
 
+    .group-title {
+      display: none;
+    }
+
     .menu-item {
       justify-content: center;
       padding: 8px;
@@ -44,6 +48,10 @@
 
       .icon {
         margin-right: 0;
+      }
+
+      .label {
+        display: none;
       }
     }
   }
@@ -190,6 +198,37 @@
 
     &.collapsed {
       width: variables.$sidebar-width;
+
+      .sidebar-header {
+        padding: 0 20px;
+        justify-content: space-between;
+
+        .logo-container {
+          display: flex;
+        }
+      }
+
+      .menu-group {
+        padding: 0;
+        border-bottom: none;
+      }
+
+      .group-title {
+        display: block;
+      }
+
+      .menu-item {
+        justify-content: flex-start;
+        padding: 8px 16px;
+
+        .icon {
+          margin-right: 12px;
+        }
+
+        .label {
+          display: block;
+        }
+      }
     }
 
     &.open {

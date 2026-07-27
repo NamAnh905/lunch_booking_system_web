@@ -3,17 +3,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { OrderDailyService } from './order-daily.service';
-import { DailyOrderSummaryResponse } from '../../../shared/models/order-summary.model';
-import { OrderResponse } from '../../../shared/models/order.model';
-import { DepartmentService } from '../../system/department/department.service';
-import { DepartmentResponse } from '../../../shared/models/department.model';
-import { UserService } from '../../system/user/user.service';
+import { DailyOrderSummaryResponse } from '@shared/models/order-summary.model';
+import { OrderResponse } from '@shared/models/order.model';
+import { DepartmentService } from '@features/system/department/department.service';
+import { DepartmentResponse } from '@shared/models/department.model';
+import { UserService } from '@features/system/user/user.service';
 import { forkJoin } from 'rxjs';
-import { FormatMoneyPipe } from '../../../shared/pipes/format-money.pipe';
-import { ToastService } from '@core/services/toast.service';
+import { FormatMoneyPipe } from '@shared/pipes/format-money.pipe';
+import { ToastService } from '@shared/services/toast.service';
 import { FileDownloadService } from '@core/services/file-download.service';
 import { EXCEL_FILE_NAMES, DEFAULT_PAGE_SIZE, APP_DATE_TIME_FORMAT } from '@shared/constants/business.constants';
 import { toIsoDate } from '@shared/utils/date.util';
+import { PageItem, buildPageItems } from '@shared/utils/pagination.util';
 
 @Component({
   selector: 'app-order-daily',
@@ -189,6 +190,10 @@ export class OrderDailyComponent implements OnInit {
 
   get totalPagesCount(): number {
     return Math.ceil(this.totalOrders / this.pageSize);
+  }
+
+  get pageItems(): PageItem[] {
+    return buildPageItems(this.currentPage, this.totalPagesCount);
   }
 
   onSizeChange(newSize: any): void {

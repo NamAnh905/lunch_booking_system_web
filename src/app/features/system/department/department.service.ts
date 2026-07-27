@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
+import { environment } from '@env/environment';
 import { PageResponse, ApiResponse } from '@shared/models';
 import { DepartmentResponse, DepartmentCreateRequest, DepartmentUpdateRequest } from '@shared/models/department.model';
 import { BaseCachedCrudService } from '@shared/services/base-cached-crud.service';

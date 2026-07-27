@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BaseCrudComponent } from '../../../shared/components/crud/base-crud.component';
-import { CrudComponent } from '../../../shared/components/crud/crud.component';
-import { CrudSearchComponent } from '../../../shared/components/crud/crud-search.component';
+import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
+import { CrudComponent } from '@shared/components/crud/crud.component';
+import { CrudSearchComponent } from '@shared/components/crud/crud-search.component';
 import { MarketService } from './market.service';
-import { TicketExchangeResponse } from '../../../shared/models/ticket-exchange.model';
+import { TicketExchangeResponse } from '@shared/models/ticket-exchange.model';
 import { toIsoDate } from '@shared/utils/date.util';
 import { Observable } from 'rxjs';
 

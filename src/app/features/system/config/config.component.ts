@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConfigService } from './config.service';
-import { ToastService } from '../../../core/services/toast.service';
+import { ToastService } from '@shared/services/toast.service';
 import { SystemConfig, SystemConfigUpdateRequest } from '@shared/models/system-config.model';
 
 const TIME_PATTERN = /^\d{2}:\d{2}$/;

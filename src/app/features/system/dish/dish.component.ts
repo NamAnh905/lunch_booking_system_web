@@ -10,7 +10,7 @@ import { DishService } from './dish.service';
 import { Dish, DishCreateRequest, DishUpdateRequest } from '@shared/models/dish.model';
 import { DishType, DISH_TYPE_LABELS } from '@shared/enums/dish-type.enum';
 import { EXCEL_FILE_NAMES } from '@shared/constants/business.constants';
-import { AutoFocusDirective } from '../../../shared/directives/autofocus.directive';
+import { AutoFocusDirective } from '@shared/directives/autofocus.directive';
 
 @Component({
   selector: 'app-dish',

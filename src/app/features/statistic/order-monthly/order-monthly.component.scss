@@ -106,12 +106,32 @@
       }
 
       .view-toggle {
+        position: relative;
         display: flex;
         background: #f1f5f9;
         border-radius: 8px;
         padding: 4px;
 
+        &__indicator {
+          position: absolute;
+          z-index: 0;
+          left: 0;
+          top: 4px;
+          bottom: 4px;
+          border-radius: 6px;
+          background: white;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          will-change: transform;
+
+          &--animated {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+        }
+
         button {
+          position: relative;
+          z-index: 1;
           padding: 8px 16px;
           border: none;
           outline: none;
@@ -122,8 +142,7 @@
           color: #64748b;
           cursor: pointer;
           -webkit-tap-highlight-color: transparent;
-          transition: background-color 0.25s ease, color 0.25s ease,
-            box-shadow 0.25s ease;
+          transition: color 0.25s ease;
 
           &:focus,
           &:focus-visible {
@@ -133,17 +152,10 @@
 
           &:hover:not(.active) {
             color: #475569;
-            background: rgba(255, 255, 255, 0.6);
           }
 
           &.active {
-            background: white;
             color: #0ea5e9;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          }
-
-          &.active:focus-visible {
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
           }
         }
       }

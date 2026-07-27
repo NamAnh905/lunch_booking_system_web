@@ -18,7 +18,7 @@ import {
 } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { ErrorHandlerService } from '../services/error-handler.service';
-import { ToastService } from '../services/toast.service';
+import { ToastService } from '@shared/services/toast.service';
 import { SKIP_ERROR_TOAST } from './http-context.tokens';
 
 let isRefreshing = false;

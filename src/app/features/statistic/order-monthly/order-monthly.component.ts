@@ -1,19 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OrderMonthlyService } from './order-monthly.service';
-import { MonthlyOrderSummaryResponse, OrderSummaryItemResponse } from '../../../shared/models/order-summary.model';
-import { DepartmentService } from '../../system/department/department.service';
-import { DepartmentResponse } from '../../../shared/models/department.model';
+import { MonthlyOrderSummaryResponse, OrderSummaryItemResponse } from '@shared/models/order-summary.model';
+import { DepartmentService } from '@features/system/department/department.service';
+import { DepartmentResponse } from '@shared/models/department.model';
 import { MonthlyMealDetailModalComponent } from './monthly-meal-detail-modal/monthly-meal-detail-modal.component';
-import { UserService } from '../../system/user/user.service';
+import { UserService } from '@features/system/user/user.service';
 import { forkJoin } from 'rxjs';
-import { FormatMoneyPipe } from '../../../shared/pipes/format-money.pipe';
-import { MonthPickerComponent } from '../../../shared/components/month-picker/month-picker.component';
-import { ToastService } from '@core/services/toast.service';
+import { FormatMoneyPipe } from '@shared/pipes/format-money.pipe';
+import { MonthPickerComponent } from '@shared/components/month-picker/month-picker.component';
+import { ToastService } from '@shared/services/toast.service';
 import { FileDownloadService } from '@core/services/file-download.service';
 import { EXCEL_FILE_NAMES, DEFAULT_PAGE_SIZE } from '@shared/constants/business.constants';
+import { PageItem, buildPageItems } from '@shared/utils/pagination.util';
 
 @Component({
   selector: 'app-order-monthly',
@@ -22,7 +23,12 @@ import { EXCEL_FILE_NAMES, DEFAULT_PAGE_SIZE } from '@shared/constants/business.
   templateUrl: './order-monthly.component.html',
   styleUrls: ['./order-monthly.component.scss']
 })
-export class OrderMonthlyComponent implements OnInit {
+export class OrderMonthlyComponent implements OnInit, AfterViewInit {
+  @ViewChildren('viewToggleBtn') viewToggleButtons!: QueryList<ElementRef<HTMLButtonElement>>;
+
+  viewToggleIndicator = { left: 0, width: 0 };
+  viewToggleIndicatorAnimated = false;
+
   selectedMonth: number = new Date().getMonth() + 1;
   selectedYear: number = new Date().getFullYear();
   selectedDepartmentIds: number[] = [];
@@ -50,6 +56,25 @@ export class OrderMonthlyComponent implements OnInit {
 
   setViewMode(mode: 'overview' | 'list'): void {
     this.viewMode = mode;
+    setTimeout(() => this.syncViewToggleIndicator());
+  }
+
+  ngAfterViewInit(): void {
+    this.syncViewToggleIndicator();
+    setTimeout(() => this.viewToggleIndicatorAnimated = true);
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.syncViewToggleIndicator();
+  }
+
+  private syncViewToggleIndicator(): void {
+    const index = this.viewMode === 'overview' ? 0 : 1;
+    const target = this.viewToggleButtons?.get(index)?.nativeElement;
+    if (!target) return;
+
+    this.viewToggleIndicator = { left: target.offsetLeft, width: target.offsetWidth };
   }
 
   constructor(
@@ -200,6 +225,10 @@ export class OrderMonthlyComponent implements OnInit {
 
   get totalPagesCount(): number {
     return Math.ceil(this.totalItems / this.pageSize);
+  }
+
+  get pageItems(): PageItem[] {
+    return buildPageItems(this.currentPage, this.totalPagesCount);
   }
 
   openUserDetail(item: OrderSummaryItemResponse): void {

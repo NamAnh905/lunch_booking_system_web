@@ -1,6 +1,5 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, Output, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { PageItem, buildPageItems } from '@shared/utils/pagination.util';
 
 export interface CrudAddOption {
   label: string;
@@ -10,7 +9,6 @@ export interface CrudAddOption {
 @Component({
   selector: 'app-crud',
   standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './crud.component.html',
   styleUrl: './crud.component.scss',
 })
@@ -36,14 +34,16 @@ export class CrudComponent {
   @Output() export = new EventEmitter<void>();
   @Output() refresh = new EventEmitter<void>();
 
-  sizeOptions = [10, 20, 50, 100];
-
   isAddMenuOpen = false;
 
   private elementRef = inject(ElementRef);
 
   get totalPages(): number {
     return Math.ceil(this.total / this.size);
+  }
+
+  get pageItems(): PageItem[] {
+    return buildPageItems(this.page, this.totalPages);
   }
 
   get startItem(): number {
@@ -59,13 +59,6 @@ export class CrudComponent {
   onPageChange(newPage: number): void {
     if (newPage >= 1 && newPage <= this.totalPages && newPage !== this.page) {
       this.pageChange.emit(newPage);
-    }
-  }
-
-  onSizeChange(newSize: any): void {
-    const sizeNum = Number(newSize);
-    if (sizeNum !== this.size) {
-      this.sizeChange.emit(sizeNum);
     }
   }
 

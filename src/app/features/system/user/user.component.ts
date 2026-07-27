@@ -12,7 +12,7 @@ import { UserResponse, UserCreateRequest, UserUpdateRequest } from '@shared/mode
 import { RoleService } from '../role/role.service';
 import { DepartmentService } from '../department/department.service';
 import { DepartmentResponse } from '@shared/models/department.model';
-import { AutoFocusDirective } from '../../../shared/directives/autofocus.directive';
+import { AutoFocusDirective } from '@shared/directives/autofocus.directive';
 import { EXCEL_FILE_NAMES } from '@shared/constants/business.constants';
 
 @Component({

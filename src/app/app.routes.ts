@@ -35,17 +35,22 @@ export const routes: Routes = [
   },
   {
     path: '401',
-    loadComponent: () => import('./shared/components/error/401.component').then(m => m.UnAuthorizedComponent),
+    loadComponent: () => import('./features/error/401.component').then(m => m.UnAuthorizedComponent),
     title: 'Truy cập bị từ chối - LunchOrder'
   },
   {
+    path: '403',
+    loadComponent: () => import('./features/error/403.component').then(m => m.ForbiddenComponent),
+    title: 'Không có quyền truy cập - LunchOrder'
+  },
+  {
     path: '404',
-    loadComponent: () => import('./shared/components/error/404.component').then(m => m.NotFoundComponent),
+    loadComponent: () => import('./features/error/404.component').then(m => m.NotFoundComponent),
     title: 'Không tìm thấy trang - LunchOrder'
   },
   {
     path: '**',
-    loadComponent: () => import('./shared/components/error/404.component').then(m => m.NotFoundComponent),
+    loadComponent: () => import('./features/error/404.component').then(m => m.NotFoundComponent),
     title: 'Không tìm thấy trang - LunchOrder'
   }
 ];

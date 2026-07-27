@@ -8,8 +8,8 @@ import {
   LucideCalendarDays, LucidePieChart,
   LucideUsers, LucideShield, LucideKey, LucideBuilding,
   LucideUtensilsCrossed, LucideSoup, LucideCoins,
-  LucideTicket, LucideMessageSquare, LucideBell,
-  LucideMenu, LucideSettings
+  LucideTicket, LucideMessageSquare,
+  LucideMenu, LucideSettings, LucideScrollText
 } from '@lucide/angular';
 
 interface MenuItem {
@@ -32,8 +32,8 @@ interface MenuGroup {
     LucideCalendarDays, LucidePieChart,
     LucideUsers, LucideShield, LucideKey, LucideBuilding,
     LucideUtensilsCrossed, LucideSoup, LucideCoins,
-    LucideTicket, LucideMessageSquare, LucideBell,
-    LucideMenu, LucideSettings
+    LucideTicket, LucideMessageSquare,
+    LucideMenu, LucideSettings, LucideScrollText
   ],
   templateUrl: './admin-sidebar.component.html',
   styleUrl: './admin-sidebar.component.scss'
@@ -89,11 +89,22 @@ export class AdminSidebarComponent {
           label: 'Phòng ban',
           icon: 'building',
           route: '/system/admin/department'
-        },
+        }
+      ]
+    },
+    {
+      title: 'CẤU HÌNH & GIÁM SÁT',
+      items: [
         {
           label: 'Cấu hình hệ thống',
           icon: 'settings',
           route: '/system/admin/config',
+          superAdminOnly: true
+        },
+        {
+          label: 'Nhật ký hoạt động',
+          icon: 'scroll-text',
+          route: '/system/admin/audit-log',
           superAdminOnly: true
         }
       ]
@@ -125,11 +136,6 @@ export class AdminSidebarComponent {
           label: 'Trao đổi vé',
           icon: 'ticket',
           route: '/system/interaction/ticket-exchange'
-        },
-        {
-          label: 'Thông báo',
-          icon: 'bell',
-          route: '/system/interaction/notification'
         }
       ]
     }
