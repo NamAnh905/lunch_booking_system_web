@@ -101,7 +101,7 @@
         <thead>
           <tr>
             <th class="stt-col">STT</th>
-            <th>Họ và Tên</th>
+            <th class="name-col">Họ và Tên</th>
             <th class="code-col">Tài khoản</th>
             <th class="dept-col">Phòng ban</th>
             <th class="count-col">Tổng suất ăn</th>
@@ -113,7 +113,7 @@
           @for (item of items; track item.userId; let i = $index) {
           <tr>
             <td class="stt-col">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-            <td [title]="item.fullName">{{ item.fullName }}</td>
+            <td class="name-col" [title]="item.fullName">{{ item.fullName }}</td>
             <td class="code-col" [title]="item.username">{{ item.username }}</td>
             <td class="dept-col" [title]="item.departmentName">{{ item.departmentName }}</td>
             <td class="count-col">{{ item.normalMealCount + item.specialMealCount }}</td>

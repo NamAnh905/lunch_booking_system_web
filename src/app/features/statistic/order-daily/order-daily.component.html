@@ -68,7 +68,7 @@
         <thead>
           <tr>
             <th class="stt-col">STT</th>
-            <th>Họ và Tên</th>
+            <th class="name-col">Họ và Tên</th>
             <th class="code-col">Tên đăng nhập</th>
             <th class="dept-col">Phòng ban</th>
             <th class="status-col">Trạng thái</th>
@@ -80,23 +80,24 @@
           @for (order of orders; track order.userId; let i = $index) {
           <tr>
             <td class="stt-col">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-            <td [title]="order.fullName || 'N/A'">{{ order.fullName || 'N/A' }}</td>
+            <td class="name-col" [title]="order.fullName || 'N/A'">{{ order.fullName || 'N/A' }}</td>
             <td class="code-col" [title]="order.userName || 'N/A'">{{ order.userName || 'N/A' }}</td>
             <td class="dept-col" [title]="order.departmentName || 'N/A'">{{ order.departmentName || 'N/A' }}</td>
             <td class="status-col">
-              <span class="status-clean" [class.active]="order.logicalStatus === 'REGISTERED'"
-                [class.inactive]="order.logicalStatus === 'UNREGISTERED'">
-                <span class="status-dot"></span> {{ order.logicalStatus === 'REGISTERED' ? 'Đã đăng ký' : 'Chưa đăng ký'
-                }}
+              <span class="badge" [class.badge-success]="order.logicalStatus === 'REGISTERED'"
+                [class.badge-danger]="order.logicalStatus === 'UNREGISTERED'">
+                {{ order.logicalStatus === 'REGISTERED' ? 'Đã đăng ký' : 'Chưa đăng ký' }}
+                <i class="fas" [class.fa-circle-check]="order.logicalStatus === 'REGISTERED'"
+                  [class.fa-circle-xmark]="order.logicalStatus === 'UNREGISTERED'"></i>
               </span>
             </td>
             @if (isFriday) {
             <td class="status-col">
               @if (order.logicalStatus === 'REGISTERED') {
               @if (order.price === 40000) {
-              <span class="meal-type-special">Tăng cường</span>
+              <span class="badge badge-warning">Tăng cường <i class="fas fa-star"></i></span>
               } @else {
-              <span class="meal-type-normal">Thường</span>
+              <span class="badge badge-info">Thường <i class="fas fa-utensils"></i></span>
               }
               } @else {
               <span class="text-muted">---</span>

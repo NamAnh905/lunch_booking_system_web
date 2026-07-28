@@ -33,8 +33,9 @@
           <td class="stt-col">{{ (page - 1) * size + i + 1 }}</td>
           <td [title]="item.name || ('Thực đơn ' + item.menuDate)">{{ item.name || ('Thực đơn ' + item.menuDate) }}</td>
           <td class="status-col">
-            <span class="type-text" [class.image]="isImage(item)" [class.list]="!isImage(item)">
+            <span class="badge" [class.badge-image]="isImage(item)" [class.badge-list]="!isImage(item)">
               {{ typeLabel(item) }}
+              <i class="fas" [class.fa-image]="isImage(item)" [class.fa-list]="!isImage(item)"></i>
             </span>
           </td>
           <td class="datetime-col">{{ item.createdAt ? (item.createdAt | date:dateTimeFormat) : '' }}</td>

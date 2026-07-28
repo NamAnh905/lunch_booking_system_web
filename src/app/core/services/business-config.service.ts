@@ -2,8 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { ApiResponse } from '@shared/models';
-import { CUTOFF_TIME } from '@shared/constants/business.constants';
+import { CUTOFF_TIME, MAX_ADVANCE_MONTHS } from '@shared/constants/business.constants';
 import { AuthService } from '@core/auth/auth.service';
+import { endOfMonthsAhead, toIsoDate } from '@shared/utils/date.util';
 
 export interface TimeOfDay {
   hour: number;
@@ -13,6 +14,8 @@ export interface TimeOfDay {
 interface BusinessConfigApiResponse {
   cutOffTime: string;
   ticketLockTime: string;
+  holidays: string[];
+  maxOrderableDate: string;
 }
 
 function parseTime(value: string, fallback: TimeOfDay): TimeOfDay {
@@ -32,6 +35,8 @@ export class BusinessConfigService {
 
   cutOffTime: TimeOfDay = { ...CUTOFF_TIME.ORDER };
   exchangeLockTime: TimeOfDay = { ...CUTOFF_TIME.EXCHANGE_END };
+  holidays: Set<string> = new Set();
+  maxOrderableDate: string = toIsoDate(endOfMonthsAhead(MAX_ADVANCE_MONTHS));
 
   constructor() {
     this.auth.currentUser$.subscribe(user => {
@@ -48,6 +53,10 @@ export class BusinessConfigService {
         if (!data) return;
         this.cutOffTime = parseTime(data.cutOffTime, this.cutOffTime);
         this.exchangeLockTime = parseTime(data.ticketLockTime, this.exchangeLockTime);
+        this.holidays = new Set(data.holidays ?? []);
+        if (data.maxOrderableDate) {
+          this.maxOrderableDate = data.maxOrderableDate;
+        }
       },
       error: () => {}
     });

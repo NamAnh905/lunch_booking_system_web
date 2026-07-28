@@ -1,24 +1,16 @@
 @use '../../../../styles/variables';
 @use '../../../../styles/mixins';
-@use '../../../../styles/buttons';
+@use '../../../../styles/table';
 
-@include buttons.crud-buttons;
-
-.config-page {
+:host {
   display: flex;
-  justify-content: center;
-}
-
-.config-card {
-  width: 100%;
-  max-width: 800px;
-  background-color: white;
-  border: 1px solid variables.$border-color;
-  border-radius: 8px;
-  padding: 24px;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
 .config-header {
+  flex: 0 0 auto;
   margin-bottom: 20px;
 
   h2 {
@@ -43,23 +35,92 @@
   font-size: 14px;
 }
 
-.config-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.view-toggle {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  position: relative;
+  display: inline-flex;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 20px;
+  background: variables.$primary-color;
+
+  &__indicator {
+    position: absolute;
+    z-index: 0;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    border-radius: 6px;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    will-change: transform;
+
+    &--animated {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  button {
+    position: relative;
+    z-index: 1;
+    padding: 8px 16px;
+    border: none;
+    outline: none;
+    background: transparent;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.25s ease;
+
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      box-shadow: none;
+    }
+
+    &:hover:not(.active) {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    &.active {
+      color: variables.$primary-color;
+    }
+
+    .tab-icon {
+      display: none;
+    }
+  }
 }
 
-.config-row {
+.crud-container {
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid variables.$border-color;
+  flex-direction: column;
+}
 
-  &:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
+.crud-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  @include mixins.custom-scroll;
+}
+
+.config-table {
+  min-width: 0;
+  table-layout: fixed;
+
+  th:first-child,
+  td:first-child {
+    min-width: 45%;
   }
 }
 
@@ -67,9 +128,9 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  white-space: normal;
 
-  label {
-    margin: 0;
+  .config-label {
     font-size: 14px;
     font-weight: 500;
     color: variables.$text-primary;
@@ -81,51 +142,141 @@
   }
 }
 
-.config-input {
-  input {
-    padding: 8px 12px;
-    border: 1px solid variables.$border-color;
-    border-radius: 6px;
-    font-size: 14px;
-    outline: none;
-    min-width: 160px;
-    transition: variables.$transition-base;
-    color: variables.$text-primary;
+.config-table td {
+  white-space: normal;
+}
 
-    &:focus {
-      border-color: variables.$primary-color;
-      box-shadow: 0 0 0 2px rgba(variables.$primary-color, 0.2);
+.config-value {
+  font-size: 14px;
+  color: variables.$text-primary;
+}
+
+.list-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.list-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 10px;
+  border-radius: 999px;
+  background-color: rgba(variables.$primary-color, 0.1);
+  color: variables.$text-primary;
+  font-size: 13px;
+}
+
+.list-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: variables.$text-secondary;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(variables.$text-secondary, 0.15);
+    color: variables.$text-primary;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.list-empty {
+  font-size: 13px;
+  color: variables.$text-secondary;
+}
+
+.add-range-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px dashed variables.$primary-color;
+  border-radius: variables.$radius-base;
+  background: transparent;
+  color: variables.$primary-color;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: variables.$transition-base;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(variables.$primary-color, 0.08);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.field-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: variables.$text-secondary;
+}
+
+.staged-chips {
+  max-height: 160px;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #f0f0f0;
+  border-radius: variables.$radius-base;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.row-actions .btn-icon.add {
+  color: variables.$primary-color;
+
+  &:hover {
+    background: white;
+    border-color: rgba(variables.$primary-color, 0.3);
+    box-shadow: 0 4px 6px rgba(variables.$primary-color, 0.1);
+
+    svg {
+      transform: scale(1.15);
     }
   }
 }
 
-.config-actions {
-  margin-top: 24px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.config-actions .btn {
-  padding: 10px 20px;
-}
-
 @media (max-width: 768px) {
-  .config-card {
-    padding: 16px;
-  }
-
-  .config-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  .config-input input {
+  .view-toggle {
+    display: flex;
+    align-self: stretch;
     width: 100%;
-    min-width: 0;
+
+    button {
+      flex: 1;
+      padding: 10px 8px;
+      font-size: 16px;
+
+      .tab-icon {
+        display: inline-block;
+      }
+
+      .tab-label {
+        display: none;
+      }
+    }
   }
 
-  .config-actions .btn {
-    width: 100%;
+  .config-table th:first-child,
+  .config-table td:first-child {
+    width: auto;
   }
 }

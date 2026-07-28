@@ -1,40 +1,143 @@
-<div class="config-page">
-  <div class="config-card">
-    <div class="config-header">
-      <h2>Cấu hình hệ thống</h2>
-      <p class="config-subtitle">Điều chỉnh các mốc thời gian và thiết lập chung áp dụng cho toàn hệ thống.</p>
+@if (loading) {
+  <div class="config-loading">Đang tải cấu hình...</div>
+} @else {
+  <div class="view-toggle">
+    <div class="view-toggle__indicator"
+         [class.view-toggle__indicator--animated]="viewToggleIndicatorAnimated"
+         [style.width.px]="viewToggleIndicator.width"
+         [style.transform]="'translateX(' + viewToggleIndicator.left + 'px)'">
+    </div>
+    <button #tabBtn [class.active]="activeTab === 'time'" (click)="setActiveTab('time')" title="Giờ">
+      <i class="fas fa-clock tab-icon"></i>
+      <span class="tab-label">Giờ</span>
+    </button>
+    <button #tabBtn [class.active]="activeTab === 'holidays'" (click)="setActiveTab('holidays')" title="Ngày nghỉ">
+      <i class="fas fa-calendar-days tab-icon"></i>
+      <span class="tab-label">Ngày nghỉ</span>
+    </button>
+    <button #tabBtn [class.active]="activeTab === 'email'" (click)="setActiveTab('email')" title="Email báo cáo">
+      <i class="fas fa-envelope tab-icon"></i>
+      <span class="tab-label">Email báo cáo</span>
+    </button>
+  </div>
+
+  <div class="crud-container">
+    <div class="crud-body">
+      <table class="data-table config-table">
+        <thead>
+          <tr>
+            <th>Cấu hình</th>
+            <th>Giá trị</th>
+            <th class="action-column">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (config of visibleConfigs; track config.configKey) {
+            <tr>
+              <td>
+                <div class="config-info">
+                  <span class="config-label">{{ config.description || config.configKey }}</span>
+                  <span class="config-key">{{ config.configKey }}</span>
+                </div>
+              </td>
+              <td>
+                @if (config.isListInput) {
+                  <div class="list-chips">
+                    @for (item of config.listItems; track item) {
+                      <span class="list-chip">
+                        {{ item }}
+                        <button type="button" class="list-chip-remove" [disabled]="saving" (click)="removeListItem(config, item)" aria-label="Xoá">&times;</button>
+                      </span>
+                    }
+                    @if (config.listItems.length === 0) {
+                      <span class="list-empty">{{ config.category === 'email' ? 'Chưa có email nào' : 'Chưa có ngày nghỉ nào' }}</span>
+                    }
+                  </div>
+                } @else {
+                  <span class="config-value">{{ config.configValue || '—' }}</span>
+                }
+              </td>
+              <td class="action-column">
+                @if (config.isListInput) {
+                  <div class="row-actions">
+                    <button type="button" class="btn-icon add" (click)="openAddListItem(config)" title="Thêm">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                    </button>
+                  </div>
+                } @else {
+                  <app-crud-actions [showDelete]="false" (edit)="openEditTime(config)" />
+                }
+              </td>
+            </tr>
+          }
+          @if (visibleConfigs.length === 0) {
+            <tr>
+              <td colspan="3" class="text-center empty-state">Chưa có cấu hình nào.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+
+<app-form-modal
+  [open]="isFormOpen"
+  [title]="formTitle"
+  [saving]="saving"
+  [saveDisabled]="editingConfig?.category === 'holidays' ? stagedHolidays.length === 0 : !formValue.trim()"
+  width="420px"
+  (save)="saveForm()"
+  (cancel)="closeForm()">
+  @if (editingConfig?.category === 'email') {
+    <div class="form-field full-span">
+      <label class="required">Email</label>
+      <input type="email" name="formValue" [(ngModel)]="formValue" placeholder="ten@vnpost.vn" (keydown.enter)="saveForm()">
+    </div>
+  } @else if (editingConfig?.category === 'holidays') {
+    <div class="form-field">
+      <label class="required">Từ ngày</label>
+      <input type="date" name="holidayFrom" [(ngModel)]="holidayFrom" (keydown.enter)="addHolidayRange()">
+    </div>
+    <div class="form-field">
+      <label>Đến ngày</label>
+      <input type="date" name="holidayTo" [(ngModel)]="holidayTo" [min]="holidayFrom" (keydown.enter)="addHolidayRange()">
     </div>
 
-    @if (loading) {
-      <div class="config-loading">Đang tải cấu hình...</div>
-    } @else {
-      <div class="config-list">
-        @for (config of configs; track config.configKey) {
-          <div class="config-row">
-            <div class="config-info">
-              <label [for]="config.configKey">{{ config.description || config.configKey }}</label>
-              <span class="config-key">{{ config.configKey }}</span>
-            </div>
-            <div class="config-input">
-              @if (config.isTimeInput) {
-                <input type="time" [id]="config.configKey" [(ngModel)]="config.configValue">
-              } @else {
-                <input type="text" [id]="config.configKey" [(ngModel)]="config.configValue">
-              }
-            </div>
-          </div>
-        }
+    <div class="form-field full-span">
+      <button type="button" class="btn btn-ghost add-range-btn" [disabled]="!canAddHolidayRange" (click)="addHolidayRange()">
+        <i class="fas fa-plus"></i> Thêm vào danh sách
+      </button>
+      <p class="field-hint">Để trống "Đến ngày" nếu chỉ nghỉ một ngày. Thứ 7 và Chủ nhật được bỏ qua vì đã bị chặn sẵn.</p>
+    </div>
 
-        @if (configs.length === 0) {
-          <div class="config-empty">Chưa có cấu hình nào.</div>
+    <div class="form-field full-span">
+      <label>Sẽ thêm ({{ stagedHolidays.length }} ngày)</label>
+      <div class="list-chips staged-chips">
+        @for (date of stagedHolidays; track date) {
+          <span class="list-chip">
+            {{ date }}
+            <button type="button" class="list-chip-remove" (click)="removeStagedHoliday(date)" aria-label="Bỏ khỏi danh sách">&times;</button>
+          </span>
+        }
+        @if (stagedHolidays.length === 0) {
+          <span class="list-empty">Chưa chọn ngày nào</span>
         }
       </div>
-
-      <div class="config-actions">
-        <button class="btn btn-primary" [disabled]="saving" (click)="save()">
-          {{ saving ? 'Đang lưu...' : 'Lưu thay đổi' }}
-        </button>
-      </div>
-    }
-  </div>
-</div>
+    </div>
+  } @else if (editingConfig?.isTimeInput) {
+    <div class="form-field full-span">
+      <label class="required">Giờ</label>
+      <input type="time" name="formValue" [(ngModel)]="formValue" (keydown.enter)="saveForm()">
+    </div>
+  } @else {
+    <div class="form-field full-span">
+      <label class="required">Giá trị</label>
+      <input type="text" name="formValue" [(ngModel)]="formValue" (keydown.enter)="saveForm()">
+    </div>
+  }
+</app-form-modal>

@@ -29,6 +29,20 @@
   margin-left: 4px;
 }
 
+.badge {
+  @include badge-base;
+
+  &-success {
+    background-color: #dcfce7;
+    color: #16a34a;
+  }
+
+  &-danger {
+    background-color: #fee2e2;
+    color: #dc2626;
+  }
+}
+
 .form-field.checkbox-group label {
   display: flex;
   gap: 8px;

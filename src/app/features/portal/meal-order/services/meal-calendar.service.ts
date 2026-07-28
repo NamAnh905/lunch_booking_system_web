@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { CalendarDay } from '@shared/models/meal-order.model';
 import { OrderResponse } from '@shared/models';
-import { SOLAR_HOLIDAYS } from '@shared/constants/business.constants';
 import { BusinessConfigService } from '@core/services/business-config.service';
 import { toIsoDate, isWeekend } from '@shared/utils/date.util';
 
@@ -46,9 +45,9 @@ export class MealCalendarService {
       const dateStr = toIsoDate(cellDate);
       const isReg = registeredDates.has(dateStr);
 
-      const mmdd = `${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-      const isHoliday = SOLAR_HOLIDAYS.includes(mmdd);
-      const isDisabled = isWeekend(cellDate) || isHoliday;
+      const isHoliday = this.businessConfig.holidays.has(dateStr);
+      const isBeyondWindow = dateStr > this.businessConfig.maxOrderableDate;
+      const isDisabled = isWeekend(cellDate) || isHoliday || isBeyondWindow;
       const isPastOrCutoff = cellDate.getTime() < earliestSelectableDate.getTime();
 
       const order = orderMap[dateStr];

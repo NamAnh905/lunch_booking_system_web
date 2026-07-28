@@ -11,9 +11,9 @@
     <thead>
       <tr>
         <th class="stt-col">STT</th>
-        <th>Tên giá</th>
+        <th class="name-col">Tên giá</th>
         <th class="money-col">Mức giá</th>
-        <th>Mô tả</th>
+        <th class="desc-col">Mô tả</th>
         <th class="status-col">Trạng thái</th>
         <th class="action-column">Thao tác</th>
       </tr>
@@ -22,12 +22,13 @@
       @for (item of data; track item.id; let i = $index) {
       <tr>
         <td class="stt-col">{{ (page - 1) * size + i + 1 }}</td>
-        <td [title]="item.name">{{ item.name }}</td>
+        <td class="name-col" [title]="item.name">{{ item.name }}</td>
         <td class="money-col">{{ item.amount | number:'1.0-0' }} VNĐ</td>
-        <td [title]="item.description">{{ item.description }}</td>
+        <td class="desc-col" [title]="item.description">{{ item.description }}</td>
         <td class="status-col">
-          <span class="status-clean" [class.active]="item.isActive" [class.inactive]="!item.isActive">
-            <span class="status-dot"></span> {{ item.isActive ? 'Hoạt động' : 'Khóa' }}
+          <span class="badge" [class.badge-success]="item.isActive" [class.badge-danger]="!item.isActive">
+            {{ item.isActive ? 'Hoạt động' : 'Khóa' }}
+            <i class="fas" [class.fa-circle-check]="item.isActive" [class.fa-lock]="!item.isActive"></i>
           </span>
         </td>
         <td class="action-column">

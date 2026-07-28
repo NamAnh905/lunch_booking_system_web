@@ -52,19 +52,20 @@
           <td [title]="item.name">{{ item.name }}</td>
           <td class="code-col">
             @switch (item.type) {
-              @case ('REGULAR') { <span>Món thường</span> }
-              @case ('SPECIAL') { <span>Món đặc biệt</span> }
-              @case ('DRINK') { <span>Nước uống</span> }
-              @case ('VEGETABLE') { <span>Rau</span> }
-              @case ('SOUP') { <span>Canh</span> }
-              @case ('RICE') { <span>Cơm</span> }
-              @default { <span>{{ item.type }}</span> }
+              @case ('REGULAR') { <span class="badge badge-regular">Món thường <i class="fas fa-tag"></i></span> }
+              @case ('SPECIAL') { <span class="badge badge-special">Món đặc biệt <i class="fas fa-star"></i></span> }
+              @case ('DRINK') { <span class="badge badge-drink">Nước uống <i class="fas fa-glass-water"></i></span> }
+              @case ('VEGETABLE') { <span class="badge badge-vegetable">Rau <i class="fas fa-carrot"></i></span> }
+              @case ('SOUP') { <span class="badge badge-soup">Canh <i class="fas fa-bowl-food"></i></span> }
+              @case ('RICE') { <span class="badge badge-rice">Cơm <i class="fas fa-bowl-rice"></i></span> }
+              @default { <span class="badge">{{ item.type }}</span> }
             }
           </td>
           <td [title]="item.description">{{ item.description }}</td>
           <td class="status-col">
-            <span class="status-clean" [class.active]="item.isActive" [class.inactive]="!item.isActive">
-              <span class="status-dot"></span> {{ item.isActive ? 'Hoạt động' : 'Khóa' }}
+            <span class="badge" [class.badge-success]="item.isActive" [class.badge-danger]="!item.isActive">
+              {{ item.isActive ? 'Hoạt động' : 'Khóa' }}
+              <i class="fas" [class.fa-circle-check]="item.isActive" [class.fa-lock]="!item.isActive"></i>
             </span>
           </td>
           <td class="action-column">

@@ -188,6 +188,11 @@ a:focus {
   right: 5px;
 }
 
+#header .next-button.nav-locked {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
 .head-day {
   font-size: 8em;
   line-height: 1;
@@ -292,6 +297,10 @@ tbody td:active {
   -webkit-transform: scale(0.7);
   -ms-transform: scale(0.7);
   transform: scale(0.7);
+}
+
+tbody td:hover {
+  z-index: 99;
 }
 
 tbody td.past-day:active,
@@ -506,8 +515,9 @@ tbody td#disabled:active {
   &::after {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: calc(100% + 6px);
-    right: -2px;
+    top: 50%;
+    left: calc(100% + 8px);
+    transform: translateY(-50%);
     padding: 4px 8px;
     border-radius: 4px;
     background: #1a1a1a;

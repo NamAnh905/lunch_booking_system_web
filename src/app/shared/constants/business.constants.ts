@@ -20,14 +20,11 @@ export const CUTOFF_TIME = {
   EXCHANGE_END: { hour: 11, minute: 0 },
 } as const;
 
-/** Ngày lễ dương lịch cố định (định dạng 'MM-DD') — không cho đặt suất ăn. */
-export const SOLAR_HOLIDAYS: readonly string[] = [
-  '01-01', // Tết Dương lịch
-  '04-30', // Giải phóng miền Nam
-  '05-01', // Quốc tế Lao động
-  '09-02', // Quốc khánh
-  '09-03',
-];
+/**
+ * Số tháng được phép đặt trước, tính từ tháng hiện tại. Chỉ dùng làm fallback
+ * khi `/business-config` chưa trả về `maxOrderableDate` — backend mới là nơi chốt.
+ */
+export const MAX_ADVANCE_MONTHS = 3;
 
 /** Các trạng thái đơn được coi là "đã đăng ký" (thay cho mảng string literal trong order-daily). */
 export const REGISTERED_ORDER_STATUSES: readonly OrderStatus[] = [

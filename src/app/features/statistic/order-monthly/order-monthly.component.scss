@@ -108,7 +108,7 @@
       .view-toggle {
         position: relative;
         display: flex;
-        background: #f1f5f9;
+        background: variables.$primary-color;
         border-radius: 8px;
         padding: 4px;
 
@@ -120,7 +120,7 @@
           bottom: 4px;
           border-radius: 6px;
           background: white;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
           will-change: transform;
 
           &--animated {
@@ -139,7 +139,7 @@
           border-radius: 6px;
           font-size: 14px;
           font-weight: 500;
-          color: #64748b;
+          color: white;
           cursor: pointer;
           -webkit-tap-highlight-color: transparent;
           transition: color 0.25s ease;
@@ -151,11 +151,11 @@
           }
 
           &:hover:not(.active) {
-            color: #475569;
+            color: rgba(255, 255, 255, 0.85);
           }
 
           &.active {
-            color: #0ea5e9;
+            color: variables.$primary-color;
           }
         }
       }

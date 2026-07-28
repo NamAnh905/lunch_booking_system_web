@@ -14,6 +14,8 @@ export class ExchangeErrorMapper {
   private readonly ticketTaken = 'Vé này đã bị người khác nhận mất, vui lòng tải lại trang!';
   private readonly claimedCannotPass = 'Vé bạn nhận từ chợ không thể pass lại lên chợ!';
   private readonly alreadyInMarket = 'Vé này đang được đăng trên chợ, vui lòng tải lại trang!';
+  private readonly ownTicketOnMarket = 'Bạn đang pass vé trên chợ nên không thể nhận thêm vé!';
+  private readonly alreadyHasTicket = 'Bạn đang có vé nên không thể nhận thêm vé!';
   private readonly generic = 'Đã có lỗi xảy ra, vui lòng thử lại!';
 
   map(err: any): string {
@@ -28,8 +30,13 @@ export class ExchangeErrorMapper {
           return this.alreadyInMarket;
         case ERROR_CODES.ORDER_ALREADY_EXISTS:
           return this.alreadyHasMeal;
+        case ERROR_CODES.USER_TICKET_ON_MARKET:
+          return this.ownTicketOnMarket;
+        case ERROR_CODES.USER_ALREADY_HAS_TICKET:
+          return this.alreadyHasTicket;
         case ERROR_CODES.EXCHANGE_NOT_FOUND:
         case ERROR_CODES.EXCHANGE_NOT_OPEN:
+        case ERROR_CODES.EXCHANGE_ALREADY_CLAIMED:
         case ERROR_CODES.CANNOT_CLAIM_OWN_TICKET:
           return this.ticketTaken;
         default:

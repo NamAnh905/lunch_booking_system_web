@@ -8,3 +8,17 @@
   flex-wrap: wrap;
   width: 100%;
 }
+
+.badge {
+  @include badge-base;
+
+  &-success {
+    background-color: #dcfce7;
+    color: #16a34a;
+  }
+
+  &-danger {
+    background-color: #fee2e2;
+    color: #dc2626;
+  }
+}

@@ -14,15 +14,16 @@
   }
 }
 
-.type-text {
-  text-transform: uppercase;
-  font-weight: 700;
+.badge {
+  @include badge-base;
 
-  &.list {
+  &-list {
+    background-color: #dbeafe;
     color: $primary-color;
   }
 
-  &.image {
+  &-image {
+    background-color: #dcfce7;
     color: #16a34a;
   }
 }

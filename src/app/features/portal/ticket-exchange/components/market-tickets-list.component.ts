@@ -6,6 +6,7 @@ import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
 import { CrudSearchComponent } from '@shared/components/crud/crud-search.component';
 import { TicketExchangeResponse } from '@shared/models';
+import { TicketExchangeStatus } from '@shared/enums';
 import { TicketExchangeService } from '../ticket-exchange.service';
 
 interface MarketQuery {
@@ -23,9 +24,20 @@ export class MarketTicketsListComponent extends BaseCrudComponent<TicketExchange
   private ticketExchangeService = inject(TicketExchangeService);
 
   @Input() currentUserId?: number;
+  @Input() claimBlocked = false;
+  @Input() claimBlockedReason: string | null = null;
   @Output() claim = new EventEmitter<TicketExchangeResponse>();
 
   readonly hiddenPermissions = {};
+
+  isClaimDisabled(ticket: TicketExchangeResponse): boolean {
+    return this.loading || this.claimBlocked || ticket.status !== TicketExchangeStatus.OPEN;
+  }
+
+  claimTooltip(ticket: TicketExchangeResponse): string {
+    if (ticket.status !== TicketExchangeStatus.OPEN) return 'Vé này đã được người khác nhận';
+    return this.claimBlockedReason ?? 'Nhận vé';
+  }
 
   getService() {
     return {

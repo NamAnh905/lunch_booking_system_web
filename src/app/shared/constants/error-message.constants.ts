@@ -1,11 +1,17 @@
 export const ERROR_CODES = {
   UNCATEGORIZED_EXCEPTION: 9999,
   INVALID_KEY: 9901,
+  RESOURCE_NOT_FOUND: 9902,
+  METHOD_NOT_ALLOWED: 9903,
+  MALFORMED_REQUEST: 9904,
+  UNSUPPORTED_MEDIA_TYPE: 9905,
+  DATA_CONFLICT: 9906,
 
   UNAUTHENTICATED: 1001,
   UNAUTHORIZED: 1002,
   TOKEN_GENERATION_FAILED: 1003,
   TOO_MANY_LOGIN_ATTEMPTS: 1004,
+  RATE_LIMIT_EXCEEDED: 1005,
 
   USER_NOT_FOUND: 2001,
   USER_LOCKED: 2002,
@@ -36,12 +42,17 @@ export const ERROR_CODES = {
   ORDER_IN_MARKET: 7005,
   ORDER_CANNOT_PASS: 7006,
   ORDER_CLAIMED_CANNOT_PASS: 7007,
+  ORDER_DATE_NOT_ALLOWED: 7008,
+  ORDER_DATE_TOO_FAR: 7009,
 
   TICKET_NOT_FOUND: 9001,
 
   EXCHANGE_NOT_FOUND: 10001,
   EXCHANGE_NOT_OPEN: 10002,
   CANNOT_CLAIM_OWN_TICKET: 10003,
+  EXCHANGE_ALREADY_CLAIMED: 10004,
+  USER_TICKET_ON_MARKET: 10005,
+  USER_ALREADY_HAS_TICKET: 10006,
 
   NOTIFICATION_NOT_FOUND: 11001,
 
@@ -75,11 +86,17 @@ export const ERROR_MESSAGES: Readonly<Record<ErrorMessageKey, string>> = {
 
   UNCATEGORIZED_EXCEPTION: 'Hệ thống đang gặp sự cố. Vui lòng thử lại sau.',
   INVALID_KEY: 'Dữ liệu nhập vào không hợp lệ. Vui lòng kiểm tra lại.',
+  RESOURCE_NOT_FOUND: 'Không tìm thấy tài nguyên được yêu cầu.',
+  METHOD_NOT_ALLOWED: 'Phương thức yêu cầu không được hỗ trợ.',
+  MALFORMED_REQUEST: 'Yêu cầu không hợp lệ. Vui lòng kiểm tra lại dữ liệu gửi lên.',
+  UNSUPPORTED_MEDIA_TYPE: 'Định dạng dữ liệu gửi lên không được hỗ trợ.',
+  DATA_CONFLICT: 'Yêu cầu xung đột với dữ liệu hiện có.',
 
   UNAUTHENTICATED: 'Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.',
   UNAUTHORIZED: 'Bạn không có quyền thực hiện thao tác này.',
   TOKEN_GENERATION_FAILED: 'Không thể tạo phiên đăng nhập. Vui lòng thử lại sau.',
   TOO_MANY_LOGIN_ATTEMPTS: 'Bạn đã đăng nhập sai quá nhiều lần. Vui lòng thử lại sau ít phút.',
+  RATE_LIMIT_EXCEEDED: 'Bạn đã thao tác quá nhiều lần. Vui lòng thử lại sau ít phút.',
 
   USER_NOT_FOUND: 'Không tìm thấy thông tin người dùng.',
   USER_LOCKED: 'Tài khoản của bạn đã bị khoá. Vui lòng liên hệ quản trị viên.',
@@ -110,12 +127,17 @@ export const ERROR_MESSAGES: Readonly<Record<ErrorMessageKey, string>> = {
   ORDER_IN_MARKET: 'Suất ăn đang được rao trên chợ vé. Vui lòng gỡ khỏi chợ trước.',
   ORDER_CANNOT_PASS: 'Không thể pass suất ăn này.',
   ORDER_CLAIMED_CANNOT_PASS: 'Vé đã nhận từ chợ không thể pass lại.',
+  ORDER_DATE_NOT_ALLOWED: 'Không thể đặt suất ăn vào ngày cuối tuần hoặc ngày lễ.',
+  ORDER_DATE_TOO_FAR: 'Chỉ được đặt suất ăn trong vòng 3 tháng tới.',
 
   TICKET_NOT_FOUND: 'Không tìm thấy vé.',
 
   EXCHANGE_NOT_FOUND: 'Không tìm thấy giao dịch đổi vé.',
   EXCHANGE_NOT_OPEN: 'Giao dịch đổi vé không còn khả dụng.',
   CANNOT_CLAIM_OWN_TICKET: 'Bạn không thể nhận lại vé do chính mình pass.',
+  EXCHANGE_ALREADY_CLAIMED: 'Vé này đã được người khác nhận mất.',
+  USER_TICKET_ON_MARKET: 'Bạn đang pass vé trên chợ nên không thể nhận thêm vé.',
+  USER_ALREADY_HAS_TICKET: 'Bạn đang có vé nên không thể nhận thêm vé.',
 
   NOTIFICATION_NOT_FOUND: 'Không tìm thấy thông báo.',
 

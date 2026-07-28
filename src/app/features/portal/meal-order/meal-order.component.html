@@ -29,6 +29,8 @@
                                                 currentYear }}</div>
                                         </div>
                                         <div class="next-button d-flex align-items-center justify-content-center"
+                                            [class.nav-locked]="!canGoNextMonth"
+                                            [attr.title]="canGoNextMonth ? null : 'Chỉ được đặt cơm đến hết tháng ' + maxOrderableMonthLabel"
                                             (click)="nextMonth()"><i class="fas fa-chevron-right"></i></div>
                                     </form>
                                 </div>

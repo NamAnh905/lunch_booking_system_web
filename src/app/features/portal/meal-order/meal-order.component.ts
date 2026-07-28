@@ -43,6 +43,11 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
     return formatVnTime(this.businessConfig.cutOffTime);
   }
 
+  get maxOrderableMonthLabel(): string {
+    const [year, month] = this.businessConfig.maxOrderableDate.split('-');
+    return `${Number(month)}/${year}`;
+  }
+
   selectedDay = new Date().getDate();
   currentMonth = new Date().getMonth(); // 0-indexed
   currentYear = new Date().getFullYear();
@@ -163,7 +168,18 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
     });
   }
 
+  get canGoNextMonth(): boolean {
+    const [maxYear, maxMonth] = this.businessConfig.maxOrderableDate.split('-').map(Number);
+    return this.currentYear < maxYear
+      || (this.currentYear === maxYear && this.currentMonth < maxMonth - 1);
+  }
+
   nextMonth(): void {
+    if (!this.canGoNextMonth) {
+      this.showToast(`Chỉ được đặt cơm đến hết tháng ${this.maxOrderableMonthLabel}.`, 'danger');
+      return;
+    }
+
     this.confirmDiscardChanges().then((canLeave) => {
       if (!canLeave) return;
       if (this.currentMonth === 11) {

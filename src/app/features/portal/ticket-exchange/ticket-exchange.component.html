@@ -1,6 +1,5 @@
 <main class="exchange-page">
-  <div class="scale-wrapper" #scaleWrapper>
-  <div class="exchange-shell" #scaleContent>
+  <div class="exchange-shell">
     <header class="exchange-header">
       <h1 class="exchange-header__title">Chợ Pass Vé</h1>
       <div class="exchange-header__nav">
@@ -15,6 +14,8 @@
       <div class="tab-content">
         <app-market-tickets-list
           [currentUserId]="currentUserId"
+          [claimBlocked]="isClaimBlocked"
+          [claimBlockedReason]="claimBlockedReason"
           (claim)="claimTicket($event)">
         </app-market-tickets-list>
       </div>
@@ -36,6 +37,5 @@
         </app-my-tickets-list>
       </div>
     }
-  </div>
   </div>
 </main>

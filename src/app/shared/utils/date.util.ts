@@ -39,6 +39,31 @@ export function isWeekend(date: Date): boolean {
   return day === 0 || day === 6;
 }
 
+export function endOfMonthsAhead(monthsAhead: number, base: Date = new Date()): Date {
+  return new Date(base.getFullYear(), base.getMonth() + monthsAhead + 1, 0);
+}
+
+/**
+ * Parse 'YYYY-MM-DD' về nửa đêm giờ địa phương. Khác `new Date(iso)` vốn hiểu
+ * chuỗi là UTC nên có thể lệch một ngày tuỳ múi giờ trình duyệt.
+ */
+export function parseIsoDate(iso: string): Date {
+  const [year, month, day] = iso.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+export function enumerateDates(from: Date, to: Date): Date[] {
+  const dates: Date[] = [];
+  const cursor = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  const last = new Date(to.getFullYear(), to.getMonth(), to.getDate());
+
+  while (cursor.getTime() <= last.getTime()) {
+    dates.push(new Date(cursor));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return dates;
+}
+
 export interface WeekRange {
   monday: Date;
   start: string;

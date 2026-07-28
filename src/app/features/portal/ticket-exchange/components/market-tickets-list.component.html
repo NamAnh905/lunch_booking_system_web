@@ -33,7 +33,8 @@
         <td class="meal-col">{{ item.isSpecial ? 'Suất đặc biệt' : 'Suất thường' }}</td>
         <td class="action-column">
           @if (item.sellerId !== currentUserId) {
-          <button type="button" class="btn-claim" (click)="onClaim(item)" [disabled]="loading">
+          <button type="button" class="btn-claim" (click)="onClaim(item)" [disabled]="isClaimDisabled(item)"
+            [title]="claimTooltip(item)">
             Nhận vé
           </button>
           } @else {

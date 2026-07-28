@@ -54,8 +54,9 @@
           <td class="name-col" [title]="item.fullName">{{ item.fullName }}</td>
           <td class="dept-col" [title]="item.department">{{ item.department }}</td>
           <td class="status-col">
-            <span class="status-clean" [class.active]="item.isActive" [class.inactive]="!item.isActive">
-              <span class="status-dot"></span> {{ item.isActive ? 'Hoạt động' : 'Khóa' }}
+            <span class="badge" [class.badge-success]="item.isActive" [class.badge-danger]="!item.isActive">
+              {{ item.isActive ? 'Hoạt động' : 'Khóa' }}
+              <i class="fas" [class.fa-circle-check]="item.isActive" [class.fa-lock]="!item.isActive"></i>
             </span>
           </td>
           <td class="roles-col" [title]="item.roles ? item.roles.join(', ') : ''">{{ item.roles ? item.roles.join(', ') : '' }}</td>

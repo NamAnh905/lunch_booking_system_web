@@ -27,8 +27,42 @@
   }
 }
 
+.data-table {
+  min-width: 0;
+}
+
+.stt-col {
+  width: 6%;
+}
+
+.date-col {
+  width: 12%;
+}
+
+.datetime-col {
+  width: 16%;
+}
+
+.name-col {
+  width: 20%;
+}
+
+.dept-col {
+  width: 16%;
+}
+
 .meal-col {
-  width: 140px;
+  width: 14%;
+}
+
+.action-column {
+  width: 16%;
+}
+
+@media (max-width: 768px) {
+  .data-table {
+    min-width: 640px;
+  }
 }
 
 .btn-claim {

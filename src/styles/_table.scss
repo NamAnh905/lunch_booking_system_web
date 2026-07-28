@@ -7,15 +7,11 @@
   height: 100%;
   background: variables.$card-bg;
   border-radius: variables.$radius-lg;
-  box-shadow: variables.$shadow-sm;
+  box-shadow: variables.$shadow-base;
   border: 1px solid variables.$border-color;
   overflow: hidden;
   margin-bottom: 24px;
   transition: variables.$transition-base;
-
-  &:hover {
-    box-shadow: variables.$shadow-base;
-  }
 }
 
 .crud-body {
@@ -51,7 +47,7 @@
     text-align: left;
     background-color: #f8fafc;
     color: variables.$text-secondary !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     text-transform: uppercase;
     font-size: 13px;
     letter-spacing: 0.5px;
@@ -90,9 +86,14 @@
   tbody tr {
     transition: all 0.3s ease;
     position: relative;
+    background-color: #ffffff;
+
+    &:nth-child(even) {
+      background-color: #f7f9fc;
+    }
 
     &:hover {
-      background-color: #f8fafc;
+      background-color: #eef2f9;
       transform: translateY(-1px);
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
       z-index: 1;
@@ -131,6 +132,10 @@
   .money-col {
     width: 140px;
     text-align: right;
+  }
+
+  .desc-col {
+    width: 250px;
   }
 
   .count-col {

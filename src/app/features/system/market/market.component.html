@@ -41,14 +41,20 @@
         <td class="name-col" [title]="item.sellerName">{{ item.sellerName }}</td>
         <td class="name-col" [title]="item.buyerName || '-'">{{ item.buyerName || '-' }}</td>
         <td class="status-col">
-          <span [ngClass]="{
-            'status-open': item.status === 'OPEN',
-            'status-matched': item.status === 'MATCHED',
-            'status-cancelled': item.status === 'CANCELLED',
-            'status-expired': item.status === 'EXPIRED'
-          }">
-            {{ item.status }}
-          </span>
+          @switch (item.status) {
+            @case ('OPEN') {
+              <span class="badge badge-info">Mở bán <i class="fas fa-arrows-rotate"></i></span>
+            }
+            @case ('MATCHED') {
+              <span class="badge badge-success">Đã ghép <i class="fas fa-check"></i></span>
+            }
+            @case ('CANCELLED') {
+              <span class="badge badge-danger">Đã hủy <i class="fas fa-xmark"></i></span>
+            }
+            @case ('EXPIRED') {
+              <span class="badge badge-warning">Hết hạn <i class="fas fa-clock"></i></span>
+            }
+          }
         </td>
       </tr>
       }
