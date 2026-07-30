@@ -55,7 +55,7 @@
           <td class="target-col">{{ entityLabel(item) }}</td>
           <td class="ip-col">{{ item.ipAddress || '-' }}</td>
           <td class="detail-col">
-            @if (item.newValue) {
+            @if (item.oldValue || item.newValue) {
               <app-crud-actions [showPreview]="true" [showEdit]="false" [showDelete]="false" (preview)="openDetail(item)" />
             } @else {
               <span class="muted">-</span>
@@ -98,9 +98,19 @@
           <span class="detail-label">Địa chỉ IP</span>
           <span class="detail-value">{{ selectedLog.ipAddress || '-' }}</span>
         </div>
-        <div class="detail-row full">
-          <span class="detail-label">Dữ liệu mới</span>
-          <pre class="detail-json">{{ formatValue(selectedLog.newValue) }}</pre>
+        <div class="detail-diff">
+          @if (selectedLog.oldValue) {
+            <div class="detail-row full">
+              <span class="detail-label">Dữ liệu cũ</span>
+              <pre class="detail-json is-old">{{ formatValue(selectedLog.oldValue) }}</pre>
+            </div>
+          }
+          @if (selectedLog.newValue) {
+            <div class="detail-row full">
+              <span class="detail-label">Dữ liệu mới</span>
+              <pre class="detail-json is-new">{{ formatValue(selectedLog.newValue) }}</pre>
+            </div>
+          }
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ export interface AuditLogResponse {
   action: string;
   targetEntity?: string;
   targetId?: number;
+  oldValue?: string;
   newValue?: string;
   ipAddress?: string;
   createdAt?: string;

@@ -39,7 +39,7 @@
       <tr>
         <th class="stt-col">STT</th>
         <th>Tên món ăn</th>
-        <th class="code-col">Loại món</th>
+        <th class="type-col">Loại món</th>
         <th>Mô tả</th>
         <th class="status-col">Trạng thái</th>
         <th class="action-column">Thao tác</th>
@@ -50,7 +50,7 @@
         <tr>
           <td class="stt-col">{{ (page - 1) * size + i + 1 }}</td>
           <td [title]="item.name">{{ item.name }}</td>
-          <td class="code-col">
+          <td class="type-col">
             @switch (item.type) {
               @case ('REGULAR') { <span class="badge badge-regular">Món thường <i class="fas fa-tag"></i></span> }
               @case ('SPECIAL') { <span class="badge badge-special">Món đặc biệt <i class="fas fa-star"></i></span> }

@@ -25,10 +25,6 @@ export class MenuService {
     return this.http.get<ApiResponse<PageResponse<Menu>>>(this.apiUrl, { params });
   }
 
-  getByDate(date: string): Observable<ApiResponse<Menu[]>> {
-    return this.http.get<ApiResponse<Menu[]>>(`${this.apiUrl}/by-date?date=${date}`);
-  }
-
   getWeeklyMenus(startDate: string, endDate: string): Observable<ApiResponse<Menu[]>> {
     return this.http.get<ApiResponse<Menu[]>>(`${this.apiUrl}/weekly?startDate=${startDate}&endDate=${endDate}`);
   }

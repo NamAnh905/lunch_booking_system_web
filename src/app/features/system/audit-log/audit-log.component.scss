@@ -217,4 +217,25 @@
   word-break: break-word;
   max-height: 320px;
   overflow-y: auto;
+
+  &.is-old {
+    border-color: #fecaca;
+    background-color: #fef2f2;
+  }
+
+  &.is-new {
+    border-color: #bbf7d0;
+    background-color: #f0fdf4;
+  }
+}
+
+.detail-diff {
+  display: grid;
+  gap: 4px;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+  }
 }

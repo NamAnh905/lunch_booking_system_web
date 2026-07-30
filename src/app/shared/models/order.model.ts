@@ -49,7 +49,6 @@ export interface OrderResponse {
   createdAt?: string;
   userName?: string;
   fullName?: string;
-  roleName?: string;
   departmentName?: string;
 }
 

@@ -2,8 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { Dish } from '@shared/models/dish.model';
 import { Menu } from '@shared/models/menu.model';
 import { PriceResponse } from '@shared/models/price.model';
-import { MEAL_PRICE } from '@shared/constants/business.constants';
 import { DishType } from '@shared/enums/dish-type.enum';
+import { MealType } from '@shared/enums/meal-type.enum';
 import { DishClassifierService } from './dish-classifier.service';
 
 export interface MenuSlot {
@@ -17,9 +17,7 @@ export class MenuSlotService {
   private classifier = inject(DishClassifierService);
 
   isSpecialPrice(price: PriceResponse): boolean {
-    if (!price || !price.name) return false;
-    const name = price.name.toLowerCase();
-    return name.includes('đặc biệt') || name.includes('vip') || price.amount === MEAL_PRICE.SPECIAL;
+    return price?.mealType === MealType.SPECIAL;
   }
 
   getMenuSlots(menu: Menu | undefined, dayName: string, price: PriceResponse): MenuSlot[] {

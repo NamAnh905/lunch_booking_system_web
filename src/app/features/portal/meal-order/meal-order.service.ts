@@ -43,12 +43,6 @@ export class MealOrderService {
     });
   }
 
-  getMenusByDate(date: string): Observable<ApiResponse<MenuResponse[]>> {
-    return this.http.get<ApiResponse<MenuResponse[]>>(`${this.apiUrl}/portal/menus/by-date`, {
-      params: { date }
-    });
-  }
-
   getWeeklyMenus(startDate: string, endDate: string): Observable<ApiResponse<MenuResponse[]>> {
     if (!this.weeklyMenusCache$) {
       this.weeklyMenusCache$ = this.refreshWeeklyMenus$.pipe(

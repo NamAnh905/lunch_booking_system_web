@@ -5,6 +5,7 @@ import { MealOrderService } from './meal-order.service';
 import { OrderResponse, OrderItemRequest } from '@shared/models';
 import { MealPrices } from './services/meal-summary.calculator';
 import { MEAL_PRICE } from '@shared/constants/business.constants';
+import { MealType } from '@shared/enums/meal-type.enum';
 import { OrderStatus } from '@shared/enums';
 import { toIsoDate } from '@shared/utils/date.util';
 
@@ -55,10 +56,11 @@ export class MealOrderFacade {
     return this.mealOrderService.getActivePrices().pipe(
       map((res) => {
         if (res?.result && res.result.length > 0) {
-          const sorted = [...res.result].sort((a, b) => a.amount - b.amount);
+          const normal = res.result.find((price) => price.mealType === MealType.NORMAL);
+          const special = res.result.find((price) => price.mealType === MealType.SPECIAL);
           this.prices = {
-            normal: sorted[0].amount,
-            special: sorted.length > 1 ? sorted[sorted.length - 1].amount : MEAL_PRICE.SPECIAL,
+            normal: normal?.amount ?? MEAL_PRICE.NORMAL,
+            special: special?.amount ?? MEAL_PRICE.SPECIAL,
           };
         } else {
           this.prices = { normal: MEAL_PRICE.NORMAL, special: MEAL_PRICE.SPECIAL };

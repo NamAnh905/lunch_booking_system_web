@@ -14,14 +14,6 @@ export class OrderDailyService {
 
   constructor(private http: HttpClient) {}
 
-  getDailySummary(date: string, departmentId?: number): Observable<{ result: DailyOrderSummaryResponse }> {
-    let params = new HttpParams().set('date', date);
-    if (departmentId) {
-      params = params.set('departmentId', departmentId.toString());
-    }
-    return this.http.get<{ result: DailyOrderSummaryResponse }>(this.summaryUrl, { params });
-  }
-
   getAdminOrders(date: string, status?: string): Observable<{ result: AdminOrderListResponse }> {
     let params = new HttpParams().set('date', date);
     if (status) {

@@ -1,5 +1,5 @@
 <app-crud [loading]="loading" [total]="total" [page]="page" [size]="size"
-  [permissions]="{ add: 'MANAGE_PRICES', edit: 'MANAGE_PRICES', delete: 'MANAGE_PRICES' }"
+  [permissions]="{ add: 'MANAGE_PRICE', edit: 'MANAGE_PRICE', delete: 'MANAGE_PRICE' }"
   (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)" (refresh)="onReset()"
   (add)="onAdd()">
 
@@ -13,6 +13,7 @@
         <th class="stt-col">STT</th>
         <th class="name-col">Tên giá</th>
         <th class="money-col">Mức giá</th>
+        <th class="name-col">Loại suất</th>
         <th class="desc-col">Mô tả</th>
         <th class="status-col">Trạng thái</th>
         <th class="action-column">Thao tác</th>
@@ -24,6 +25,7 @@
         <td class="stt-col">{{ (page - 1) * size + i + 1 }}</td>
         <td class="name-col" [title]="item.name">{{ item.name }}</td>
         <td class="money-col">{{ item.amount | number:'1.0-0' }} VNĐ</td>
+        <td class="name-col">{{ MEAL_TYPE_LABELS[item.mealType] }}</td>
         <td class="desc-col" [title]="item.description">{{ item.description }}</td>
         <td class="status-col">
           <span class="badge" [class.badge-success]="item.isActive" [class.badge-danger]="!item.isActive">
@@ -39,7 +41,7 @@
       }
       @if (data.length === 0 && !loading) {
       <tr>
-        <td colspan="6" class="text-center empty-state">Không có dữ liệu</td>
+        <td colspan="7" class="text-center empty-state">Không có dữ liệu</td>
       </tr>
       }
     </tbody>
@@ -76,6 +78,18 @@
           @if (amount.errors?.['required']) { Giá không được để trống. }
           @else if (amount.errors?.['min']) { Giá không được nhỏ hơn 0. }
         </span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label class="required">Loại suất</label>
+      <select name="mealType" #mealType="ngModel" [(ngModel)]="formModel.mealType" required>
+        @for (option of MEAL_TYPE_OPTIONS; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+      @if (mealType.invalid && (mealType.dirty || mealType.touched)) {
+        <span class="error-text">Loại suất không được để trống.</span>
       }
     </div>
 

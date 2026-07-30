@@ -9,6 +9,8 @@ import { FormModalComponent } from '@shared/components/form-modal/form-modal.com
 import { PriceService } from './price.service';
 import { PriceResponse, PriceCreateRequest, PriceUpdateRequest } from '@shared/models/price.model';
 import { AutoFocusDirective } from '@shared/directives/autofocus.directive';
+import { MealType } from '@shared/enums/meal-type.enum';
+import { MEAL_TYPE_LABELS, MEAL_TYPE_OPTIONS } from '@shared/constants/business.constants';
 
 @Component({
   selector: 'app-price',
@@ -19,7 +21,10 @@ import { AutoFocusDirective } from '@shared/directives/autofocus.directive';
 })
 export class PriceComponent extends BaseCrudComponent<PriceResponse, { keyword?: string }, PriceCreateRequest | PriceUpdateRequest> implements OnInit {
   private priceService = inject(PriceService);
-  
+
+  readonly MEAL_TYPE_OPTIONS = MEAL_TYPE_OPTIONS;
+  readonly MEAL_TYPE_LABELS = MEAL_TYPE_LABELS;
+
   override ngOnInit() {
     super.ngOnInit();
   }
@@ -37,6 +42,7 @@ export class PriceComponent extends BaseCrudComponent<PriceResponse, { keyword?:
     return {
       name: '',
       amount: 0,
+      mealType: MealType.NORMAL,
       description: '',
       isActive: true
     };
@@ -74,6 +80,7 @@ export class PriceComponent extends BaseCrudComponent<PriceResponse, { keyword?:
         const updateData: PriceUpdateRequest = {
           name: item.name,
           amount: item.amount,
+          mealType: item.mealType,
           description: item.description,
           isActive: !item.isActive
         };
