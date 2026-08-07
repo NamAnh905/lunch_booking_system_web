@@ -96,6 +96,12 @@
         color: variables.$primary-color;
         font-weight: 500;
       }
+
+      .upload-hint {
+        margin-top: 6px;
+        font-size: 12px;
+        color: #6c757d;
+      }
     }
 
     .image-preview {

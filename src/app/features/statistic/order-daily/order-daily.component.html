@@ -68,16 +68,16 @@
         <thead>
           <tr>
             <th class="stt-col">STT</th>
-            <th class="name-col">Họ và Tên</th>
+            <th class="name-col" appSortHeader="fullName" [sort]="sort" (sortChange)="onSortChange($event)">Họ và Tên</th>
             <th class="code-col">Tên đăng nhập</th>
-            <th class="dept-col">Phòng ban</th>
+            <th class="dept-col" appSortHeader="departmentName" [sort]="sort" (sortChange)="onSortChange($event)">Phòng ban</th>
             <th class="status-col">Trạng thái</th>
             @if (isFriday) { <th class="status-col">Loại suất ăn</th> }
             <th class="datetime-col">Thời gian đặt</th>
           </tr>
         </thead>
         <tbody>
-          @for (order of orders; track order.userId; let i = $index) {
+          @for (order of orders; track order.userId ?? order.departmentName; let i = $index) {
           <tr>
             <td class="stt-col">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
             <td class="name-col" [title]="order.fullName || 'N/A'">{{ order.fullName || 'N/A' }}</td>
@@ -93,8 +93,11 @@
             </td>
             @if (isFriday) {
             <td class="status-col">
-              @if (order.logicalStatus === 'REGISTERED') {
-              @if (order.price === 40000) {
+              @if (order.isGuest) {
+              <span class="badge badge-info badge-auto">{{ order.normalQuantity }} thường / {{ order.specialQuantity }}
+                tăng cường</span>
+              } @else if (order.logicalStatus === 'REGISTERED') {
+              @if (order.isSpecial) {
               <span class="badge badge-warning">Tăng cường <i class="fas fa-star"></i></span>
               } @else {
               <span class="badge badge-info">Thường <i class="fas fa-utensils"></i></span>

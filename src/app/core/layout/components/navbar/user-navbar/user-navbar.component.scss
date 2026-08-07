@@ -1,3 +1,5 @@
+@use '../../../../../../styles/mixins';
+
 .logo-vnpost {
   width: 68%;
   /* Khử "baseline gap" của ảnh inline (~5px thừa bên dưới). Bootstrap reboot
@@ -46,18 +48,9 @@
 
 /* .container căn giữa + max-width theo breakpoint như Bootstrap 4 -> logo thụt vào đúng vị trí. */
 .container {
-  width: 100%;
   padding-right: 0;
   padding-left: 0;
-  margin-right: auto;
-  margin-left: auto;
-}
-
-@media (min-width: 576px) {
-  .container { max-width: 540px; }
-}
-@media (min-width: 768px) {
-  .container { max-width: 65%; }
+  @include mixins.portal-shell-width;
 }
 
 /* inline-block để logo width:68% tính trên kích thước ẢNH, không phải cả trang. */
@@ -202,7 +195,7 @@
   }
 }
 
-@media (max-width: 767.98px) {
+@media (max-width: 991.98px) {
   .navbar > .container {
     flex-wrap: nowrap;
     gap: 0.75rem;

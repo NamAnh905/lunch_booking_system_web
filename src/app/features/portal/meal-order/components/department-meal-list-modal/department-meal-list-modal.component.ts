@@ -14,9 +14,23 @@ type OrderFilter = 'ALL' | 'ORDERED' | 'NOT_ORDERED';
 })
 export class DepartmentMealListModalComponent {
   @Input() members: DepartmentMemberOrder[] = [];
+  @Input() guestNormalQuantity = 0;
+  @Input() guestSpecialQuantity = 0;
   @Output() close = new EventEmitter<void>();
 
   selectedFilter: OrderFilter = 'ALL';
+
+  get guestTotal(): number {
+    return this.guestNormalQuantity + this.guestSpecialQuantity;
+  }
+
+  get totalMeals(): number {
+    return this.orderedCount + this.guestTotal;
+  }
+
+  get showGuestRow(): boolean {
+    return this.guestTotal > 0 && this.selectedFilter !== 'NOT_ORDERED';
+  }
 
   get filteredMembers(): DepartmentMemberOrder[] {
     switch (this.selectedFilter) {

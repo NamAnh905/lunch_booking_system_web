@@ -40,7 +40,6 @@ export const systemRoutes: Routes = [
                 path: 'config',
                 data: { breadcrumb: 'Cấu hình hệ thống' },
                 title: 'Cấu hình hệ thống',
-                canActivate: [superAdminGuard],
                 loadComponent: () => import('./config/config.component').then(m => m.ConfigComponent)
             },
             {
@@ -74,6 +73,12 @@ export const systemRoutes: Routes = [
                 data: { breadcrumb: 'Giá' },
                 title: 'Giá',
                 loadComponent: () => import('./price/price.component').then(m => m.PriceComponent)
+            },
+            {
+                path: 'guest-meal',
+                data: { breadcrumb: 'Suất ăn khách' },
+                title: 'Suất ăn khách',
+                loadComponent: () => import('./guest-meal/guest-meal.component').then(m => m.GuestMealComponent)
             }
         ]
     },

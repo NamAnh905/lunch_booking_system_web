@@ -76,7 +76,7 @@
       <div class="modal-body">
         @if (isImage(previewMenu)) {
           @if (previewMenu.imageUrl) {
-            <img class="preview-image" [src]="previewMenu.imageUrl" alt="Thực đơn hình ảnh">
+            <img class="preview-image" [src]="optimizedImageUrl(previewMenu.imageUrl)" alt="Thực đơn hình ảnh">
           } @else {
             <p class="empty-state">Chưa có ảnh cho thực đơn này.</p>
           }

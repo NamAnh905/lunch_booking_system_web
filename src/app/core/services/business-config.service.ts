@@ -4,7 +4,7 @@ import { environment } from '@env/environment';
 import { ApiResponse } from '@shared/models';
 import { CUTOFF_TIME, MAX_ADVANCE_MONTHS } from '@shared/constants/business.constants';
 import { AuthService } from '@core/auth/auth.service';
-import { endOfMonthsAhead, toIsoDate } from '@shared/utils/date.util';
+import { endOfMonthsAhead, isWeekend, parseIsoDate, toIsoDate } from '@shared/utils/date.util';
 
 export interface TimeOfDay {
   hour: number;
@@ -44,6 +44,24 @@ export class BusinessConfigService {
         this.reload();
       }
     });
+  }
+
+  isPastCutOff(now: Date = new Date()): boolean {
+    const { hour, minute } = this.cutOffTime;
+    return now.getHours() > hour || (now.getHours() === hour && now.getMinutes() >= minute);
+  }
+
+  earliestOrderableDate(now: Date = new Date()): Date {
+    const date = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    date.setDate(date.getDate() + (this.isPastCutOff(now) ? 2 : 1));
+    return date;
+  }
+
+  isOrderable(date: string): boolean {
+    return date >= toIsoDate(this.earliestOrderableDate())
+      && date <= this.maxOrderableDate
+      && !this.holidays.has(date)
+      && !isWeekend(parseIsoDate(date));
   }
 
   private reload(): void {

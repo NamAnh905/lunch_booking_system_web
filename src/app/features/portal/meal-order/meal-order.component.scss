@@ -1,9 +1,13 @@
+@use '../../../../styles/mixins';
+
 .container.meal-header {
   display: flex;
   align-items: flex-end;
   flex-wrap: wrap;
   gap: 12px;
   padding-right: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .meal-header .header-info {
@@ -53,9 +57,15 @@ a:focus {
   padding: 28px 0 !important;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 767.98px) {
   .tickets h1 {
     font-size: 1.2rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .tickets h1 {
+    font-size: 1.6rem;
   }
 }
 
@@ -95,13 +105,8 @@ a:focus {
   font-weight: 600;
 }
 
-@media (min-width: 768px) {
-  .container.tickets {
-    width: 65%;
-    max-width: 65%;
-    margin-right: auto;
-    margin-left: auto;
-  }
+.container.tickets {
+  @include mixins.portal-shell-width;
 }
 
 @media only screen and (max-width: 426px) {
@@ -592,10 +597,11 @@ tbody td.draft:before {
   padding: 31.969px 0;
 }
 
-@media only screen and (max-width: 767.98px) {
+@media only screen and (max-width: 991.98px) {
   #days {
     flex-basis: 100%;
     width: 100%;
+    padding-bottom: 0;
   }
 
   .right-panel {
@@ -611,6 +617,21 @@ tbody td.draft:before {
   padding: 10px;
   box-shadow: 3px 4px 7px #888888 !important;
   margin-left: 5px;
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .right-panel {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .legend-panel,
+  .summary-panel {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-left: 0;
+  }
 }
 
 .legend-title {

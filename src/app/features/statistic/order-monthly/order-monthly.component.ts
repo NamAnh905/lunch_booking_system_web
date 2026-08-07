@@ -15,11 +15,13 @@ import { ToastService } from '@shared/services/toast.service';
 import { FileDownloadService } from '@core/services/file-download.service';
 import { EXCEL_FILE_NAMES, DEFAULT_PAGE_SIZE } from '@shared/constants/business.constants';
 import { PageItem, buildPageItems } from '@shared/utils/pagination.util';
+import { SortState, sortByText } from '@shared/utils/sort.util';
+import { SortHeaderComponent } from '@shared/components/crud/sort-header.component';
 
 @Component({
   selector: 'app-order-monthly',
   standalone: true,
-  imports: [CommonModule, FormsModule, MonthPickerComponent, MonthlyMealDetailModalComponent, FormatMoneyPipe],
+  imports: [CommonModule, FormsModule, MonthPickerComponent, MonthlyMealDetailModalComponent, FormatMoneyPipe, SortHeaderComponent],
   templateUrl: './order-monthly.component.html',
   styleUrls: ['./order-monthly.component.scss']
 })
@@ -48,6 +50,7 @@ export class OrderMonthlyComponent implements OnInit, AfterViewInit {
   items: any[] = [];
   allMergedItems: any[] = [];
   sizeOptions = [10, 20, 50, 100];
+  sort: SortState | null = null;
 
   isModalOpen: boolean = false;
   selectedUserId?: number;
@@ -133,6 +136,8 @@ export class OrderMonthlyComponent implements OnInit, AfterViewInit {
           };
         });
 
+        mergedItems = mergedItems.concat(this.buildGuestItems(fetchedItems));
+
         if (this.selectedDepartmentIds && this.selectedDepartmentIds.length > 0) {
           mergedItems = mergedItems.filter(o => o.departmentId && this.selectedDepartmentIds.includes(o.departmentId));
         }
@@ -146,7 +151,31 @@ export class OrderMonthlyComponent implements OnInit, AfterViewInit {
   }
 
   updateListView(): void {
-    this.items = this.allMergedItems.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+    const sortedItems = sortByText(this.allMergedItems, this.sort);
+    this.items = sortedItems.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+  }
+
+  onSortChange(sort: SortState): void {
+    this.sort = sort;
+    this.currentPage = 1;
+    this.updateListView();
+  }
+
+  private buildGuestItems(fetchedItems: OrderSummaryItemResponse[]): any[] {
+    return fetchedItems
+      .filter(item => item.userId === null || item.userId === undefined)
+      .map(item => ({
+        userId: null,
+        fullName: item.fullName,
+        username: '',
+        departmentName: item.departmentName || '',
+        departmentId: this.departments.find(d => d.name === item.departmentName)?.id,
+        normalMealCount: item.normalMealCount,
+        specialMealCount: item.specialMealCount,
+        totalAmount: item.totalAmount,
+        hasData: false,
+        isGuest: true
+      }));
   }
 
   generateCalendarGrid(): void {
@@ -232,6 +261,10 @@ export class OrderMonthlyComponent implements OnInit, AfterViewInit {
   }
 
   openUserDetail(item: OrderSummaryItemResponse): void {
+    if (item.userId === null || item.userId === undefined) {
+      return;
+    }
+
     this.selectedUserId = item.userId;
     this.selectedUserName = item.fullName;
     this.selectedUserTotalMeals = item.normalMealCount + item.specialMealCount;

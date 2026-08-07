@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { PageResponse, ApiResponse } from '@shared/models';
-import { Menu, MenuCreateRequest, MenuUpdateRequest, MenuImageCreateRequest, UploadResponse } from '@shared/models/menu.model';
+import { Menu, MenuCreateRequest, MenuUpdateRequest, MenuImageCreateRequest } from '@shared/models/menu.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +11,6 @@ import { Menu, MenuCreateRequest, MenuUpdateRequest, MenuImageCreateRequest, Upl
 export class MenuService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/admin/menus`;
-  private uploadUrl = `${environment.apiUrl}/admin/uploads`;
 
   query(query: any, page: number, size: number): Observable<ApiResponse<PageResponse<Menu>>> {
     let params = new HttpParams()
@@ -33,18 +32,21 @@ export class MenuService {
     return this.http.post<ApiResponse<Menu>>(this.apiUrl, form);
   }
 
-  uploadImage(file: File): Observable<ApiResponse<UploadResponse>> {
+  addImageMenu(form: MenuImageCreateRequest, file: File): Observable<ApiResponse<Menu>> {
+    return this.http.post<ApiResponse<Menu>>(`${this.apiUrl}/image`, this.buildImageMenuForm(form, file));
+  }
+
+  updateImageMenu(id: number | string, form: MenuImageCreateRequest, file: File | null): Observable<ApiResponse<Menu>> {
+    return this.http.put<ApiResponse<Menu>>(`${this.apiUrl}/image/${id}`, this.buildImageMenuForm(form, file));
+  }
+
+  private buildImageMenuForm(form: MenuImageCreateRequest, file: File | null): FormData {
     const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post<ApiResponse<UploadResponse>>(`${this.uploadUrl}/image`, formData);
-  }
-
-  addImageMenu(form: MenuImageCreateRequest): Observable<ApiResponse<Menu>> {
-    return this.http.post<ApiResponse<Menu>>(`${this.apiUrl}/image`, form);
-  }
-
-  updateImageMenu(id: number | string, form: MenuImageCreateRequest): Observable<ApiResponse<Menu>> {
-    return this.http.put<ApiResponse<Menu>>(`${this.apiUrl}/image/${id}`, form);
+    formData.append('request', new Blob([JSON.stringify(form)], { type: 'application/json' }));
+    if (file) {
+      formData.append('file', file);
+    }
+    return formData;
   }
 
   edit(id: number | string, form: MenuUpdateRequest): Observable<ApiResponse<Menu>> {

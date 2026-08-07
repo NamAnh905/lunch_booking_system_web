@@ -19,10 +19,10 @@
     </div>
 
     <div class="form-field">
-      <label class="required">Họ tên</label>
-      <input type="text" formControlName="fullName" placeholder="Nhập họ tên" />
+      <label class="required">Họ và tên</label>
+      <input type="text" formControlName="fullName" placeholder="Nhập họ và tên" />
       @if (form.get('fullName')?.invalid && form.get('fullName')?.touched) {
-      <small class="error-text">Họ tên không được để trống.</small>
+      <small class="error-text">Họ và tên không được để trống.</small>
       }
     </div>
 

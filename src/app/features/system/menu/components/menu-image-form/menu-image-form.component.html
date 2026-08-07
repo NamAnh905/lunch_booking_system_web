@@ -22,7 +22,8 @@
 
         <div class="form-group">
           <label>Ảnh thực đơn <span class="required">*</span></label>
-          <input type="file" name="file" accept="image/*" (change)="onFileChange($event)">
+          <input type="file" name="file" [accept]="uploadRules.ACCEPT_ATTR" (change)="onFileChange($event)">
+          <div class="upload-hint">{{ uploadRules.ACCEPTED_TYPES_LABEL }}, tối đa {{ uploadRules.MAX_SIZE_LABEL }}</div>
         </div>
 
         @if (previewUrl) {

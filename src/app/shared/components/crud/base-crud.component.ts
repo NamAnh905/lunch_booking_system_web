@@ -4,6 +4,7 @@ import { PageResponse } from '@shared/models';
 import { VALIDATION_PATTERNS, VALIDATION_LENGTHS } from '@shared/constants/validation.constants';
 import { ToastService } from '@shared/services/toast.service';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { SortState } from '@shared/utils/sort.util';
 
 @Directive()
 export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
@@ -19,6 +20,7 @@ export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
   size = 10;
 
   query: Q = {} as Q;
+  sort: SortState | null = null;
 
   isFormOpen = false;
   formModel: F = {} as F;
@@ -45,7 +47,7 @@ export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
 
   loadData(): void {
     this.loading = true;
-    this.getService().query(this.query, this.page - 1, this.size).subscribe({
+    this.getService().query(this.buildQuery(), this.page - 1, this.size).subscribe({
       next: (res) => {
         const pageData = (res as any).result !== undefined ? (res as any).result : res;
 
@@ -81,10 +83,24 @@ export abstract class BaseCrudComponent<T, Q = any, F = any> implements OnInit {
     this.loadData();
   }
 
-  onReset(): void {
-    this.query = this.getDefaultQuery();
+  onSortChange(sort: SortState): void {
+    this.sort = sort;
     this.page = 1;
     this.loadData();
+  }
+
+  onReset(): void {
+    this.query = this.getDefaultQuery();
+    this.sort = null;
+    this.page = 1;
+    this.loadData();
+  }
+
+  protected buildQuery(): Q {
+    if (!this.sort) {
+      return this.query;
+    }
+    return { ...this.query, sortBy: this.sort.field, sortDir: this.sort.direction } as Q;
   }
 
   onAdd(): void {

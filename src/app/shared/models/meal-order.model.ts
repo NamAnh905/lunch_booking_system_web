@@ -5,6 +5,12 @@ export interface DepartmentMemberOrder {
   isSpecial: boolean;
 }
 
+export interface DepartmentMealList {
+  members: DepartmentMemberOrder[];
+  guestNormalQuantity: number;
+  guestSpecialQuantity: number;
+}
+
 export interface CalendarDay {
   dayNumber: number | null;
   dateString: string;

@@ -1,9 +1,11 @@
-import { Injectable, NgZone, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subject, map, tap } from 'rxjs';
 import { environment } from '@env/environment';
 import { ApiResponse } from '@shared/models';
 import { NotificationResponse } from '@shared/models/notification.model';
+import { REALTIME_EVENTS } from '@shared/constants/realtime.constants';
+import { RealtimeService } from './realtime.service';
 
 interface NotificationPage {
   content: NotificationResponse[];
@@ -16,12 +18,10 @@ interface NotificationPage {
 })
 export class NotificationService {
   private http = inject(HttpClient);
-  private zone = inject(NgZone);
+  private realtime = inject(RealtimeService);
   private apiUrl = `${environment.apiUrl}/notifications`;
 
   private readonly listSize = 20;
-  private readonly reconnectBaseDelayMs = 2000;
-  private readonly reconnectMaxDelayMs = 60000;
 
   private notificationsSubject = new BehaviorSubject<NotificationResponse[]>([]);
   notifications$ = this.notificationsSubject.asObservable();
@@ -38,18 +38,31 @@ export class NotificationService {
   private incomingSubject = new Subject<NotificationResponse>();
   incoming$ = this.incomingSubject.asObservable();
 
-  private eventSource: EventSource | null = null;
-  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
-  private reconnectAttempts = 0;
   private loadedPage = 0;
+  private awaitingFirstConnect = false;
+
+  constructor() {
+    this.realtime
+      .on<NotificationResponse>(REALTIME_EVENTS.NOTIFICATION)
+      .subscribe((notification) => this.onIncoming(notification));
+
+    this.realtime.connected$.subscribe(() => {
+      if (this.awaitingFirstConnect) {
+        this.awaitingFirstConnect = false;
+        return;
+      }
+      this.refresh();
+    });
+  }
 
   start(): void {
+    this.awaitingFirstConnect = true;
     this.refresh();
-    this.openStream();
+    this.realtime.start();
   }
 
   stop(): void {
-    this.closeStream();
+    this.realtime.stop();
     this.notificationsSubject.next([]);
     this.unreadCountSubject.next(0);
     this.hasMoreSubject.next(false);
@@ -125,35 +138,7 @@ export class NotificationService {
     );
   }
 
-  private openStream(): void {
-    this.closeStream();
-
-    const source = new EventSource(`${this.apiUrl}/stream`, { withCredentials: true });
-    this.eventSource = source;
-
-    source.addEventListener('notification', (event) => {
-      this.zone.run(() => this.onIncoming((event as MessageEvent).data));
-    });
-
-    source.onopen = () => {
-      this.reconnectAttempts = 0;
-    };
-
-    source.onerror = () => {
-      if (source.readyState === EventSource.CLOSED) {
-        this.zone.run(() => this.scheduleReconnect());
-      }
-    };
-  }
-
-  private onIncoming(raw: string): void {
-    let notification: NotificationResponse;
-    try {
-      notification = JSON.parse(raw) as NotificationResponse;
-    } catch {
-      return;
-    }
-
+  private onIncoming(notification: NotificationResponse): void {
     if (this.notificationsSubject.value.some((item) => item.id === notification.id)) {
       return;
     }
@@ -163,34 +148,5 @@ export class NotificationService {
       this.unreadCountSubject.next(this.unreadCountSubject.value + 1);
     }
     this.incomingSubject.next(notification);
-  }
-
-  private scheduleReconnect(): void {
-    if (this.reconnectTimer) {
-      return;
-    }
-
-    const delay = Math.min(
-      this.reconnectBaseDelayMs * Math.pow(2, this.reconnectAttempts),
-      this.reconnectMaxDelayMs
-    );
-    this.reconnectAttempts++;
-
-    this.reconnectTimer = setTimeout(() => {
-      this.reconnectTimer = null;
-      this.refresh();
-      this.openStream();
-    }, delay);
-  }
-
-  private closeStream(): void {
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-    if (this.eventSource) {
-      this.eventSource.close();
-      this.eventSource = null;
-    }
   }
 }

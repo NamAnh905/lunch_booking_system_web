@@ -1,14 +1,15 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { OverlayModule } from '@angular/cdk/overlay';
 import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
 import { CrudActionsComponent } from '@shared/components/crud/crud-actions.component';
 import { CrudSearchComponent } from '@shared/components/crud/crud-search.component';
+import { SortHeaderComponent } from '@shared/components/crud/sort-header.component';
 import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { UserService } from './user.service';
-import { UserResponse, UserCreateRequest, UserUpdateRequest } from '@shared/models/user.model';
+import { UserImportResultResponse, UserResponse, UserCreateRequest, UserUpdateRequest } from '@shared/models/user.model';
+import { UserImportResultModalComponent } from './components/user-import-result-modal/user-import-result-modal.component';
 import { RoleService } from '../role/role.service';
 import { DepartmentService } from '../department/department.service';
 import { DepartmentResponse } from '@shared/models/department.model';
@@ -18,7 +19,7 @@ import { EXCEL_FILE_NAMES } from '@shared/constants/business.constants';
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule, FormsModule, OverlayModule, CrudComponent, CrudActionsComponent, CrudSearchComponent, FormModalComponent, AutoFocusDirective],
+  imports: [CommonModule, FormsModule, CrudComponent, CrudActionsComponent, CrudSearchComponent, SortHeaderComponent, FormModalComponent, AutoFocusDirective, UserImportResultModalComponent],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss'
 })
@@ -91,31 +92,21 @@ export class UserComponent extends BaseCrudComponent<UserResponse, { keyword?: s
     }
     this.formModel.password = ''; // empty password field for editing
     this.isFormOpen = true;
-    this.isRolesDropdownOpen = false;
   }
 
-  isRolesDropdownOpen = false;
+  showPassword = false;
 
-  toggleRolesDropdown() {
-    this.isRolesDropdownOpen = !this.isRolesDropdownOpen;
+  override closeForm(): void {
+    this.showPassword = false;
+    super.closeForm();
   }
 
-  onRoleChange(roleCode: string, event: Event) {
-    const isChecked = (event.target as HTMLInputElement).checked;
-    if (!this.formModel.roles) this.formModel.roles = [];
-
-    if (isChecked) {
-      if (!this.formModel.roles.includes(roleCode)) {
-        this.formModel.roles.push(roleCode);
-      }
-    } else {
-      this.formModel.roles = this.formModel.roles.filter((r: string) => r !== roleCode);
-    }
+  get selectedRole(): string {
+    return this.formModel.roles?.[0] ?? '';
   }
 
-  getRolesDisplayText(): string {
-    if (!this.formModel.roles || this.formModel.roles.length === 0) return 'Chọn vai trò';
-    return this.formModel.roles.join(', ');
+  set selectedRole(roleCode: string) {
+    this.formModel.roles = roleCode ? [roleCode] : [];
   }
 
   onToggleStatus(item: any) {
@@ -146,6 +137,7 @@ export class UserComponent extends BaseCrudComponent<UserResponse, { keyword?: s
 
   override onSave(formData: any): void {
     formData.roles = this.formModel.roles || [];
+    delete formData.role;
 
     // Do not send empty password on update
     if (!formData.password) {
@@ -159,14 +151,7 @@ export class UserComponent extends BaseCrudComponent<UserResponse, { keyword?: s
     this.loading = true;
     this.userService.exportExcel(this.query.keyword).subscribe({
       next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = EXCEL_FILE_NAMES.USER_LIST;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+        this.downloadBlob(blob, EXCEL_FILE_NAMES.USER_LIST);
         this.loading = false;
         this.toastService.showSuccess('Xuất file Excel thành công!');
       },
@@ -176,5 +161,66 @@ export class UserComponent extends BaseCrudComponent<UserResponse, { keyword?: s
         this.toastService.showError('Xuất file Excel thất bại!');
       }
     });
+  }
+
+  importResult: UserImportResultResponse | null = null;
+  importedFileName = '';
+
+  onDownloadTemplate() {
+    this.loading = true;
+    this.userService.downloadImportTemplate().subscribe({
+      next: (blob) => {
+        this.downloadBlob(blob, EXCEL_FILE_NAMES.USER_IMPORT_TEMPLATE);
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Failed to download import template', err);
+        this.loading = false;
+      }
+    });
+  }
+
+  onImportFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) {
+      return;
+    }
+
+    this.loading = true;
+    this.importedFileName = file.name;
+    this.userService.importExcel(file).subscribe({
+      next: (res) => {
+        this.loading = false;
+        this.importResult = res.result ?? null;
+
+        if (this.importResult && this.importResult.successCount > 0) {
+          this.toastService.showSuccess(`Đã thêm ${this.importResult.successCount} người dùng từ file Excel.`);
+          this.loadData();
+        }
+      },
+      error: (err) => {
+        console.error('Failed to import excel', err);
+        this.loading = false;
+        this.importedFileName = '';
+      }
+    });
+  }
+
+  closeImportResult() {
+    this.importResult = null;
+    this.importedFileName = '';
+  }
+
+  private downloadBlob(blob: Blob, fileName: string) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   }
 }

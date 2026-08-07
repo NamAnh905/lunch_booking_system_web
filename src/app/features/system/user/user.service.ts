@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { PageResponse, ApiResponse } from '@shared/models';
-import { UserResponse, UserCreateRequest, UserUpdateRequest } from '@shared/models/user.model';
+import { UserResponse, UserCreateRequest, UserUpdateRequest, UserImportResultResponse } from '@shared/models/user.model';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +30,9 @@ export class UserService {
     if (query && query.isActives && query.isActives.length > 0) {
       params = params.set('isActives', query.isActives.join(','));
     }
+    if (query && query.sortBy) {
+      params = params.set('sortBy', query.sortBy).set('sortDir', query.sortDir || 'asc');
+    }
 
     return this.http.get<ApiResponse<PageResponse<UserResponse>>>(this.apiUrl, { params });
   }
@@ -55,5 +58,15 @@ export class UserService {
       params,
       responseType: 'blob'
     });
+  }
+
+  downloadImportTemplate(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/import/template`, { responseType: 'blob' });
+  }
+
+  importExcel(file: File): Observable<ApiResponse<UserImportResultResponse>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ApiResponse<UserImportResultResponse>>(`${this.apiUrl}/import`, formData);
   }
 }

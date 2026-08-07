@@ -1,5 +1,5 @@
 export interface OrderSummaryItemResponse {
-  userId: number;
+  userId: number | null;
   fullName: string;
   departmentName: string;
   normalMealCount: number;

@@ -6,6 +6,8 @@ import { ToastService } from '@shared/services/toast.service';
 import { MenuService } from '../../menu.service';
 import { Menu, MenuImageCreateRequest } from '@shared/models/menu.model';
 import { toIsoDate, toDisplayDate, getMonday } from '@shared/utils/date.util';
+import { toOptimizedImageUrl } from '@shared/utils/image.util';
+import { MENU_IMAGE_UPLOAD } from '@shared/constants/upload.constants';
 
 @Component({
   selector: 'app-menu-image-form',
@@ -26,12 +28,13 @@ export class MenuImageFormComponent implements OnInit {
 
   form: MenuImageCreateRequest = {
     name: '',
-    imageUrl: '',
     weekDate: toIsoDate(new Date())
   };
 
   selectedFile: File | null = null;
   previewUrl: string | null = null;
+
+  readonly uploadRules = MENU_IMAGE_UPLOAD;
 
   get isEdit(): boolean {
     return !!this.menu;
@@ -41,10 +44,9 @@ export class MenuImageFormComponent implements OnInit {
     if (this.menu) {
       this.form = {
         name: this.menu.name || '',
-        imageUrl: this.menu.imageUrl || '',
         weekDate: this.menu.menuDate || toIsoDate(new Date())
       };
-      this.previewUrl = this.menu.imageUrl || null;
+      this.previewUrl = toOptimizedImageUrl(this.menu.imageUrl) || null;
     }
   }
 
@@ -59,8 +61,15 @@ export class MenuImageFormComponent implements OnInit {
     const file = input.files && input.files[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      this.toastService.showError('Vui lòng chọn một tệp hình ảnh.');
+    if (!MENU_IMAGE_UPLOAD.ACCEPTED_TYPES.includes(file.type)) {
+      input.value = '';
+      this.toastService.showError(`Chỉ chấp nhận ảnh ${MENU_IMAGE_UPLOAD.ACCEPTED_TYPES_LABEL}.`);
+      return;
+    }
+
+    if (file.size > MENU_IMAGE_UPLOAD.MAX_SIZE_BYTES) {
+      input.value = '';
+      this.toastService.showError(`Ảnh vượt quá ${MENU_IMAGE_UPLOAD.MAX_SIZE_LABEL}, vui lòng chọn ảnh nhỏ hơn.`);
       return;
     }
 
@@ -75,39 +84,16 @@ export class MenuImageFormComponent implements OnInit {
   onSubmit() {
     if (!this.form.name || !this.form.weekDate) return;
 
-    if (!this.selectedFile && !this.form.imageUrl) {
+    if (!this.selectedFile && !this.isEdit) {
       this.toastService.showError('Vui lòng chọn ảnh cho thực đơn.');
       return;
     }
 
     this.loading = true;
 
-    if (this.selectedFile) {
-      this.menuService.uploadImage(this.selectedFile).subscribe({
-        next: (res) => {
-          const url = res.result?.url;
-          if (!url) {
-            this.loading = false;
-            this.toastService.showError('Tải ảnh thất bại!');
-            return;
-          }
-          this.form.imageUrl = url;
-          this.persist();
-        },
-        error: (err) => {
-          console.error('Upload image failed', err);
-          this.loading = false;
-        }
-      });
-    } else {
-      this.persist();
-    }
-  }
-
-  private persist() {
     const request$ = this.isEdit
-      ? this.menuService.updateImageMenu(this.menu!.id!, this.form)
-      : this.menuService.addImageMenu(this.form);
+      ? this.menuService.updateImageMenu(this.menu!.id!, this.form, this.selectedFile)
+      : this.menuService.addImageMenu(this.form, this.selectedFile!);
 
     request$.subscribe({
       next: () => {

@@ -10,6 +10,22 @@
   (export)="onExport()"
   (add)="onAdd()">
 
+  <div crud-add class="import-actions">
+    <button type="button" class="btn btn-secondary" (click)="onDownloadTemplate()" [disabled]="loading"
+      title="Tải file Excel mẫu để nhập danh sách người dùng">
+      <i class="fas fa-file-arrow-down"></i>
+      File mẫu
+    </button>
+
+    <button type="button" class="btn btn-warning" (click)="importInput.click()" [disabled]="loading"
+      title="Nhập danh sách người dùng từ file Excel">
+      <i class="fas fa-file-import"></i>
+      Nhập Excel
+    </button>
+
+    <input #importInput type="file" accept=".xlsx" hidden (change)="onImportFileSelected($event)">
+  </div>
+
   <div crud-filters class="filters">
     <div class="toolbar-top">
       <app-crud-search placeholder="Tìm kiếm người dùng..." [(value)]="query.keyword" (search)="onSearch()" />
@@ -39,8 +55,8 @@
       <tr>
         <th class="stt-col">STT</th>
         <th class="code-col">Tài khoản</th>
-        <th class="name-col">Họ tên</th>
-        <th class="dept-col">Phòng ban</th>
+        <th class="name-col" appSortHeader="fullName" [sort]="sort" (sortChange)="onSortChange($event)">Họ và tên</th>
+        <th class="dept-col" appSortHeader="department" [sort]="sort" (sortChange)="onSortChange($event)">Phòng ban</th>
         <th class="status-col">Trạng thái</th>
         <th class="roles-col">Vai trò</th>
         <th class="action-column">Thao tác</th>
@@ -112,9 +128,17 @@
           <span class="hint">(Để trống nếu không đổi)</span>
         }
       </label>
-      <input type="password" name="password" #password="ngModel" [(ngModel)]="formModel.password" [required]="formMode === 'add'"
-        [pattern]="VALIDATION.PASSWORD" [minlength]="VALIDATION_LEN.PASSWORD.min" [maxlength]="VALIDATION_LEN.PASSWORD.max"
-        [appAutoFocus]="formMode === 'edit'">
+      <div class="password-input">
+        <input [type]="showPassword ? 'text' : 'password'" name="password" #password="ngModel" [(ngModel)]="formModel.password"
+          [required]="formMode === 'add'"
+          [pattern]="VALIDATION.PASSWORD" [minlength]="VALIDATION_LEN.PASSWORD.min" [maxlength]="VALIDATION_LEN.PASSWORD.max"
+          [appAutoFocus]="formMode === 'edit'">
+        <button type="button" class="password-toggle" (click)="showPassword = !showPassword"
+          [attr.aria-label]="showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
+          [title]="showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'">
+          <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+        </button>
+      </div>
       @if (password.invalid && (password.dirty || password.touched)) {
         <span class="error-text">
           @if (password.errors?.['required']) { Mật khẩu không được để trống. }
@@ -125,14 +149,14 @@
     </div>
 
     <div class="form-field">
-      <label>Họ tên <span class="required">*</span></label>
+      <label>Họ và tên <span class="required">*</span></label>
       <input type="text" name="fullName" #fullName="ngModel" [(ngModel)]="formModel.fullName" required
         [pattern]="VALIDATION.PERSON_NAME" [maxlength]="VALIDATION_LEN.PERSON_NAME.max">
       @if (fullName.invalid && (fullName.dirty || fullName.touched)) {
         <span class="error-text">
-          @if (fullName.errors?.['required']) { Họ tên không được để trống. }
-          @else if (fullName.errors?.['pattern']) { Họ tên chỉ được chứa chữ cái và khoảng trắng. }
-          @else if (fullName.errors?.['maxlength']) { Họ tên không được vượt quá 255 ký tự. }
+          @if (fullName.errors?.['required']) { Họ và tên không được để trống. }
+          @else if (fullName.errors?.['pattern']) { Họ và tên chỉ được chứa chữ cái và khoảng trắng. }
+          @else if (fullName.errors?.['maxlength']) { Họ và tên không được vượt quá 255 ký tự. }
         </span>
       }
     </div>
@@ -147,31 +171,14 @@
       </select>
     </div>
 
-    <div class="form-field full-span">
-      <label>Vai trò</label>
-      <div class="multi-select-dropdown">
-        <div class="dropdown-header" cdkOverlayOrigin #rolesTrigger="cdkOverlayOrigin" (click)="toggleRolesDropdown()">
-          {{ getRolesDisplayText() }}
-        </div>
-      </div>
-      <ng-template
-        cdkConnectedOverlay
-        [cdkConnectedOverlayOrigin]="rolesTrigger"
-        [cdkConnectedOverlayOpen]="isFormOpen && isRolesDropdownOpen"
-        [cdkConnectedOverlayWidth]="rolesTrigger.elementRef.nativeElement.offsetWidth"
-        cdkConnectedOverlayHasBackdrop
-        cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
-        (backdropClick)="isRolesDropdownOpen = false"
-        (detach)="isRolesDropdownOpen = false">
-        <div class="dropdown-list">
-          @for (role of availableRoles; track role.code) {
-            <label class="dropdown-item">
-              <input type="checkbox" [value]="role.code" (change)="onRoleChange(role.code, $event)" [checked]="formModel.roles?.includes(role.code)">
-              {{ role.name }} ({{ role.code }})
-            </label>
-          }
-        </div>
-      </ng-template>
+    <div class="form-field">
+      <label>Vai trò <span class="required">*</span></label>
+      <select name="role" [(ngModel)]="selectedRole" required>
+        <option value="" disabled>-- Chọn vai trò --</option>
+        @for (role of availableRoles; track role.code) {
+          <option [value]="role.code">{{ role.name }} ({{ role.code }})</option>
+        }
+      </select>
     </div>
 
     @if (formMode === 'edit') {
@@ -184,3 +191,10 @@
     }
   </form>
 </app-form-modal>
+
+@if (importResult) {
+  <app-user-import-result-modal
+    [result]="importResult"
+    [fileName]="importedFileName"
+    (close)="closeImportResult()" />
+}

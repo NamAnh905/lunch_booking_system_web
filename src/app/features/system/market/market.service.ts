@@ -37,4 +37,26 @@ export class MarketService {
   forceCancelTicket(exchangeId: number): Observable<ApiResponse<string>> {
     return this.http.delete<ApiResponse<string>>(`${this.apiUrl}/${exchangeId}`);
   }
+
+  exportExcel(startDate?: string, endDate?: string, status?: string, keyword?: string): Observable<Blob> {
+    let params = new HttpParams();
+
+    if (startDate) {
+      params = params.set('startDate', startDate);
+    }
+    if (endDate) {
+      params = params.set('endDate', endDate);
+    }
+    if (status) {
+      params = params.set('status', status);
+    }
+    if (keyword) {
+      params = params.set('keyword', keyword);
+    }
+
+    return this.http.get(`${this.apiUrl}/export`, {
+      params,
+      responseType: 'blob'
+    });
+  }
 }

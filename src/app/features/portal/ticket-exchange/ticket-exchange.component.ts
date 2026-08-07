@@ -1,19 +1,23 @@
-import { Component, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatDividerModule } from '@angular/material/divider';
 import { TicketExchangeService } from './ticket-exchange.service';
 import { AuthService } from '@core/auth/auth.service';
+import { RealtimeService } from '@core/services/realtime.service';
 import { MealOrderService } from '../meal-order/meal-order.service';
 import { OrderResponse, TicketExchangeResponse } from '@shared/models';
+import { REALTIME_EVENTS } from '@shared/constants/realtime.constants';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, merge } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 import { ExchangeWindowService } from './services/exchange-window.service';
 import { ExchangeErrorMapper } from './services/exchange-error.mapper';
 import { toIsoDate } from '@shared/utils/date.util';
 import { OrderStatus } from '@shared/enums';
-import { SWAL_COLORS } from '@shared/constants/business.constants';
+import { PASSABLE_ORDER_STATUSES, SWAL_COLORS } from '@shared/constants/business.constants';
 import { MarketTicketsListComponent } from './components/market-tickets-list.component';
 import { EligibleOrdersListComponent } from './components/eligible-orders-list.component';
 import { MyTicketsListComponent } from './components/my-tickets-list.component';
@@ -41,6 +45,8 @@ export class TicketExchangeComponent implements OnInit {
   private mealOrderService = inject(MealOrderService);
   private exchangeWindow = inject(ExchangeWindowService);
   private errorMapper = inject(ExchangeErrorMapper);
+  private realtime = inject(RealtimeService);
+  private destroyRef = inject(DestroyRef);
 
   @ViewChild(MarketTicketsListComponent) private marketList?: MarketTicketsListComponent;
 
@@ -71,6 +77,15 @@ export class TicketExchangeComponent implements OnInit {
   ngOnInit(): void {
     const user = this.authService.currentUserValue;
     this.currentUserId = user?.userId;
+    this.refreshMyTab();
+
+    merge(this.realtime.on(REALTIME_EVENTS.MARKET_CHANGED), this.realtime.connected$)
+      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refreshAll());
+  }
+
+  private refreshAll(): void {
+    this.marketList?.loadData();
     this.refreshMyTab();
   }
 
@@ -110,16 +125,16 @@ export class TicketExchangeComponent implements OnInit {
   }
 
   private applyEligibleOrders(allOrders: OrderResponse[]): void {
-    const pendingOrders = allOrders.filter(o =>
-      o.status === OrderStatus.PENDING &&
+    const passableOrders = allOrders.filter(o =>
+      PASSABLE_ORDER_STATUSES.includes(o.status) &&
       !this.isClaimedTicket(o) &&
       !this.myTickets.some(t => t.orderId === o.id)
     );
 
-    this.eligibleOrders = pendingOrders.filter(o => this.isValidExchangeTime(o.menuDate));
+    this.eligibleOrders = passableOrders.filter(o => this.isValidExchangeTime(o.menuDate));
 
-    if (this.eligibleOrders.length === 0 && pendingOrders.length > 0) {
-      const closestOrder = [...pendingOrders].sort((a, b) => new Date(a.menuDate).getTime() - new Date(b.menuDate).getTime())[0];
+    if (this.eligibleOrders.length === 0 && passableOrders.length > 0) {
+      const closestOrder = [...passableOrders].sort((a, b) => new Date(a.menuDate).getTime() - new Date(b.menuDate).getTime())[0];
       this.pendingOrderWarning = this.exchangeWindow.getWarning(closestOrder.menuDate);
     } else {
       this.pendingOrderWarning = null;
@@ -145,8 +160,7 @@ export class TicketExchangeComponent implements OnInit {
           next: () => {
             this.isLoading = false;
             Swal.fire('Thành công', 'Nhận vé thành công!', 'success');
-            this.refreshMyTab();
-            this.marketList?.loadData();
+            this.refreshAll();
           },
           error: (err) => {
             this.isLoading = false;
@@ -173,8 +187,7 @@ export class TicketExchangeComponent implements OnInit {
             next: () => {
               this.isLoading = false;
               Swal.fire('Thành công', 'Đăng vé lên chợ thành công!', 'success');
-              this.refreshMyTab();
-              this.marketList?.loadData();
+              this.refreshAll();
             },
             error: (err) => {
               this.isLoading = false;
@@ -202,8 +215,7 @@ export class TicketExchangeComponent implements OnInit {
           next: () => {
             this.isLoading = false;
             Swal.fire('Thành công', 'Thu hồi vé thành công!', 'success');
-            this.refreshMyTab();
-            this.marketList?.loadData();
+            this.refreshAll();
           },
           error: (err) => {
             this.isLoading = false;
@@ -215,6 +227,10 @@ export class TicketExchangeComponent implements OnInit {
   }
 
   private handleError(err: any): void {
+    if (this.errorMapper.isStaleTicket(err)) {
+      this.refreshAll();
+    }
+
     Swal.fire({
       title: 'Lỗi!',
       text: this.errorMapper.map(err),

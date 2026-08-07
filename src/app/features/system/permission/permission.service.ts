@@ -46,4 +46,15 @@ export class PermissionService {
   deletePermission(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
+
+  exportExcel(keyword?: string): Observable<Blob> {
+    let params = new HttpParams();
+    if (keyword) {
+      params = params.set('keyword', keyword);
+    }
+    return this.http.get(`${this.apiUrl}/export`, {
+      params,
+      responseType: 'blob'
+    });
+  }
 }

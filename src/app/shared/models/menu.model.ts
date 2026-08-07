@@ -30,12 +30,7 @@ export interface MenuUpdateRequest {
 
 export interface MenuImageCreateRequest {
   name: string;
-  imageUrl: string;
   weekDate: string; // YYYY-MM-DD
-}
-
-export interface UploadResponse {
-  url: string;
 }
 
 export interface MenuResponse {

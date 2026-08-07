@@ -16,6 +16,7 @@
 
 .crud-body {
   position: relative;
+  flex: 1;
   min-height: 525px;
   overflow-x: auto;
   @include mixins.custom-scroll;
@@ -60,6 +61,45 @@
 
     &:last-child {
       padding-right: 24px;
+    }
+
+    &.sortable {
+      cursor: pointer;
+      user-select: none;
+      transition: variables.$transition-base;
+
+      .sort-header {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      i {
+        font-size: 11px;
+        color: #94a3b8;
+        transition: variables.$transition-base;
+      }
+
+      &:hover {
+        background-color: #eef2f9;
+
+        i {
+          color: variables.$text-secondary;
+        }
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: inset 0 0 0 2px rgba(variables.$primary-color, 0.35);
+      }
+
+      &.sorted {
+        color: variables.$primary-color !important;
+
+        i {
+          color: variables.$primary-color;
+        }
+      }
     }
   }
 

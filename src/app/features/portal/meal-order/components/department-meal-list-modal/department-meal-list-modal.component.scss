@@ -181,6 +181,26 @@
   font-weight: 600;
 }
 
+.meal-type-normal + .meal-type-special {
+  margin-left: 8px;
+}
+
+.guest-row {
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+.guest-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .text-muted {
   color: #94a3b8;
 }

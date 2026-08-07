@@ -6,7 +6,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, 
  * Responsibilities (UI presentation only):
  *  - Overlay, header (title/subtitle + close button), footer (Hủy / Lưu).
  *  - A 2-column responsive grid for the projected form body (collapses to 1 column on mobile).
- *  - Backdrop-click and Escape-to-close, disabled while `saving`.
+ *  - Escape-to-close, disabled while `saving`. Backdrop-click does NOT close by
+ *    default (avoids losing a half-filled form); opt in with [closeOnBackdrop]="true".
  *
  * The projected content owns the reactive/template form and its validation.
  * The host component decides what "Save" does via the (save) output and controls
@@ -41,7 +42,7 @@ export class FormModalComponent {
   @Input() saveDisabled: boolean | null = false;
   @Input() saveLabel = 'Lưu';
   @Input() cancelLabel = 'Hủy';
-  @Input() closeOnBackdrop = true;
+  @Input() closeOnBackdrop = false;
   @Input() width = '640px';
 
   @Output() save = new EventEmitter<void>();

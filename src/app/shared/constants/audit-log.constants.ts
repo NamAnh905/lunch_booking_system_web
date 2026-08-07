@@ -5,6 +5,7 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   CREATE_USER: 'Thêm người dùng',
   UPDATE_USER: 'Sửa người dùng',
   DELETE_USER: 'Khóa người dùng',
+  IMPORT_USERS: 'Nhập người dùng',
   ASSIGN_USER_ROLES: 'Gán vai trò cho người dùng',
   CREATE_ROLE: 'Thêm vai trò',
   UPDATE_ROLE: 'Sửa vai trò',
@@ -13,6 +14,9 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   CREATE_PERMISSION: 'Thêm quyền',
   UPDATE_PERMISSION: 'Sửa quyền',
   DELETE_PERMISSION: 'Xóa quyền',
+  CREATE_GUEST_MEAL: 'Thêm suất ăn khách',
+  UPDATE_GUEST_MEAL: 'Sửa suất ăn khách',
+  DELETE_GUEST_MEAL: 'Xóa suất ăn khách',
 };
 
 export const AUDIT_ACTION_KINDS: Record<string, 'create' | 'update' | 'delete'> = {
@@ -22,6 +26,7 @@ export const AUDIT_ACTION_KINDS: Record<string, 'create' | 'update' | 'delete'> 
   CREATE_USER: 'create',
   UPDATE_USER: 'update',
   DELETE_USER: 'delete',
+  IMPORT_USERS: 'create',
   ASSIGN_USER_ROLES: 'update',
   CREATE_ROLE: 'create',
   UPDATE_ROLE: 'update',
@@ -30,6 +35,9 @@ export const AUDIT_ACTION_KINDS: Record<string, 'create' | 'update' | 'delete'> 
   CREATE_PERMISSION: 'create',
   UPDATE_PERMISSION: 'update',
   DELETE_PERMISSION: 'delete',
+  CREATE_GUEST_MEAL: 'create',
+  UPDATE_GUEST_MEAL: 'update',
+  DELETE_GUEST_MEAL: 'delete',
 };
 
 export const AUDIT_ENTITY_LABELS: Record<string, string> = {

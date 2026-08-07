@@ -18,14 +18,17 @@ export class DepartmentService extends BaseCachedCrudService {
     return this.http.get<ApiResponse<DepartmentResponse[]>>(`${this.apiUrl}/all`);
   }
 
-  getDepartments(page: number, size: number, keyword?: string): Observable<ApiResponse<PageResponse<DepartmentResponse>>> {
-    const cacheKey = `${page}-${size}-${keyword || ''}`;
+  getDepartments(page: number, size: number, keyword?: string, sortBy?: string, sortDir?: string): Observable<ApiResponse<PageResponse<DepartmentResponse>>> {
+    const cacheKey = `${page}-${size}-${keyword || ''}-${sortBy || ''}-${sortDir || ''}`;
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
 
     if (keyword) {
       params = params.set('keyword', keyword);
+    }
+    if (sortBy) {
+      params = params.set('sortBy', sortBy).set('sortDir', sortDir || 'asc');
     }
 
     return this.cached(cacheKey, () =>

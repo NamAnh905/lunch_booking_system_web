@@ -1,5 +1,6 @@
 <app-crud [loading]="loading" [total]="total" [page]="page" [size]="size" [hideAdd]="true"
-  (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)" (refresh)="onReset()">
+  [permissions]="{ export: 'MANAGE_TICKETS' }"
+  (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)" (refresh)="onReset()" (export)="onExport()">
 
   <div crud-filters class="filters">
     <div class="filter-group">
@@ -29,6 +30,7 @@
         <th class="date-col">Thời gian đăng</th>
         <th class="name-col">Người Pass</th>
         <th class="name-col">Người Nhận</th>
+        <th class="status-col">Loại vé</th>
         <th class="status-col">Trạng thái</th>
       </tr>
     </thead>
@@ -40,6 +42,13 @@
         <td class="date-col">{{ item.createdAt | date:'dd/MM/yyyy HH:mm:ss' }}</td>
         <td class="name-col" [title]="item.sellerName">{{ item.sellerName }}</td>
         <td class="name-col" [title]="item.buyerName || '-'">{{ item.buyerName || '-' }}</td>
+        <td class="status-col">
+          @if (item.isSpecial) {
+            <span class="badge badge-warning">Tăng cường <i class="fas fa-star"></i></span>
+          } @else {
+            <span class="badge badge-info">Thường <i class="fas fa-utensils"></i></span>
+          }
+        </td>
         <td class="status-col">
           @switch (item.status) {
             @case ('OPEN') {
@@ -60,7 +69,7 @@
       }
       @if (data.length === 0 && !loading) {
       <tr>
-        <td colspan="6" class="text-center empty-state">Không có dữ liệu</td>
+        <td colspan="7" class="text-center empty-state">Không có dữ liệu</td>
       </tr>
       }
     </tbody>

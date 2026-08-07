@@ -79,3 +79,28 @@
     @media (min-width: 1200px) { @content; }
   }
 }
+
+@mixin portal-shell-width {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+
+  @media (min-width: 576px) {
+    width: 94%;
+    max-width: 720px;
+  }
+
+  @media (min-width: 768px) {
+    max-width: 820px;
+  }
+
+  @media (min-width: 992px) {
+    max-width: 940px;
+  }
+
+  @media (min-width: 1200px) {
+    width: 65%;
+    max-width: 65%;
+    min-width: 900px;
+  }
+}

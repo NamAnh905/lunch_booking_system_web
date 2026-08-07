@@ -8,6 +8,9 @@ import { OrderResponse } from '@shared/models/order.model';
 import { DepartmentService } from '@features/system/department/department.service';
 import { DepartmentResponse } from '@shared/models/department.model';
 import { UserService } from '@features/system/user/user.service';
+import { GuestMealService } from '@features/system/guest-meal/guest-meal.service';
+import { GuestMealResponse } from '@shared/models/guest-meal.model';
+import { GUEST_ROW_NAME, MAX_GUEST_MEAL_ROWS } from '@shared/constants/guest-meal.constants';
 import { forkJoin } from 'rxjs';
 import { FormatMoneyPipe } from '@shared/pipes/format-money.pipe';
 import { ToastService } from '@shared/services/toast.service';
@@ -15,11 +18,13 @@ import { FileDownloadService } from '@core/services/file-download.service';
 import { EXCEL_FILE_NAMES, DEFAULT_PAGE_SIZE, APP_DATE_TIME_FORMAT } from '@shared/constants/business.constants';
 import { toIsoDate } from '@shared/utils/date.util';
 import { PageItem, buildPageItems } from '@shared/utils/pagination.util';
+import { SortState, sortByText } from '@shared/utils/sort.util';
+import { SortHeaderComponent } from '@shared/components/crud/sort-header.component';
 
 @Component({
   selector: 'app-order-daily',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormatMoneyPipe],
+  imports: [CommonModule, FormsModule, FormatMoneyPipe, SortHeaderComponent],
   templateUrl: './order-daily.component.html',
   styleUrls: ['./order-daily.component.scss']
 })
@@ -41,11 +46,13 @@ export class OrderDailyComponent implements OnInit {
   pageSize: number = DEFAULT_PAGE_SIZE;
   totalOrders: number = 0;
   sizeOptions = [10, 20, 50, 100];
+  sort: SortState | null = null;
 
   constructor(
     private orderDailyService: OrderDailyService,
     private departmentService: DepartmentService,
     private userService: UserService,
+    private guestMealService: GuestMealService,
     private route: ActivatedRoute,
     private toastService: ToastService,
     private fileDownloadService: FileDownloadService
@@ -87,12 +94,16 @@ export class OrderDailyComponent implements OnInit {
   fetchData(): void {
     forkJoin({
       ordersRes: this.orderDailyService.getAdminOrders(this.selectedDate, undefined),
-      usersRes: this.userService.getAll()
+      usersRes: this.userService.getAll(),
+      guestRes: this.guestMealService.getGuestMeals(1, MAX_GUEST_MEAL_ROWS, {
+        startDate: this.selectedDate,
+        endDate: this.selectedDate
+      })
     }).subscribe({
       next: (res) => {
         let fetchedOrders = res.ordersRes.result?.orders || [];
         let allUsers = res.usersRes.result || [];
-        
+
         let mergedList = allUsers.map(user => {
           let userOrder = fetchedOrders.find(o => o.userId === user.id);
           let logicalStatus = this.getLogicalStatus(userOrder?.status);
@@ -112,6 +123,8 @@ export class OrderDailyComponent implements OnInit {
           };
         });
 
+        mergedList = mergedList.concat(this.buildGuestRows(res.guestRes.result?.data || []));
+
         if (this.selectedDepartmentId !== null) {
           mergedList = mergedList.filter(o => o.departmentId === this.selectedDepartmentId);
         }
@@ -121,7 +134,9 @@ export class OrderDailyComponent implements OnInit {
         }
         
         this.calculateSummary(mergedList);
-        
+
+        mergedList = sortByText(mergedList, this.sort);
+
         this.totalOrders = mergedList.length;
         this.orders = mergedList.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize).map(order => {
            if (Array.isArray(order.createdAt)) {
@@ -134,6 +149,33 @@ export class OrderDailyComponent implements OnInit {
     });
   }
 
+  buildGuestRows(guestMeals: GuestMealResponse[]): any[] {
+    const rowsByDepartment = new Map<string, any>();
+
+    guestMeals.forEach(meal => {
+      const key = meal.departmentName || '';
+      const row = rowsByDepartment.get(key) ?? {
+        userId: null,
+        userName: '',
+        fullName: GUEST_ROW_NAME,
+        departmentName: key,
+        departmentId: meal.departmentId,
+        logicalStatus: 'REGISTERED',
+        isGuest: true,
+        normalQuantity: 0,
+        specialQuantity: 0,
+        totalAmount: 0
+      };
+
+      row.normalQuantity += meal.normalQuantity;
+      row.specialQuantity += meal.specialQuantity;
+      row.totalAmount += meal.totalAmount;
+      rowsByDepartment.set(key, row);
+    });
+
+    return Array.from(rowsByDepartment.values());
+  }
+
   calculateSummary(list: any[]): void {
     const registered = list.filter(o => o.logicalStatus === 'REGISTERED');
     let totalNormal = 0;
@@ -143,13 +185,19 @@ export class OrderDailyComponent implements OnInit {
     this.isFriday = new Date(this.selectedDate).getDay() === 5;
 
     registered.forEach(o => {
-      const price = o.price || 25000;
-      if (price === 40000) {
+      if (o.isGuest) {
+        totalNormal += o.normalQuantity;
+        totalSpecial += o.specialQuantity;
+        totalAmount += o.totalAmount;
+        return;
+      }
+
+      if (o.isSpecial) {
         totalSpecial++;
       } else {
         totalNormal++;
       }
-      totalAmount += price;
+      totalAmount += o.price || 0;
     });
 
     if (this.isFriday) {
@@ -171,6 +219,12 @@ export class OrderDailyComponent implements OnInit {
 
   onPageChange(page: number): void {
     this.currentPage = page;
+    this.fetchData();
+  }
+
+  onSortChange(sort: SortState): void {
+    this.sort = sort;
+    this.currentPage = 1;
     this.fetchData();
   }
 

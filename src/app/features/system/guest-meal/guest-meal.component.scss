@@ -1,0 +1,113 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.filters {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  width: 100%;
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    label {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 500;
+      color: $text-secondary;
+    }
+
+    > input[type="date"],
+    > select {
+      padding: 8px 12px;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      min-width: 160px;
+      background-color: white;
+      color: $text-primary;
+
+      &:focus {
+        border-color: $primary-color;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+
+    .filter-group {
+      width: 100%;
+
+      > input[type="date"],
+      > select {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+  }
+}
+
+.data-table {
+  min-width: 1200px;
+
+  th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stt-col {
+    width: 75px;
+  }
+
+  .date-col {
+    width: 115px;
+  }
+
+  .count-col {
+    width: 110px;
+  }
+
+  .special-col {
+    width: 140px;
+  }
+
+  .action-column {
+    width: 120px;
+  }
+
+  .note-col {
+    width: 240px;
+    @include text-ellipsis;
+  }
+}
+
+.money-col {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+}
+
+.hint-text {
+  font-size: 12px;
+  color: $text-secondary;
+}

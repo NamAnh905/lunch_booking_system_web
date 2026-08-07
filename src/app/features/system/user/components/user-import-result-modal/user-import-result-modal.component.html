@@ -1,0 +1,62 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <div class="heading">
+        <h2>Kết quả nhập Excel</h2>
+        @if (fileName) {
+          <p class="file-name">{{ fileName }}</p>
+        }
+      </div>
+      <button type="button" class="close-btn" (click)="onClose()" aria-label="Đóng">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="summary">
+        <div class="summary-card">
+          <span class="value">{{ result.totalRows }}</span>
+          <span class="label">Tổng số dòng</span>
+        </div>
+        <div class="summary-card success">
+          <span class="value">{{ result.successCount }}</span>
+          <span class="label">Thêm thành công</span>
+        </div>
+        <div class="summary-card danger">
+          <span class="value">{{ result.failureCount }}</span>
+          <span class="label">Dòng bị lỗi</span>
+        </div>
+      </div>
+
+      @if (result.errors.length > 0) {
+        <p class="errors-hint">
+          Các dòng dưới đây chưa được thêm. Bạn sửa lại trong file Excel rồi nhập lại chỉ những dòng này.
+        </p>
+        <div class="errors-scroll">
+          <table class="errors-table">
+            <thead>
+              <tr>
+                <th class="row-col">Dòng</th>
+                <th class="account-col">Tài khoản</th>
+                <th class="message-col">Lý do</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (error of result.errors; track error.rowNumber) {
+                <tr>
+                  <td class="row-col">{{ error.rowNumber }}</td>
+                  <td class="account-col">{{ error.username || '—' }}</td>
+                  <td class="message-col">{{ error.message }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="all-done">Tất cả các dòng trong file đều được thêm thành công.</p>
+      }
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="onClose()">Đóng</button>
+    </div>
+  </div>
+</div>

@@ -11,6 +11,7 @@ export * from './ticket-exchange.model';
 export * from './system-config.model';
 export * from './notification.model';
 export * from './order-summary.model';
+export * from './guest-meal.model';
 export * from './audit-log.model';
 export * from './auth.model';
 export * from './role.model';

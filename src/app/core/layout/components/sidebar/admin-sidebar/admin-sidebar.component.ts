@@ -7,7 +7,7 @@ import { ROLES } from '@shared/constants/role.constants';
 import {
   LucideCalendarDays, LucidePieChart,
   LucideUsers, LucideShield, LucideKey, LucideBuilding,
-  LucideUtensilsCrossed, LucideSoup, LucideCoins,
+  LucideUtensilsCrossed, LucideSoup, LucideCoins, LucideUserPlus,
   LucideTicket, LucideMessageSquare,
   LucideMenu, LucideSettings, LucideScrollText
 } from '@lucide/angular';
@@ -31,7 +31,7 @@ interface MenuGroup {
     CommonModule, RouterModule,
     LucideCalendarDays, LucidePieChart,
     LucideUsers, LucideShield, LucideKey, LucideBuilding,
-    LucideUtensilsCrossed, LucideSoup, LucideCoins,
+    LucideUtensilsCrossed, LucideSoup, LucideCoins, LucideUserPlus,
     LucideTicket, LucideMessageSquare,
     LucideMenu, LucideSettings, LucideScrollText
   ],
@@ -126,6 +126,11 @@ export class AdminSidebarComponent {
           label: 'Giá',
           icon: 'coins',
           route: '/system/meal/price'
+        },
+        {
+          label: 'Suất ăn khách',
+          icon: 'user-plus',
+          route: '/system/meal/guest-meal'
         }
       ]
     },

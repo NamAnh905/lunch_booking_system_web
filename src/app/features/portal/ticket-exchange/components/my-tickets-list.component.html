@@ -27,7 +27,7 @@
             </div>
             <div class="card-heading">
               <span class="card-heading__date">{{ ticket.menuDate | date: 'dd/MM/yyyy' }}</span>
-              <span class="meal-chip" [class.special]="ticket.isSpecial">
+              <span class="badge" [class.badge-warning]="ticket.isSpecial" [class.badge-info]="!ticket.isSpecial">
                 <i class="fas" [ngClass]="ticket.isSpecial ? 'fa-star' : 'fa-utensils'"></i>
                 {{ ticket.isSpecial ? 'Suất đặc biệt' : 'Suất thường' }}
               </span>

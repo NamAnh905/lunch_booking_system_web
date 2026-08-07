@@ -34,6 +34,7 @@ export const ERROR_CODES = {
 
   MENU_NOT_FOUND: 6001,
   MENU_ALREADY_EXISTS: 6002,
+  MENU_IMAGE_WEEK_ALREADY_EXISTS: 6003,
 
   ORDER_NOT_FOUND: 7001,
   ORDER_CUTOFF_REACHED: 7002,
@@ -60,6 +61,7 @@ export const ERROR_CODES = {
 
   PRICE_NOT_FOUND: 13001,
   PRICE_ALREADY_EXISTS: 13002,
+  PRICE_MEAL_TYPE_ALREADY_ACTIVE: 13003,
 
   ADMIN_REPORT_EMAIL_NOT_CONFIGURED: 14001,
   EXPORT_FAILED: 14002,
@@ -68,6 +70,12 @@ export const ERROR_CODES = {
   IMAGE_UPLOAD_FAILED: 15002,
   IMAGE_TYPE_NOT_ALLOWED: 15003,
   IMAGE_TOO_LARGE: 15004,
+
+  GUEST_MEAL_NOT_FOUND: 16001,
+  GUEST_MEAL_QUANTITY_REQUIRED: 16002,
+  GUEST_MEAL_DEPARTMENT_MISMATCH: 16003,
+  GUEST_MEAL_DATE_IN_PAST: 16004,
+  GUEST_MEAL_LOCKED: 16005,
 } as const;
 
 export type ErrorCodeKey = keyof typeof ERROR_CODES;
@@ -119,6 +127,7 @@ export const ERROR_MESSAGES: Readonly<Record<ErrorMessageKey, string>> = {
 
   MENU_NOT_FOUND: 'Không tìm thấy thực đơn.',
   MENU_ALREADY_EXISTS: 'Thực đơn cho ngày này đã tồn tại.',
+  MENU_IMAGE_WEEK_ALREADY_EXISTS: 'Tuần này đã có thực đơn hình ảnh. Vui lòng sửa thực đơn đang có hoặc chọn tuần khác.',
 
   ORDER_NOT_FOUND: 'Không tìm thấy đơn đặt suất ăn.',
   ORDER_CUTOFF_REACHED: 'Đã quá thời gian đặt hoặc huỷ suất ăn.',
@@ -145,6 +154,7 @@ export const ERROR_MESSAGES: Readonly<Record<ErrorMessageKey, string>> = {
 
   PRICE_NOT_FOUND: 'Không tìm thấy bảng giá.',
   PRICE_ALREADY_EXISTS: 'Bảng giá này đã tồn tại.',
+  PRICE_MEAL_TYPE_ALREADY_ACTIVE: 'Loại suất ăn này đã có một bảng giá đang áp dụng.',
 
   ADMIN_REPORT_EMAIL_NOT_CONFIGURED: 'Chưa cấu hình email nhận báo cáo trong hệ thống.',
   EXPORT_FAILED: 'Xuất dữ liệu ra Excel thất bại. Vui lòng thử lại.',
@@ -153,4 +163,10 @@ export const ERROR_MESSAGES: Readonly<Record<ErrorMessageKey, string>> = {
   IMAGE_UPLOAD_FAILED: 'Tải ảnh lên thất bại. Vui lòng thử lại.',
   IMAGE_TYPE_NOT_ALLOWED: 'Định dạng ảnh không được hỗ trợ.',
   IMAGE_TOO_LARGE: 'Dung lượng ảnh vượt quá giới hạn cho phép.',
+
+  GUEST_MEAL_NOT_FOUND: 'Không tìm thấy suất ăn khách.',
+  GUEST_MEAL_QUANTITY_REQUIRED: 'Suất ăn khách phải có ít nhất 1 suất.',
+  GUEST_MEAL_DEPARTMENT_MISMATCH: 'Người yêu cầu không thuộc phòng ban đã chọn.',
+  GUEST_MEAL_DATE_IN_PAST: 'Chỉ được đặt suất ăn khách cho hôm nay hoặc ngày sau đó.',
+  GUEST_MEAL_LOCKED: 'Đã quá giờ chốt suất, không thể sửa hoặc xoá suất ăn khách này.',
 };

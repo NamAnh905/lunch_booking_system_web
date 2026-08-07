@@ -216,6 +216,7 @@
 }
 
 @if (showDepartmentList) {
-<app-department-meal-list-modal [members]="departmentMembers" (close)="closeDepartmentList()">
+<app-department-meal-list-modal [members]="departmentMembers" [guestNormalQuantity]="guestNormalQuantity"
+    [guestSpecialQuantity]="guestSpecialQuantity" (close)="closeDepartmentList()">
 </app-department-meal-list-modal>
 }

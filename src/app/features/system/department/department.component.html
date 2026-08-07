@@ -11,7 +11,7 @@
       <tr>
         <th class="stt-col">STT</th>
         <th class="code-col">Mã phòng ban</th>
-        <th>Tên phòng ban</th>
+        <th appSortHeader="name" [sort]="sort" (sortChange)="onSortChange($event)">Tên phòng ban</th>
         <th class="count-col">Số lượng user</th>
         <th class="action-column">Thao tác</th>
       </tr>

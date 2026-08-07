@@ -1,3 +1,5 @@
+@use '../../../../styles/mixins';
+
 $brand: #004b8c;
 $brand-dark: #003a6d;
 $primary: #2c7be5;
@@ -20,15 +22,7 @@ $primary-dark: #1b64c9;
 }
 
 .exchange-shell {
-  width: 100%;
-  margin: 0 auto;
-
-  @media (min-width: 576px) {
-    max-width: 540px;
-  }
-  @media (min-width: 768px) {
-    max-width: 65%;
-  }
+  @include mixins.portal-shell-width;
 }
 
 .exchange-header {

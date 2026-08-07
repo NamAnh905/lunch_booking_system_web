@@ -20,6 +20,7 @@ import { OrderStatus } from '@shared/enums';
 import { MenuType } from '@shared/enums/menu-type.enum';
 import { toIsoDate, getWeekRange } from '@shared/utils/date.util';
 import { formatMoneyShort } from '@shared/utils/money.util';
+import { toOptimizedImageUrl } from '@shared/utils/image.util';
 
 @Component({
   selector: 'app-meal-order',
@@ -71,6 +72,8 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
   showMenuModal = false;
   showDepartmentList = false;
   departmentMembers: DepartmentMemberOrder[] = [];
+  guestNormalQuantity = 0;
+  guestSpecialQuantity = 0;
   menuGrid: {
     priceName: string,
     priceAmount: number,
@@ -309,7 +312,7 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
     if (this.menuGrid.length === 0) {
       const imageMenu = menus.find((m) => m?.type === MenuType.IMAGE && m?.imageUrl);
       if (imageMenu) {
-        this.menuImageUrl = imageMenu.imageUrl;
+        this.menuImageUrl = toOptimizedImageUrl(imageMenu.imageUrl);
         this.menuImageName = imageMenu.name || '';
       }
     }
@@ -321,7 +324,9 @@ export class MealOrderComponent implements OnInit, CanComponentDeactivate {
 
   openDepartmentList(): void {
     this.mealOrderService.getDepartmentToday().subscribe((res) => {
-      this.departmentMembers = res.result || [];
+      this.departmentMembers = res.result?.members || [];
+      this.guestNormalQuantity = res.result?.guestNormalQuantity || 0;
+      this.guestSpecialQuantity = res.result?.guestSpecialQuantity || 0;
       this.showDepartmentList = true;
     });
   }

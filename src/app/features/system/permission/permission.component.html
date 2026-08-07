@@ -1,5 +1,5 @@
 <app-crud [loading]="loading" [total]="total" [page]="page" [size]="size"
-  [permissions]="{ add: 'MANAGE_PERMISSIONS', edit: 'MANAGE_PERMISSIONS', delete: 'MANAGE_PERMISSIONS', export: 'EXPORT_PERMISSIONS' }"
+  [permissions]="{ add: 'MANAGE_PERMISSIONS', edit: 'MANAGE_PERMISSIONS', delete: 'MANAGE_PERMISSIONS', export: 'VIEW_PERMISSIONS' }"
   (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)" (refresh)="onReset()" (export)="onExport()"
   (add)="onAdd()">
 

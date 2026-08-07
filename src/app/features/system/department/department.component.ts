@@ -5,6 +5,7 @@ import { BaseCrudComponent } from '@shared/components/crud/base-crud.component';
 import { CrudComponent } from '@shared/components/crud/crud.component';
 import { CrudActionsComponent } from '@shared/components/crud/crud-actions.component';
 import { CrudSearchComponent } from '@shared/components/crud/crud-search.component';
+import { SortHeaderComponent } from '@shared/components/crud/sort-header.component';
 import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { DepartmentService } from './department.service';
 import { DepartmentResponse, DepartmentCreateRequest, DepartmentUpdateRequest } from '@shared/models/department.model';
@@ -13,7 +14,7 @@ import { AutoFocusDirective } from '@shared/directives/autofocus.directive';
 @Component({
   selector: 'app-department',
   standalone: true,
-  imports: [CommonModule, FormsModule, CrudComponent, CrudActionsComponent, CrudSearchComponent, FormModalComponent, AutoFocusDirective],
+  imports: [CommonModule, FormsModule, CrudComponent, CrudActionsComponent, CrudSearchComponent, SortHeaderComponent, FormModalComponent, AutoFocusDirective],
   templateUrl: './department.component.html',
   styleUrl: './department.component.scss'
 })
@@ -26,7 +27,7 @@ export class DepartmentComponent extends BaseCrudComponent<DepartmentResponse, {
 
   getService() {
     return {
-      query: (queryObj: any, page: number, size: number) => this.departmentService.getDepartments(page + 1, size, queryObj.keyword),
+      query: (queryObj: any, page: number, size: number) => this.departmentService.getDepartments(page + 1, size, queryObj.keyword, queryObj.sortBy, queryObj.sortDir),
       add: (data: DepartmentCreateRequest) => this.departmentService.createDepartment(data),
       edit: (id: number, data: DepartmentUpdateRequest) => this.departmentService.updateDepartment(id, data),
       delete: (id: number) => this.departmentService.deleteDepartment(id)

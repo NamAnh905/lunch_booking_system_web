@@ -37,6 +37,19 @@ export interface UserResponse {
   roles: string[];
 }
 
+export interface UserImportErrorResponse {
+  rowNumber: number;
+  username: string;
+  message: string;
+}
+
+export interface UserImportResultResponse {
+  totalRows: number;
+  successCount: number;
+  failureCount: number;
+  errors: UserImportErrorResponse[];
+}
+
 export interface UserAssignRolesRequest {
   roleCodes: string[];
 }

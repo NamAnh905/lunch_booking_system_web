@@ -101,16 +101,16 @@
         <thead>
           <tr>
             <th class="stt-col">STT</th>
-            <th class="name-col">Họ và Tên</th>
+            <th class="name-col" appSortHeader="fullName" [sort]="sort" (sortChange)="onSortChange($event)">Họ và Tên</th>
             <th class="code-col">Tài khoản</th>
-            <th class="dept-col">Phòng ban</th>
+            <th class="dept-col" appSortHeader="departmentName" [sort]="sort" (sortChange)="onSortChange($event)">Phòng ban</th>
             <th class="count-col">Tổng suất ăn</th>
             <th class="money-col">Tổng tiền ăn</th>
             <th class="action-column">Thao tác</th>
           </tr>
         </thead>
         <tbody>
-          @for (item of items; track item.userId; let i = $index) {
+          @for (item of items; track item.userId ?? item.departmentName; let i = $index) {
           <tr>
             <td class="stt-col">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
             <td class="name-col" [title]="item.fullName">{{ item.fullName }}</td>
@@ -119,7 +119,9 @@
             <td class="count-col">{{ item.normalMealCount + item.specialMealCount }}</td>
             <td class="money-col">{{ item.totalAmount | formatMoney }}</td>
             <td class="action-column">
-              @if (item.hasData) {
+              @if (item.isGuest) {
+              <span class="text-muted">—</span>
+              } @else if (item.hasData) {
               <div class="row-actions">
                 <button class="btn-icon view" (click)="openUserDetail(item)" title="Xem chi tiết">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"

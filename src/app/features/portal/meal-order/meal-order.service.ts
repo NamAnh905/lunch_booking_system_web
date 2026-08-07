@@ -4,7 +4,7 @@ import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { shareReplay, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { ApiResponse, OrderResponse, OrderCreateRequest, MenuResponse, PriceResponse, PageResponse } from '@shared/models';
-import { DepartmentMemberOrder } from '@shared/models/meal-order.model';
+import { DepartmentMealList } from '@shared/models/meal-order.model';
 
 @Injectable({
   providedIn: 'root'
@@ -33,8 +33,8 @@ export class MealOrderService {
     return this.http.patch<ApiResponse<OrderResponse>>(`${this.apiUrl}/orders/${orderId}/cancel`, {});
   }
 
-  getDepartmentToday(): Observable<ApiResponse<DepartmentMemberOrder[]>> {
-    return this.http.get<ApiResponse<DepartmentMemberOrder[]>>(`${this.apiUrl}/orders/department-today`);
+  getDepartmentToday(): Observable<ApiResponse<DepartmentMealList>> {
+    return this.http.get<ApiResponse<DepartmentMealList>>(`${this.apiUrl}/orders/department-today`);
   }
 
   getMenus(): Observable<ApiResponse<PageResponse<MenuResponse>>> {

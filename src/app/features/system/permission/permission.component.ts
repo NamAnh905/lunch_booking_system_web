@@ -8,6 +8,8 @@ import { CrudSearchComponent } from '@shared/components/crud/crud-search.compone
 import { FormModalComponent } from '@shared/components/form-modal/form-modal.component';
 import { PermissionService } from './permission.service';
 import { Permission, PermissionCreateRequest, PermissionUpdateRequest } from '@shared/models/permission.model';
+import { FileDownloadService } from '@core/services/file-download.service';
+import { EXCEL_FILE_NAMES } from '@shared/constants/business.constants';
 
 @Component({
   selector: 'app-permission',
@@ -18,6 +20,7 @@ import { Permission, PermissionCreateRequest, PermissionUpdateRequest } from '@s
 })
 export class PermissionComponent extends BaseCrudComponent<Permission, { keyword?: string }, PermissionCreateRequest | PermissionUpdateRequest> implements OnInit {
   private permissionService = inject(PermissionService);
+  private fileDownloadService = inject(FileDownloadService);
 
   override ngOnInit() {
     super.ngOnInit();
@@ -64,6 +67,18 @@ export class PermissionComponent extends BaseCrudComponent<Permission, { keyword
   }
 
   onExport() {
-    alert('Tính năng xuất Excel đang được phát triển ở phía Backend!');
+    this.loading = true;
+    this.permissionService.exportExcel(this.query.keyword).subscribe({
+      next: (blob) => {
+        this.fileDownloadService.save(blob, EXCEL_FILE_NAMES.PERMISSION_LIST);
+        this.loading = false;
+        this.toastService.showSuccess('Xuất file Excel thành công!');
+      },
+      error: (err) => {
+        console.error('Failed to export excel', err);
+        this.loading = false;
+        this.toastService.showError('Xuất file Excel thất bại!');
+      }
+    });
   }
 }

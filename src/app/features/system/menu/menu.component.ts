@@ -12,6 +12,7 @@ import { FileDownloadService } from '@core/services/file-download.service';
 import { EXCEL_FILE_NAMES, APP_DATE_TIME_FORMAT } from '@shared/constants/business.constants';
 import { MenuListEditorComponent } from './components/menu-list-editor/menu-list-editor.component';
 import { MenuImageFormComponent } from './components/menu-image-form/menu-image-form.component';
+import { toOptimizedImageUrl } from '@shared/utils/image.util';
 
 @Component({
   selector: 'app-menu',
@@ -86,6 +87,10 @@ export class MenuComponent extends BaseCrudComponent<Menu, { keyword?: string },
   }
   typeLabel(item: Menu): string {
     return this.isImage(item) ? 'Hình ảnh' : 'Danh sách';
+  }
+
+  optimizedImageUrl(url: string | null | undefined): string {
+    return toOptimizedImageUrl(url);
   }
 
   onEditRow(item: Menu) {

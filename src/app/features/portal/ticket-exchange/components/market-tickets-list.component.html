@@ -30,7 +30,12 @@
           {{ item.sellerName }}@if (item.sellerId === currentUserId) {<span class="self-tag">(Bạn)</span>}
         </td>
         <td class="dept-col" [title]="item.departmentName || '-'">{{ item.departmentName || '-' }}</td>
-        <td class="meal-col">{{ item.isSpecial ? 'Suất đặc biệt' : 'Suất thường' }}</td>
+        <td class="meal-col">
+          <span class="meal-chip" [class.special]="item.isSpecial">
+            <i class="fas" [ngClass]="item.isSpecial ? 'fa-star' : 'fa-utensils'"></i>
+            {{ item.isSpecial ? 'Suất đặc biệt' : 'Suất thường' }}
+          </span>
+        </td>
         <td class="action-column">
           @if (item.sellerId !== currentUserId) {
           <button type="button" class="btn-claim" (click)="onClaim(item)" [disabled]="isClaimDisabled(item)"

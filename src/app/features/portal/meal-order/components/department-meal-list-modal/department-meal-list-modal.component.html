@@ -62,7 +62,27 @@
             </td>
           </tr>
           }
-          @if (filteredMembers.length === 0) {
+          @if (showGuestRow) {
+          <tr class="guest-row">
+            <td class="stt-col">{{ filteredMembers.length + 1 }}</td>
+            <td>Khách <span class="guest-badge">{{ guestTotal }} suất</span></td>
+            <td class="dept-col" [title]="departmentName || 'N/A'">{{ departmentName || 'N/A' }}</td>
+            <td class="status-col">
+              <span class="status-clean active">
+                <span class="status-dot"></span> Đã đặt
+              </span>
+            </td>
+            <td class="status-col">
+              @if (guestNormalQuantity > 0) {
+              <span class="meal-type-normal">{{ guestNormalQuantity }} thường</span>
+              }
+              @if (guestSpecialQuantity > 0) {
+              <span class="meal-type-special">{{ guestSpecialQuantity }} tăng cường</span>
+              }
+            </td>
+          </tr>
+          }
+          @if (filteredMembers.length === 0 && !showGuestRow) {
           <tr>
             <td colspan="5" class="text-center empty-state">Không có dữ liệu</td>
           </tr>
@@ -76,6 +96,10 @@
         Tổng <strong>{{ members.length }}</strong> người &middot;
         Đã đặt <strong>{{ orderedCount }}</strong> &middot;
         Không đặt <strong>{{ notOrderedCount }}</strong>
+        @if (guestTotal > 0) {
+        &middot; Khách <strong>{{ guestTotal }}</strong> suất
+        &middot; Tổng suất ăn <strong>{{ totalMeals }}</strong>
+        }
       </span>
       <button type="button" class="btn-close-modal" (click)="onClose()">Đóng</button>
     </div>

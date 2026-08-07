@@ -55,6 +55,28 @@
   width: 14%;
 }
 
+.meal-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #eef2f7;
+  color: #475569;
+  white-space: nowrap;
+
+  i {
+    font-size: 11px;
+  }
+
+  &.special {
+    background: #fef3c7;
+    color: #b45309;
+  }
+}
+
 .action-column {
   width: 16%;
 }

@@ -26,13 +26,7 @@ export class MealCalendarService {
     const today = new Date();
     const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-    const { hour: cutHour, minute: cutMinute } = this.businessConfig.cutOffTime;
-    const isPastCutoff =
-      today.getHours() > cutHour ||
-      (today.getHours() === cutHour && today.getMinutes() >= cutMinute);
-
-    const dayOffset = isPastCutoff ? 2 : 1;
-    const earliestSelectableDate = new Date(todayStart.getTime() + dayOffset * 24 * 60 * 60 * 1000);
+    const earliestSelectableDate = this.businessConfig.earliestOrderableDate(today);
 
     const days: CalendarDay[] = [];
 

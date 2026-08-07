@@ -1,6 +1,17 @@
 @use '../../../../styles/variables' as *;
 @use '../../../../styles/mixins' as *;
 @use '../../../../styles/filters' as *;
+@use '../../../../styles/buttons' as *;
+
+.import-actions {
+  @include crud-buttons;
+  display: flex;
+  gap: 8px;
+
+  @media (max-width: 768px) {
+    flex: 1 1 100%;
+  }
+}
 
 .filters {
   display: flex;
@@ -43,6 +54,36 @@
   }
 }
 
+.password-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  input {
+    padding-right: 38px !important;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: calc(100% - 2px);
+    border: none;
+    background: transparent;
+    color: $text-secondary;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 0 6px 6px 0;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
+
 .form-field.checkbox-group label {
   display: flex;
   gap: 8px;
@@ -57,75 +98,3 @@
   }
 }
 
-@keyframes dropdownFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.multi-select-dropdown {
-  position: relative;
-  width: 100%;
-  .dropdown-header {
-    padding: 10px 12px;
-    border: 1px solid $border-color;
-    border-radius: 6px;
-    font-size: 14px;
-    background: white;
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: $text-primary;
-
-    &:after {
-      content: '▼';
-      font-size: 10px;
-      color: $text-secondary;
-    }
-  }
-
-}
-
-.dropdown-list {
-  background: white;
-  border: 1px solid $border-color;
-  border-radius: 6px;
-  margin-top: 4px;
-  max-height: 200px;
-  overflow-y: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  transform-origin: top;
-
-  .dropdown-item {
-    padding: 8px 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    user-select: none;
-    font-size: 14px;
-    font-weight: normal;
-    margin: 0;
-    color: $text-primary;
-
-    &:hover {
-      background-color: #f8fafc;
-    }
-
-    input[type="checkbox"] {
-      margin: 0;
-      cursor: pointer;
-      width: 16px;
-      height: 16px;
-    }
-  }
-}

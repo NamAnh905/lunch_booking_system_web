@@ -8,6 +8,8 @@ import { MarketService } from './market.service';
 import { TicketExchangeResponse } from '@shared/models/ticket-exchange.model';
 import { toIsoDate } from '@shared/utils/date.util';
 import { Observable } from 'rxjs';
+import { FileDownloadService } from '@core/services/file-download.service';
+import { EXCEL_FILE_NAMES } from '@shared/constants/business.constants';
 
 interface MarketQuery {
   date?: string;
@@ -29,6 +31,7 @@ interface MarketQuery {
 })
 export class MarketComponent extends BaseCrudComponent<TicketExchangeResponse, MarketQuery, any> {
   private marketService = inject(MarketService);
+  private fileDownloadService = inject(FileDownloadService);
 
   getService() {
     return {
@@ -49,6 +52,22 @@ export class MarketComponent extends BaseCrudComponent<TicketExchangeResponse, M
       status: '',
       keyword: ''
     };
+  }
+
+  onExport() {
+    this.loading = true;
+    this.marketService.exportExcel(this.query.date, this.query.date, this.query.status, this.query.keyword).subscribe({
+      next: (blob) => {
+        this.fileDownloadService.save(blob, EXCEL_FILE_NAMES.TICKET_EXCHANGE_LIST);
+        this.loading = false;
+        this.toastService.showSuccess('Xuất file Excel thành công!');
+      },
+      error: (err) => {
+        console.error('Failed to export excel', err);
+        this.loading = false;
+        this.toastService.showError('Xuất file Excel thất bại!');
+      }
+    });
   }
 
   onDeleteRow(item: TicketExchangeResponse) {

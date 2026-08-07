@@ -1,0 +1,154 @@
+<app-crud [loading]="loading" [total]="total" [page]="page" [size]="size"
+  [permissions]="{ add: 'MANAGE_GUEST_MEALS', edit: 'MANAGE_GUEST_MEALS', delete: 'MANAGE_GUEST_MEALS' }"
+  (pageChange)="onPageChange($event)" (sizeChange)="onSizeChange($event)" (refresh)="onReset()" (add)="onAdd()">
+
+  <div crud-filters class="filters">
+    <div class="filter-group">
+      <label>Từ ngày</label>
+      <input type="date" lang="vi-VN" [(ngModel)]="query.startDate" (change)="onSearch()" />
+    </div>
+
+    <div class="filter-group">
+      <label>Đến ngày</label>
+      <input type="date" lang="vi-VN" [(ngModel)]="query.endDate" (change)="onSearch()" />
+    </div>
+
+    <div class="filter-group">
+      <label>Phòng ban</label>
+      <select [(ngModel)]="query.departmentId" (change)="onSearch()">
+        <option [ngValue]="null">Tất cả phòng ban</option>
+        @for (department of departments; track department.id) {
+          <option [ngValue]="department.id">{{ department.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <table crud-table class="data-table">
+    <thead>
+      <tr>
+        <th class="stt-col">STT</th>
+        <th class="date-col">Ngày ăn</th>
+        <th class="name-col">Phòng ban</th>
+        <th class="name-col">Người yêu cầu</th>
+        <th class="count-col">Thường</th>
+        <th class="count-col special-col">Tăng cường</th>
+        <th class="note-col">Ghi chú</th>
+        <th class="action-column">Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of data; track item.id; let i = $index) {
+      <tr>
+        <td class="stt-col">{{ (page - 1) * size + i + 1 }}</td>
+        <td class="date-col">{{ item.mealDate | date:'dd/MM/yyyy' }}</td>
+        <td class="name-col" [title]="item.departmentName">{{ item.departmentName }}</td>
+        <td class="name-col" [title]="item.requestedByFullName">{{ item.requestedByFullName }}</td>
+        <td class="count-col">{{ item.normalQuantity }}</td>
+        <td class="count-col special-col">{{ item.specialQuantity }}</td>
+        <td class="note-col" [title]="item.note">{{ item.note }}</td>
+        <td class="action-column">
+          <app-crud-actions [showEdit]="isEditable(item)" [showDelete]="isEditable(item)"
+            (edit)="onEditRow(item)" (delete)="onDeleteRow(item)" />
+        </td>
+      </tr>
+      }
+      @if (data.length === 0 && !loading) {
+      <tr>
+        <td colspan="8" class="text-center empty-state">Không có dữ liệu</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</app-crud>
+
+<app-form-modal
+  [open]="isFormOpen"
+  [title]="(formMode === 'add' ? 'Thêm mới' : 'Cập nhật') + ' suất ăn khách'"
+  [saving]="loading"
+  [saveDisabled]="f.invalid || formTotalQuantity < 1 || !isMealDateOrderable"
+  (save)="onSubmit()"
+  (cancel)="closeForm()">
+  <form #f="ngForm" style="display: contents">
+    <div class="form-field">
+      <label class="required">Ngày ăn</label>
+      <input type="date" lang="vi-VN" name="mealDate" #mealDate="ngModel" [(ngModel)]="formModel.mealDate" required
+        [min]="minMealDate" [max]="maxMealDate" [appAutoFocus]="formMode === 'add'">
+      @if (mealDate.invalid && (mealDate.dirty || mealDate.touched)) {
+        <span class="error-text">Ngày ăn không được để trống.</span>
+      } @else if (!isMealDateOrderable) {
+        <span class="error-text">Chỉ được đặt suất khách trước {{ cutOffLabel }} của ngày hôm trước, không tính T7, CN và ngày lễ.</span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label class="required">Phòng ban</label>
+      <select name="departmentId" #departmentId="ngModel" [(ngModel)]="formModel.departmentId" required
+        (ngModelChange)="onDepartmentChange()">
+        <option [ngValue]="null" disabled>-- Chọn phòng ban --</option>
+        @for (department of departments; track department.id) {
+          <option [ngValue]="department.id">{{ department.name }}</option>
+        }
+      </select>
+      @if (departmentId.invalid && (departmentId.dirty || departmentId.touched)) {
+        <span class="error-text">Phòng ban không được để trống.</span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label class="required">Người yêu cầu</label>
+      <select name="requestedByUserId" #requestedByUserId="ngModel" [(ngModel)]="formModel.requestedByUserId" required
+        [disabled]="!formModel.departmentId">
+        <option [ngValue]="null" disabled>-- Chọn người yêu cầu --</option>
+        @for (user of filteredUsers; track user.id) {
+          <option [ngValue]="user.id">{{ user.fullName }}</option>
+        }
+      </select>
+      @if (requestedByUserId.invalid && (requestedByUserId.dirty || requestedByUserId.touched)) {
+        <span class="error-text">Người yêu cầu không được để trống.</span>
+      }
+    </div>
+
+    <div class="form-field">
+      <label class="required">Số suất ăn (Thường)</label>
+      <input type="number" name="normalQuantity" #normalQuantity="ngModel" [(ngModel)]="formModel.normalQuantity"
+        required min="0" max="100" placeholder="VD: 10">
+      @if (normalQuantity.invalid && (normalQuantity.dirty || normalQuantity.touched)) {
+        <span class="error-text">
+          @if (normalQuantity.errors?.['required']) { Số suất ăn không được để trống. }
+          @else { Số suất ăn phải nằm trong khoảng 0 - 100. }
+        </span>
+      }
+    </div>
+
+    <div class="form-field full-span">
+      <label class="checkbox-label">
+        <input type="checkbox" name="hasSpecial" [(ngModel)]="hasSpecial" (ngModelChange)="onSpecialToggle()">
+        <span>Áp dụng suất ăn tăng cường</span>
+      </label>
+    </div>
+
+    @if (hasSpecial) {
+      <div class="form-field">
+        <label class="required">Số suất tăng cường</label>
+        <input type="number" name="specialQuantity" #specialQuantity="ngModel" [(ngModel)]="formModel.specialQuantity"
+          required min="0" max="100" placeholder="VD: 3">
+        @if (specialQuantity.invalid && (specialQuantity.dirty || specialQuantity.touched)) {
+          <span class="error-text">Số suất tăng cường phải nằm trong khoảng 0 - 100.</span>
+        }
+      </div>
+    }
+
+    <div class="form-field full-span">
+      <label>Ghi chú</label>
+      <input type="text" name="note" [(ngModel)]="formModel.note" maxlength="500"
+        placeholder="VD: Đặt cho đối tác ABC">
+    </div>
+
+    @if (formTotalQuantity < 1) {
+      <div class="form-field full-span">
+        <span class="error-text">Phải có ít nhất 1 suất ăn.</span>
+      </div>
+    }
+  </form>
+</app-form-modal>
